@@ -7,15 +7,18 @@ int read_data(obra_info *info){
   }/* Caso o ponteiro seja nulo, retorna erro. */
   
   printf("Por favor digite o titulo da obra: ");
-  scanf("%s", ((*info).title));
+  fgets(((*info).title), 200, stdin);
+/*   scanf(" %s ", ((*info).title)); */
   printf("\nPor favor digite o tipo da obra: ");
-  scanf("%s", ((*info).tipo));
+  fgets(((*info).tipo), 100, stdin);
+/*   scanf(" %s ", ((*info).tipo)); */
   printf("\nPor favor digite o autor da obra: ");
-  scanf("%s", ((*info).autor));
+  fgets(((*info).autor), 100, stdin);
+/*   scanf(" %s ", ((*info).autor)); */
   printf("\nPor favor digite o ano da obra: ");
   scanf("%d", &((*info).ano));
   printf("\nPor favor digite o valor da obra: ");
-  scanf("%f", &((*info).valor));
+  scanf("%d", &((*info).valor));
   printf("\nPor favor digite o identificador da obra: ");
   scanf("%s", ((*info).img));
   
@@ -32,8 +35,8 @@ int write_data(FILE *file, obra_info *info){
   fprintf(file, "%-200s",   (*info).title);
   fprintf(file, "%-100s",   (*info).tipo);
   fprintf(file, "%-100s",   (*info).autor);
-  fprintf(file, "%4d",      (*info).ano);
-  fprintf(file, "%5.2f",    (*info).valor);
+  fprintf(file, "%04d",      (*info).ano);
+  fprintf(file, "%09d",    (*info).valor);
   fprintf(file, "%-7s",     (*info).img);
 
   return 0;
