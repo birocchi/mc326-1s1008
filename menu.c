@@ -1,3 +1,5 @@
+#include "menu.h"
+
 void printWelcome(void)
 { 
   printf("\n");
