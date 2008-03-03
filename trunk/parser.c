@@ -2,5 +2,5 @@
 
 int parseCommand(void)
 {
-  return 1;
+        return 1;
 }
