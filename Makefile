@@ -17,4 +17,4 @@ io.o: io.c
 	$(CC) $(CFLAGS) io.c
 
 clean:
-	rm -rf *.o art
+	rm -rf *.o art base01.dat
