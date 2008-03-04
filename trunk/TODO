@@ -1,0 +1,3 @@
+io.c
+- A função stripNewLine pode ser insegura por causa do uso de strlen com strings sem '\0' no final, embora seja meio difícil explorar esse exploit
+- (menu.c tambem) A validacao do input do usuario ainda eh falha

@@ -1,45 +1,91 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "io.h"
 
-int read_data(obra_info *info)
+/*
+ * stripNewLine
+ * This function looks for a trailing '\n' character in a string,
+ * replaces it with a '\0' and returns 1.
+ * If there is no trailing newline, returns 0.
+ */
+static int stripNewLine(char s[])
 {
+  int pos;
+
+  for (pos = 0; pos < strlen(s); pos++) {
+    if (pos[i] == '\n') {
+      pos[i] = '\0';
+      return 1;
+    }
+  }
+
+  return 0;
+}
+
+/*
+ * readValue
+ * Reads at most length bytes from stdin and
+ * strips the trailing newline if it is present.
+ * Otherwise, clear the input buffer before leaving.
+ */
+static void readValue(char s[], size_t length)
+{
+  int c;
+
+  fgets(s, length+1, stdin);
+
+  if (!stripNewLine(s)) {
+    while ((c = getchar()) != '\n' && c != EOF)
+      continue;
+  }
+}
+
+int readData(artwork_info *info)
+{
+  char value[10];
+  char year[5];
 
         if (!info) {
                 return 1;
-        }/* Caso o ponteiro seja nulo, retorna erro. */
+        } /* Returns an error if the pointer is NULL. */
 
-        printf("Por favor digite o titulo da obra: ");
-        fgets(((*info).title), 200, stdin);
-        /*   scanf(" %s ", ((*info).title)); */
-        printf("\nPor favor digite o tipo da obra: ");
-        fgets(((*info).tipo), 100, stdin);
-        /*   scanf(" %s ", ((*info).tipo)); */
-        printf("\nPor favor digite o autor da obra: ");
-        fgets(((*info).autor), 100, stdin);
-        /*   scanf(" %s ", ((*info).autor)); */
-        printf("\nPor favor digite o ano da obra: ");
-        scanf("%d", &((*info).ano));
-        printf("\nPor favor digite o valor da obra: ");
-        scanf("%d", &((*info).valor));
-        printf("\nPor favor digite o identificador da obra: ");
-        scanf("%s", ((*info).img));
+        printf("Por favor, digite o titulo da obra: ");
+        readValue(info->title, 200);
+
+        printf("\nPor favor, digite o tipo da obra: ");
+        readValue(info->type, 100);
+
+        printf("\nPor favor, digite o autor da obra: ");
+        readValue(info->author, 100);
+
+        printf("\nPor favor, digite o ano da obra: ");
+        readValue(year, 4);
+        info->year = atoi(year);
+
+        printf("\nPor favor, digite o valor da obra: ");
+        readValue(value, 9);
+        info->value = atoi(value);
+
+        printf("\nPor favor, digite o identificador da obra: ");
+        readValue(info->img, 7);
 
         return 0;
 }
 
-int write_data(FILE *file, obra_info *info)
+int writeData(FILE *file, artwork_info *info)
 {
-
         /* Return error if the file or struct pointers are NULL. */
         if (!file | !info) {
                 return 1;
         }
 
-        fprintf(file, "%-200s",   (*info).title);
-        fprintf(file, "%-100s",   (*info).tipo);
-        fprintf(file, "%-100s",   (*info).autor);
-        fprintf(file, "%04d",      (*info).ano);
-        fprintf(file, "%09d",    (*info).valor);
-        fprintf(file, "%-7s",     (*info).img);
+        fprintf(file, "%-200s",   info->title);
+        fprintf(file, "%-100s",   info->type);
+        fprintf(file, "%-100s",   info->author);
+        fprintf(file, "%04d",     info->year);
+        fprintf(file, "%09d",     info->value);
+        fprintf(file, "%-7s",     info->img);
 
         return 0;
 }

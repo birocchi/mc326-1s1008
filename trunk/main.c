@@ -4,7 +4,7 @@
 int main()
 {
         FILE *file;
-        obra_info info; /* Holds the artwork data. */
+        artwork_info info; /* Holds the artwork data. */
         char c; /* Holds the user's choice from the menus. */
 
         printWelcome();
@@ -20,17 +20,15 @@ int main()
                 case 'i':
                         /* Open the file for appending. */
                         file = fopen("base01.dat", "a");
-                        read_data(&info);
-                        /* read_data() leaves a '\n' behind, so getchar() gets it. */
-                        getchar();
-                        write_data(file, &info);
+                        readData(&info);
+                        writeData(file, &info);
                         printf("\nDeseja inserir mais uma entrada? (s)im, (n)ao? ");
 
                         while ( scanf("%c", &c) && c == 's') {
                                 getchar();
-                                read_data(&info);
+                                readData(&info);
                                 getchar();
-                                write_data(file, &info);
+                                writeData(file, &info);
                                 printf("\nDeseja inserir mais uma entrada? (s)im, (n)ao? ");
                         }
                         getchar();

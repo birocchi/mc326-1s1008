@@ -3,11 +3,11 @@
 
 typedef struct {
   char title[200];
-  char tipo[100];
-  char autor[100];
-  int ano;
-  int valor;
+  char type[100];
+  char author[100];
+  int year;
+  int value;
   char img[7];
-} obra_info;
+} artwork_info;
 
 #endif
