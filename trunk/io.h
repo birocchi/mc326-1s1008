@@ -13,7 +13,7 @@ int readData(artwork_info *info);
 
 
 /* Writes the data from the struct pointed at by *info
-   to the file pointed at by *file. 
+   to the file pointed at by *file.
    Writes it according to the requested parameters.*/
 int writeData(FILE *file, artwork_info *info);
 
