@@ -1,6 +1,15 @@
+#
+# MC326 1s2008
+#
+# Group 1
+# Anderson Phillip Birocchi
+# Miguel Francisco Alves de Mattos Gaiowski
+# Raphael Kubo da Costa
+#
+
 CC=gcc
-CFLAGS=-c -Wall
-LDFLAGS=-Wall -ansi
+CFLAGS=-c -Wall -g -ansi
+LDFLAGS=
 
 all: art
 
