@@ -9,7 +9,8 @@
  * replaces it with a '\0' and returns 1.
  * If there is no trailing newline, returns 0.
  */
-static int stripNewLine(char s[]){
+static int stripNewLine(char s[]) {
+
   int pos;
 
   for (pos = 0; pos < strlen(s); pos++) {
@@ -28,7 +29,8 @@ static int stripNewLine(char s[]){
  * strips the trailing newline if it is present.
  * Otherwise, clear the input buffer before leaving.
  */
-static void readValue(char s[], size_t length){
+static void readValue(char s[], size_t length) {
+
   int c;
 
   /* fgets reads n-1 characters from the stream, so we
@@ -41,7 +43,8 @@ static void readValue(char s[], size_t length){
   }
 }
 
-int readData(artwork_info *info){
+int readData(artwork_info *info) {
+
   char value[10];
   char year[5];
 
@@ -72,7 +75,8 @@ int readData(artwork_info *info){
   return 0;
 }
 
-int writeData(FILE *file, artwork_info *info){
+int writeData(FILE *file, artwork_info *info) {
+
   /* Return error if the file or struct pointers are NULL. */
   if (!file | !info) {
     return 1;
