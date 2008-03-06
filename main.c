@@ -1,3 +1,4 @@
+#include <string.h>
 #include "io.h"
 #include "menu.h"
 
@@ -5,17 +6,23 @@ int main(int argc, char* argv[]) {
 	FILE *file;
 	artwork_info info;    /* Holds the artwork data. */
 	char c;               /* Holds the user's choice from the menus. */
-  int insert_data = 1;  /* Whether or not to insert more data into the dat file */
+  char input[2];        /* Holds the full user input from the menu. */
+  int insert_data = 1;  /* Whether or not to insert more data into the dat file. */
 
 	printWelcome();
 
   while (1) {
     printMenu();
 
-    c = getchar();
-    flushBuffer();
+    /* We read n+1 from the input to be able to check
+     * if the user has written exactly n characters */
+    readValue(input, 2);
+    if (strlen(input) != 1) {
+      printf("\nErro: Opcao invalida.\n");
+      continue;
+    }
 
-		switch (c) {
+		switch (input[0]) {
     default:
       printf("\n(%c): Opcao invalida.\n", c);
       break;
