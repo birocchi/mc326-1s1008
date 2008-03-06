@@ -1,6 +1,6 @@
 CC=gcc
-CFLAGS=-c -Wall -g
-LDFLAGS=-Wall -ansi -g
+CFLAGS=-c -Wall
+LDFLAGS=-Wall -ansi
 
 all: art
 
