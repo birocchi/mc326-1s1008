@@ -31,26 +31,28 @@ static int stripNewLine(char s[]) {
  */
 static void readValue(char s[], size_t length) {
 
-  int c;
-
   /* fgets reads n-1 characters from the stream, so we
    * use length+1 to make readValue calls keep making sense. */
   fgets(s, length+1, stdin);
 
-  if (!stripNewLine(s)) {
-    while ((c = getchar()) != '\n' && c != EOF)
-      continue;
-  }
+  if (!stripNewLine(s))
+    flushBuffer();
+}
+
+void flushBuffer(void) {
+  int c;
+
+  while ((c = getchar()) != '\n' && c != EOF)
+    continue;
 }
 
 int readData(artwork_info *info) {
-
   char value[10];
   char year[5];
 
-  if (!info) {
+  /* Returns an error if the pointer is NULL. */
+  if (!info)
     return 1;
-  } /* Returns an error if the pointer is NULL. */
 
   printf("Por favor, digite o titulo da obra: ");
   readValue(info->title, 200);
@@ -76,7 +78,6 @@ int readData(artwork_info *info) {
 }
 
 int writeData(FILE *file, artwork_info *info) {
-
   /* Return error if the file or struct pointers are NULL. */
   if (!file | !info) {
     return 1;
