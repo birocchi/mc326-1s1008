@@ -75,6 +75,7 @@ class CheckDat(object):
 
   def checkConsistency(self):
     errorCount = 0
+    imageNameList = list()
 
     for f in self.fileList:
       print "Checking %s..." % f.getName()
@@ -85,6 +86,7 @@ class CheckDat(object):
         errorCount += 1
         continue
 
+      # TODO: Refactor this if-print-errorCount++ crap
       for fileChunk in f:
         # Check if we only have numbers on our year and value fields
         if not fileChunk["year"].isdigit():
@@ -95,11 +97,23 @@ class CheckDat(object):
           print "  %s: Invalid value in image %s" % (f.getName(), fileChunk["image"])
           errorCount += 1
 
+        # Check if we have a valid image name
+        if not fileChunk["image"][:-3].isdigit():
+          print "  %s: Invalid image name %s" % (f.getName(), fileChunk["image"])
+          errorCount += 1
+
         # Check if the image exists in the img directory
         imageName = os.path.join("img", str(self.GROUPNUMBER).zfill(2) + fileChunk["image"][:-3] + "." + fileChunk["image"][-3:])
         if not os.path.isfile(imageName):
           print "  %s: Image %s not found" % (f.getName(), imageName)
           errorCount += 1
+
+        # Check if there is already an image with the same name in the dat file
+        if imageName in imageNameList:
+          print "  %s: Image %s has already been found in the file" % (f.getName(), imageName)
+          errorCount += 1
+        else:
+          imageNameList.append(imageName)
 
     if errorCount == 0:
       print "Everything looks fine. Yay!"

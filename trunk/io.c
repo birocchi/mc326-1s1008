@@ -5,12 +5,12 @@
 
 /*
  * stripNewLine
+ *
  * This function looks for a trailing '\n' character in a string,
  * replaces it with a '\0' and returns 1.
  * If there is no trailing newline, returns 0.
  */
 static int stripNewLine(char s[]) {
-
   int pos;
 
   for (pos = 0; pos < strlen(s); pos++) {
@@ -25,12 +25,12 @@ static int stripNewLine(char s[]) {
 
 /*
  * readValue
+ *
  * Reads at most length bytes from stdin and
  * strips the trailing newline if it is present.
  * Otherwise, clear the input buffer before leaving.
  */
-static void readValue(char s[], size_t length) {
-
+void readValue(char s[], size_t length) {
   /* fgets reads n-1 characters from the stream, so we
    * use length+1 to make readValue calls keep making sense. */
   fgets(s, length+1, stdin);
@@ -39,6 +39,12 @@ static void readValue(char s[], size_t length) {
     flushBuffer();
 }
 
+/* 
+ * flushBuffer
+ *
+ * Flushes stdin to remove any leftover characters
+ * which may still be lying around
+ */
 void flushBuffer(void) {
   int c;
 
@@ -46,6 +52,14 @@ void flushBuffer(void) {
     continue;
 }
 
+/* 
+ * readData
+ *
+ * Reads the input from the user for one
+ * artwork only and puts all the obtained data
+ * into the struct pointed by the parameter pointer.
+ * Return 1 on error and 0 for OK.
+ */
 int readData(artwork_info *info) {
   char value[10];
   char year[5];
@@ -77,6 +91,13 @@ int readData(artwork_info *info) {
   return 0;
 }
 
+/*
+ * writeData
+ *
+ * Writes the data from the struct pointed at by *info
+ * to the file pointed at by *file.
+ * Writes it according to the requested parameters.
+ */
 int writeData(FILE *file, artwork_info *info) {
   /* Return error if the file or struct pointers are NULL. */
   if (!file | !info) {
