@@ -24,6 +24,10 @@ Internally, we have the following aggregation:
 
 DatFile is an iterable object, and each call to
 next() returns its next PictureInfo object.
+
+TODO:
+- Refactor the code so that we make error reporting
+  less painful and repetitive
 """
 
 from StringIO import StringIO
