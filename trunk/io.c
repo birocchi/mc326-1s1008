@@ -120,7 +120,6 @@ int readData(artwork_info *info) {
     return 1;
 
   readString("\n   Por favor, digite o titulo da obra: ", info->title, 200);
-  printf("%s\n", info->title);
   readString("\n   Por favor, digite o tipo da obra: ", info->type, 100);
   readString("\n   Por favor, digite o autor da obra: ", info->author, 100);
 
