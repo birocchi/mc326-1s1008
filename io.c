@@ -68,24 +68,24 @@ int readData(artwork_info *info) {
   if (!info)
     return 1;
 
-  printf("Por favor, digite o titulo da obra: ");
+  printf("\n   Por favor, digite o titulo da obra: ");
   readValue(info->title, 200);
 
-  printf("\nPor favor, digite o tipo da obra: ");
+  printf("\n   Por favor, digite o tipo da obra: ");
   readValue(info->type, 100);
 
-  printf("\nPor favor, digite o autor da obra: ");
+  printf("\n   Por favor, digite o autor da obra: ");
   readValue(info->author, 100);
 
-  printf("\nPor favor, digite o ano da obra: ");
+  printf("\n   Por favor, digite o ano da obra: ");
   readValue(year, 4);
   info->year = atoi(year);
 
-  printf("\nPor favor, digite o valor da obra: ");
+  printf("\n   Por favor, digite o valor da obra: ");
   readValue(value, 9);
   info->value = atoi(value);
 
-  printf("\nPor favor, digite o identificador da obra: ");
+  printf("\n   Por favor, digite o identificador da obra: ");
   readValue(info->img, 7);
 
   return 0;
