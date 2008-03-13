@@ -28,6 +28,7 @@ next() returns its next PictureInfo object.
 TODO:
 - Refactor the code so that we make error reporting
   less painful and repetitive
+- Make the group number a command line option
 """
 
 from StringIO import StringIO
@@ -130,6 +131,7 @@ class CheckDat(object):
           imageNameList.append(imageName)
 
     if errorCount == 0:
+      print "Total: %d entries in the database" % len(imageNameList)
       print "Everything looks fine. Yay!"
     else:
       print "We had %d errors." % errorCount
