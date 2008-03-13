@@ -30,7 +30,6 @@ from StringIO import StringIO
 from sys import argv, exit
 import os
 
-# TODO: Should we use getters/setters or a dict?
 class DatFile(object):
   def __init__(self, name):
     self.__name = name
@@ -54,17 +53,23 @@ class DatFile(object):
 
     raise StopIteration
 
-# TODO: Should we use getters/setters or a dict?
-class PictureInfo(dict):
+class PictureInfo(object):
   def __init__(self, data):
-    dict.__init__(self)
+    self.__title = data.read(200)
+    self.__type = data.read(100)
+    self.__author = data.read(100)
+    self.__year = data.read(4)
+    self.__value = data.read(9)
+    self.__imageName = data.read(7)
 
-    self["title"] = data.read(200)
-    self["type"] = data.read(100)
-    self["author"] = data.read(100)
-    self["year"] = data.read(4)
-    self["value"] = data.read(9)
-    self["image"] = data.read(7)
+  def getAuthor(self):         return self.__author
+  def getImageBaseName(self):  return self.__imageName[:-3]
+  def getImageExtension(self): return self.__imageName[-3:]
+  def getImageName(self):      return self.__imageName
+  def getTitle(self):          return self.__title
+  def getType(self):           return self.__type
+  def getValue(self):          return self.__value
+  def getYear(self):           return self.__year
 
 class CheckDat(object):
   # Edit with the number of the group whose dat is to be checked
@@ -89,21 +94,26 @@ class CheckDat(object):
       # TODO: Refactor this if-print-errorCount++ crap
       for fileChunk in f:
         # Check if we only have numbers on our year and value fields
-        if not fileChunk["year"].isdigit():
-          print "  %s: Invalid year in image %s" % (f.getName(), fileChunk["image"])
+	if not fileChunk.getYear().isdigit():
+          print "  %s: Invalid year in image %s" % (f.getName(), fileChunk.getImageName())
           errorCount += 1
 
-        if not fileChunk["value"].isdigit():
-          print "  %s: Invalid value in image %s" % (f.getName(), fileChunk["image"])
+        if not fileChunk.getValue().isdigit():
+          print "  %s: Invalid value in image %s" % (f.getName(), fileChunk.getImageName())
           errorCount += 1
 
         # Check if we have a valid image name
-        if not fileChunk["image"][:-3].isdigit():
-          print "  %s: Invalid image name %s" % (f.getName(), fileChunk["image"])
+        if not fileChunk.getImageBaseName().isdigit():
+          print "  %s: Invalid image name %s" % (f.getName(), fileChunk.getImageName())
           errorCount += 1
 
+	# Check the file extension
+	if fileChunk.getImageExtension().lower() not in ('png', 'jpg', 'gif'):
+	  print "  %s: Invalid image extension %s for %s" % (f.getName(), fileChunk.getImageExtension(), fileChunk.getImageName())
+	  errorCount += 1
+
         # Check if the image exists in the img directory
-        imageName = os.path.join("img", str(self.GROUPNUMBER).zfill(2) + fileChunk["image"][:-3] + "." + fileChunk["image"][-3:])
+	imageName = os.path.join("img", str(self.GROUPNUMBER).zfill(2) + fileChunk.getImageBaseName() + "." + fileChunk.getImageExtension())
         if not os.path.isfile(imageName):
           print "  %s: Image %s not found" % (f.getName(), imageName)
           errorCount += 1
