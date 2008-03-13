@@ -32,6 +32,7 @@ int main(int argc, char* argv[]) {
 
       case 'i':
         /* Open the file for appending. */
+	insert_data = 1;
         file = fopen("base01.dat", "a");
 
         while (insert_data) {
@@ -50,8 +51,9 @@ int main(int argc, char* argv[]) {
             else if (c == 'n') {
               insert_data = 0;
               break;
-            } else
-            printf("\nOpcao invalida");
+            } 
+	    else
+	      printf("\nOpcao invalida");
           }
         }
 
