@@ -9,7 +9,6 @@ typedef struct
 	int year;
 	int value;
 	char img[7];
-}
-artwork_info;
+} artwork_info;
 
 #endif

@@ -26,17 +26,24 @@ O arquivo \textbf{data.h} é onde estão definidos as estruturas de dados usadas
 
 Os arquivos \textbf{io.c} e \textbf{io.h} controlam a leitura e escrita de dados entrados pelo usuário. A função readData ``conversa'' com o usuário e chama a função readValues que lê os dados de forma apropriada. A funçao writeData toma conta da escrita dos dados no arquivo.
 
-Convém, aqui, detalhar as funções \textit{stripNewLine} e \textit{readValue}. A validação das entradas do usuário é conhecidamente um problema da linguagem C, como se vê em \textit{http://www.c-faq.com/stdio/index.html}. A função \textit{readValue} recebe dois parâmetros: um \textit{char} onde deve ser armazenada a entrada do usuário e um \textit{size\_t (unsigned int)} com o tamanho máximo da entrada.
+Convém, aqui, detalhar as funções \textit{stripNewLine} e \textit{readValue}. A validação das entradas do usuário é conhecidamente um problema da linguagem C, como se vê em \textit{http://www.c-faq.com/stdio/index.html}. A função \textit{readValue} recebe dois parâmetros: um \textit{char} onde deve ser armazenada a entrada do usuário e um \textit{size\_t (unsigned int)} com seu tamanho máximo.
 
-Optamos por usar a função fgets para a leitura de dados da entrada padrão, já que podemos especificar o tamanho da entrada. No caso de uso de scanf o usuário poderia, por exemplo, colocar um título com mais de 200 caracteres. Devido ao uso da função fgets, tivemos que criar uma função simplória para extração do `$\backslash$n' no final da string retornada.
+Optamos por usar a função \textit{fgets} para a leitura de dados da entrada padrão, já que podemos especificar o tamanho da entrada. Funções da família \textit{scanf} devem ser utilizadas com cautela apenas em entradas já formatadas. Se a entrada do usuário fosse lida através dela, poderia-se, por exemplo, colocar um título com mais de 200 caracteres. Entretanto, o uso de \textit{fgets} gera um inconveniente: caso o usuário entre com menos de \textit{length} caracteres, o `$\backslash$n' também é armazenado na string final. Para que ele seja eliminado quando existir, foi criada a função \textit{stripNewLine}, que substiti o `$\backslash$n' por um `$\backslash$0'. Futuramente, pode-se aumentar sua utilidade removendo todos os caracteres especificados.
 
-Os arquivos menu.c e menu.h carregam as funções de impressão de boas vindas e do menu de opções para o usuário. Como a impressão do menu é algo que ocorre com frequência, é saudável definir funções para tal.
+Além de \textit{readValue}, foram criadas as funções \textit{readInt} e \textit{readString}, que utilizam \textit{readValue}. Cada uma lê uma string ou um inteiro, checa se a entrada é nula e, no caso dos inteiros, se a entrada é realmente apenas numérica.
 
-O código contido em main.c contém a lógica de execução do programa, que deve imprimir o menu, sair caso esta seja a opção do usuário, ou inserir uma obra de arte perguntando, logo após, se deseja inserir outro registro.
+Ainda em \textbf{io.c}, existe também a função \textit{flushBuffer}, que é usada quando uma entrada maior que a esperada é lida, e sobram caracteres no buffer de input. A função se encarrega de ler todos os caracteres até o EOF e descartá-los.
+
+Os arquivos \textbf{menu.c} e \textbf{menu.h} carregam as funções de impressão de boas vindas e do menu de opções para o usuário. Como a impressão do menu é algo que ocorre com frequência, é saudável definir funções para tal. Novamente, outras funções úteis de I/O podem vir a ser acrescentadas no futuro, à medida que o sistema crescer.
+
+O código contido em \textbf{main.c} contém a lógica de execução do programa, que deve imprimir o menu, sair caso esta seja a opção do usuário, ou inserir uma obra de arte perguntando, logo após, se deseja inserir outro registro.
+
+Por enquanto, o loop de leitura da opção desejada pelo usuário está todo em \textbf{main.c}, mas, devido à escalabilidade quando novas opções forem inseridas, ele pode ser transferido para uma função à parte. Tentou-se validar a entrada do usuário da melhor forma possível, inclusive usando um \textit{char input[2]}, com espaço para dois caracteres, para se ter certeza de que o usuário entrou com apenas uma letra. Como a leitura do menu não é case-sensitive, foi usada a função \textit{tolower}, definida em \textbf{ctype.h} para transformar qualquer entrada em minúscula.
 
 \section*{Resultado final}\
 
-   Conseguimos fazer um programa funcional, com uma boa interface para ajudar o usuário, e que gera o arquivo contendo os registros no padrão, porém, feito para um usuário que conhece os dados que devem ser entrados, pois a validação dos dados não é perfeita caso um usuário que totalmente desconhece o programa coloque, por exemplo, no campo valor, o ``R\$'', ou no codigo da imagem, o ponto que antecede o tipo da imagem (1200.png). Fora isso o programa não demonstra bugs.
+Conseguimos fazer um programa funcional, sem vazamentos de memória e sem bugs conhecidos. O ponto mais crítico nesta fase inicial do sistema foi a validação das entradas do usuário, conhecidamente um dos aspectos mais perigosos para programadores C novatos.
 
+É feita uma checagem de entradas nulas e se dados inteiros contêm apenas dígitos. Entretanto, não é checada a presença de entradas repetidas ou de identificadores que correspondam a imagens inexistentes, visto que o trabalho para isso, pelo menos por enquanto, é grande e fora do escopo desta tarefa, por envolver a criação de estruturas de dados apenas para a busca de repetições e funções de manipulação de diretórios.
 
 \end{document}

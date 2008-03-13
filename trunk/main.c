@@ -1,4 +1,6 @@
+#include <ctype.h>
 #include <string.h>
+#include "data.h"
 #include "io.h"
 #include "menu.h"
 
@@ -23,7 +25,7 @@ int main(int argc, char* argv[]) {
       continue;
     }
 
-    switch (input[0]) {
+    switch (tolower(input[0])) {
       default:
         printf("\n(%c): Opcao invalida.\n", c);
         break;
@@ -38,7 +40,7 @@ int main(int argc, char* argv[]) {
 
           while (1) {
             printf("\nDeseja inserir mais uma entrada? (s)im, (n)ao? "); 
-            c = getchar();
+            c = tolower(getchar());
             flushBuffer();
 
             /* We only have two options, there's no
