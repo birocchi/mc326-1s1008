@@ -20,11 +20,13 @@ Em específico, este trabalho apenas insere registros na base de dados de obras 
 
 \section*{Descrição do Trabalho}\
 
-Nosso projeto consiste de vários arquivos .c e .h, pois assim, nos facilitará na implementação de futuros projetos de expansão deste atual, como remoção de registros, consultas, etc. 
+Definiu-se, inicialmente, dividir o sistema em vários arquivos de modo a facilitar sua manutenção e a escalabilidade. Apesar de o projeto apenas inserir dados na base, posteriormente seu uso crescerá e a divisão em arquivos em vários ``módulos'' facilita o planejamento e a engenharia do software.
 
-O arquivo data.h é onde estão definidos os tipos usados no programa. Basicamente, é onde está definida a estrutura de armazenamento dos dados. No futuro, quando o projeto crescer, mais tipos serão definidos ali.
+O arquivo \textbf{data.h} é onde estão definidos as estruturas de dados usadas no programa. No futuro, quando o projeto crescer, mais tipos serão definidos ali.
 
-Os arquivos io.c e io.h(cabeçalhos das funções de io.c) controlam a leitura e escrita de dados. A função readData ``conversa'' com o usuário e chama a função readValues que lê os dados de forma apropriada. A funçao writeData toma conta da escrita dos dados no arquivo.
+Os arquivos \textbf{io.c} e \textbf{io.h} controlam a leitura e escrita de dados entrados pelo usuário. A função readData ``conversa'' com o usuário e chama a função readValues que lê os dados de forma apropriada. A funçao writeData toma conta da escrita dos dados no arquivo.
+
+Convém, aqui, detalhar as funções \textit{stripNewLine} e \textit{readValue}. A validação das entradas do usuário é conhecidamente um problema da linguagem C, como se vê em \textit{http://www.c-faq.com/stdio/index.html}. A função \textit{readValue} recebe dois parâmetros: um \textit{char} onde deve ser armazenada a entrada do usuário e um \textit{size\_t (unsigned int)} com o tamanho máximo da entrada.
 
 Optamos por usar a função fgets para a leitura de dados da entrada padrão, já que podemos especificar o tamanho da entrada. No caso de uso de scanf o usuário poderia, por exemplo, colocar um título com mais de 200 caracteres. Devido ao uso da função fgets, tivemos que criar uma função simplória para extração do `$\backslash$n' no final da string retornada.
 
