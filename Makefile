@@ -31,4 +31,4 @@ report: report.tex
 clean:
 	cp base01.dat base01.dat.back > /dev/null 2>&1 ; \
 	rm -rf *.o art base01.dat ; \
-	rm -rf *.aux *.log *.pdf
+	rm -rf *.aux *.log
