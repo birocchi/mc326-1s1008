@@ -29,4 +29,6 @@ report: report.tex
 	pdflatex report.tex
 
 clean:
-	cp base01.dat base01.dat.back ; rm -rf *.o art base01.dat report.pdf
+	cp base01.dat base01.dat.back ; \
+	rm -rf *.o art base01.dat ; \
+	rm -rf *.aux *.log *.pdf
