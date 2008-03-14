@@ -103,7 +103,7 @@ class CheckDat(object):
           print "  %s: Invalid year in image %s" % (f.getName(), fileChunk.getImageName())
           errorCount += 1
 
-        if not fileChunk.getValue().isdigit():
+        if not fileChunk.getValue().strip().isdigit():
           print "  %s: Invalid value in image %s" % (f.getName(), fileChunk.getImageName())
           errorCount += 1
 
