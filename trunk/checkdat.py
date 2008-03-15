@@ -1,12 +1,27 @@
 #!/usr/bin/env python
-
 """
 checkdata.py - MC326 1s2008
 
-Group 1:
-  Anderson Birocchi
-  Miguel Gaiowski
-  Raphael Kubo da Costa
+"Copyright 2008 Anderson Birocchi, Miguel Gaiowski, Raphael Kubo da Costa"
+
+*-*-*-*-*-*
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+*-*-*-*-*-*
+
+
 
 Checks the consistency of a dat file used
 by the art catalog program.
@@ -102,7 +117,7 @@ class CheckDat(object):
 	if not fileChunk.getYear().isdigit():
           print "  %s: Invalid year in image %s" % (f.getName(), fileChunk.getImageName())
           errorCount += 1
-
+          
         if not fileChunk.getValue().strip().isdigit():
           print "  %s: Invalid value in image %s" % (f.getName(), fileChunk.getImageName())
           errorCount += 1
