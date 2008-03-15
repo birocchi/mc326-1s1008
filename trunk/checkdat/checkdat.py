@@ -114,7 +114,7 @@ class CheckDat(object):
       # TODO: Refactor this if-print-errorCount++ crap
       for fileChunk in f:
         # Check if we only have numbers on our year and value fields
-	if not fileChunk.getYear().isdigit():
+        if not fileChunk.getYear().isdigit():
           print "  %s: Invalid year in image %s" % (f.getName(), fileChunk.getImageName())
           errorCount += 1
           
@@ -127,13 +127,13 @@ class CheckDat(object):
           print "  %s: Invalid image name %s" % (f.getName(), fileChunk.getImageName())
           errorCount += 1
 
-	# Check the file extension
-	if fileChunk.getImageExtension().lower() not in ('png', 'jpg', 'gif'):
-	  print "  %s: Invalid image extension %s for %s" % (f.getName(), fileChunk.getImageExtension(), fileChunk.getImageName())
-	  errorCount += 1
+        # Check the file extension
+        if fileChunk.getImageExtension().lower() not in ('png', 'jpg', 'gif'):
+          print "  %s: Invalid image extension %s for %s" % (f.getName(), fileChunk.getImageExtension(), fileChunk.getImageName())
+          errorCount += 1
 
         # Check if the image exists in the img directory
-	imageName = os.path.join("img", str(self.GROUPNUMBER).zfill(2) + fileChunk.getImageBaseName() + "." + fileChunk.getImageExtension())
+        imageName = os.path.join("img", str(self.GROUPNUMBER).zfill(2) + fileChunk.getImageBaseName() + "." + fileChunk.getImageExtension())
         if not os.path.isfile(imageName):
           print "  %s: Image %s not found" % (f.getName(), imageName)
           errorCount += 1
