@@ -113,25 +113,25 @@ void flushBuffer(void) {
  * Return 1 on error and 0 for OK.
  */
 int readData(artwork_info *info) {
-  char img[10];
+  char img[IMG + 1];
 
   /* Returns an error if the pointer is NULL. */
   if (!info)
     return 1;
 
-  readString("\n   Por favor, digite o titulo da obra: ", info->title, 200);
-  readString("\n   Por favor, digite o tipo da obra: ", info->type, 100);
-  readString("\n   Por favor, digite o autor da obra: ", info->author, 125);
+  readString("\n   Por favor, digite o titulo da obra: ", info->title, NAME);
+  readString("\n   Por favor, digite o tipo da obra: ", info->type, TYPE);
+  readString("\n   Por favor, digite o autor da obra: ", info->author, AUTHOR);
 
-  readInt("\n   Por favor, digite o ano da obra: ", &(info->year), 4);
-  readInt("\n   Por favor, digite o valor da obra: ", &(info->value), 12);
+  readInt("\n   Por favor, digite o ano da obra: ", &(info->year), YEAR);
+  readInt("\n   Por favor, digite o valor da obra: ", &(info->value), VALUE);
 
   while (1) {
-    readString("\n   Por favor, digite o identificador da obra: ", img, 9);
+    readString("\n   Por favor, digite o identificador da obra: ", img, IMG);
 
     /* Validate the image identifier */
     if (!validateIdentifier(img)) {
-      strncpy(info->img, img, 10);
+      strncpy(info->img, img, IMG + 1);
       break;
     }
     else {
