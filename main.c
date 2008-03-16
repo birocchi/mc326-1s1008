@@ -1,5 +1,6 @@
 #include <ctype.h>
 #include <string.h>
+#include <stdlib.h>
 #include "data.h"
 #include "io.h"
 #include "menu.h"
@@ -45,8 +46,6 @@ int main(int argc, char* argv[]) {
 	  c = tolower(getchar());
 	  flushBuffer();
 
-	  /* We only have two options, there's no
-	   * need for a switch here */
 	  if (c == 's')
 	    break;
 	  else if (c == 'n') {
@@ -66,9 +65,28 @@ int main(int argc, char* argv[]) {
       break;
 
     case 'g':
+      printf("Gerando lista de obras...\n");
       html = fopen("list.hmtl", "a");
       file = fopen("base01.dat", "a");
-      makeHtml(file, html);
+      if(makeHtml(file, html))
+	printf("Erro ao gerar lista de obras!\n");
+      else{
+	printf("Lista gerada com sucesso.\n");
+	printf("Deseja vizualisar a lista em seu browser? (s)im, (n)ao? ");
+	c = tolower(getchar());
+	flushBuffer();
+
+	if (c == 's'){
+	  system("firefox list.html &");
+	  break;
+	}
+	else if (c == 'n') {
+	  break;
+	} 
+	else
+	  printf("\nOpcao invalida");
+      }
+      
       break;
 
     case 's':
