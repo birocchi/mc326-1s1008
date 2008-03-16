@@ -121,19 +121,20 @@ int readData(artwork_info *info) {
 
   readString("\n   Por favor, digite o titulo da obra: ", info->title, 200);
   readString("\n   Por favor, digite o tipo da obra: ", info->type, 100);
-  readString("\n   Por favor, digite o autor da obra: ", info->author, 100);
+  readString("\n   Por favor, digite o autor da obra: ", info->author, 125);
 
   readInt("\n   Por favor, digite o ano da obra: ", &(info->year), 4);
-  readInt("\n   Por favor, digite o valor da obra: ", &(info->value), 9);
+  readInt("\n   Por favor, digite o valor da obra: ", &(info->value), 12);
 
   while (1) {
-    readString("\n   Por favor, digite o identificador da obra: ", img, 7);
+    readString("\n   Por favor, digite o identificador da obra: ", img, 9);
 
     /* Validate the image identifier */
     if (!validateIdentifier(img)) {
-      strncpy(info->img, img, 7);
+      strncpy(info->img, img, 10);
       break;
-    } else {
+    }
+    else {
       printf("   Entrada invalida.");
       continue;
     }
@@ -173,10 +174,10 @@ int writeData(FILE *file, artwork_info *info) {
 
   fprintf(file, "%-200s",   info->title);
   fprintf(file, "%-100s",   info->type);
-  fprintf(file, "%-100s",   info->author);
+  fprintf(file, "%-125s",   info->author);
   fprintf(file, "%04d",     info->year);
-  fprintf(file, "%09d",     info->value);
-  fprintf(file, "%-7s",     info->img);
+  fprintf(file, "%012d",     info->value);
+  fprintf(file, "%s",     info->img);
 
   return 0;
 }
