@@ -168,7 +168,7 @@ void readValue(char s[], size_t length) {
  */
 int writeData(FILE *file, artwork_info *info) {
   /* Return error if the file or struct pointers are NULL. */
-  if (!file | !info) {
+  if (!file || !info) {
     return 1;
   }
 
@@ -178,6 +178,37 @@ int writeData(FILE *file, artwork_info *info) {
   fprintf(file, "%04d",     info->year);
   fprintf(file, "%012d",     info->value);
   fprintf(file, "%s",     info->img);
+
+  return 0;
+}
+
+/*
+ * makeHtml
+ *
+ * Generates a html format file for browser viewing.
+ * FILE *base is our database.
+ * FILE *html is the html destination file pointer.
+ */
+
+int makeHtml(FILE *base, FILE *html){
+
+  if (!base || !html){
+    return 1;
+  }
+
+
+  fprintf(html, "<html>\n<head>\n</head><body>\n");
+  fprintf(html, "<p>teste\n");
+
+  
+
+  /* get base's size to know how many entries..
+     then read that many entries part by part
+     fprinting its data adequately.*/
+  
+
+  fprintf(html, "</body>\n</html>\n");
+
 
   return 0;
 }

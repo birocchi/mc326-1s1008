@@ -8,5 +8,6 @@ void flushBuffer(void);
 int  readData(artwork_info *info);
 void readValue(char s[], size_t length);
 int  writeData(FILE *file, artwork_info *info);
+int makeHtml(FILE *base, FILE *html);
 
 #endif
