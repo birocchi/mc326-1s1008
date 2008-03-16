@@ -6,6 +6,8 @@ void printMenu(void)
 	printf("    _____________________________________\n");
 	printf("   |                                     |\n");
 	printf("   |  (i)nserir entrada no catalogo      |\n");
+	printf("   |  (c)onsultar obra de arte           |\n");
+	printf("   |  (g)erar lista de obras de arte     |\n");
 	printf("   |  (s)air                             |\n");
 	printf("   |_____________________________________|\n\n");
 	printf("   Opcao desejada: ");
