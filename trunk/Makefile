@@ -11,7 +11,10 @@ CC=gcc
 CFLAGS=-c -Wall -g -ansi
 LDFLAGS=
 
-all: art report
+all: art moveart
+
+moveart: art
+	mv art tp2
 
 art: io.o main.o menu.o
 	$(CC) $(LDFLAGS) io.o main.o menu.o -o art 
@@ -26,7 +29,7 @@ io.o: io.c
 	$(CC) $(CFLAGS) io.c
 
 report: report.tex
-	#pdflatex report.tex
+	pdflatex report.tex
 
 clean:
 	cp base01.dat base01.dat.back > /dev/null 2>&1 ; \
