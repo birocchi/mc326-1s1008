@@ -5,10 +5,10 @@ typedef struct
 {
 	char title[200];
 	char type[100];
-	char author[100];
+	char author[125];
 	int year;
 	int value;
-	char img[7];
+	char img[9];
 } artwork_info;
 
 #endif
