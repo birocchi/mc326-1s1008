@@ -43,7 +43,6 @@ next() returns its next PictureInfo object.
 TODO:
 - Refactor the code so that we make error reporting
   less painful and repetitive
-- Make the group number a command line option
 """
 
 from StringIO import StringIO
@@ -69,7 +68,7 @@ class DatFile(object):
 
   def next(self):
     if self.getFile().tell() < self.getSize():
-      return PictureInfo(StringIO(self.getFile().read(420)))
+      return PictureInfo(StringIO(self.getFile().read(450)))
 
     raise StopIteration
 
@@ -77,10 +76,10 @@ class PictureInfo(object):
   def __init__(self, data):
     self.__title = data.read(200)
     self.__type = data.read(100)
-    self.__author = data.read(100)
+    self.__author = data.read(125)
     self.__year = data.read(4)
-    self.__value = data.read(9)
-    self.__imageName = data.read(7)
+    self.__value = data.read(12)
+    self.__imageName = data.read(9)
 
   def getAuthor(self):         return self.__author
   def getImageBaseName(self):  return self.__imageName[:-3]
@@ -92,8 +91,6 @@ class PictureInfo(object):
   def getYear(self):           return self.__year
 
 class CheckDat(object):
-  # Edit with the number of the group whose dat is to be checked
-  GROUPNUMBER = 01
 
   def __init__(self):
     self.fileList = list()
@@ -106,7 +103,7 @@ class CheckDat(object):
       print "Checking %s..." % f.getName()
 
       # Check file size
-      if f.getSize() % 420:
+      if f.getSize() % 450:
         print "%s: Invalid file size" % f.getName()
         errorCount += 1
         continue
@@ -133,7 +130,8 @@ class CheckDat(object):
           errorCount += 1
 
         # Check if the image exists in the img directory
-        imageName = os.path.join("img", str(self.GROUPNUMBER).zfill(2) + fileChunk.getImageBaseName() + "." + fileChunk.getImageExtension())
+        imageName = os.path.join("img", fileChunk.getImageBaseName() + "." + fileChunk.getImageExtension())
+
         if not os.path.isfile(imageName):
           print "  %s: Image %s not found" % (f.getName(), imageName)
           errorCount += 1
@@ -151,7 +149,10 @@ class CheckDat(object):
     else:
       print "We had %d errors." % errorCount
 
+      
   def parseArguments(self, arglist):
+    """ Takes a list of filenames. """
+    
     if len(arglist) == 0:
       return False
 
