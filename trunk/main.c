@@ -7,6 +7,7 @@
 int main(int argc, char* argv[]) {
 
   FILE *file;
+  FILE *html;
   artwork_info info;    /* Holds the artwork data. */
   char c;               /* Holds the user's choice from the menus. */
   char input[2];        /* Holds the full user input from the menu. */
@@ -26,43 +27,53 @@ int main(int argc, char* argv[]) {
     }
 
     switch (tolower(input[0])) {
-      default:
-        printf("\n(%c): Opcao invalida.\n", c);
-        break;
+    default:
+      printf("\n(%c): Opcao invalida.\n", c);
+      break;
+      
+    case 'i':
+      /* Open the file for appending. */
+      insert_data = 1;
+      file = fopen("base01.dat", "a");
+      
+      while (insert_data) {
+	readData(&info);
+	writeData(file, &info);
+	  
+	while (1) {
+	  printf("\nDeseja inserir mais uma entrada? (s)im, (n)ao? "); 
+	  c = tolower(getchar());
+	  flushBuffer();
 
-      case 'i':
-        /* Open the file for appending. */
-	insert_data = 1;
-        file = fopen("base01.dat", "a");
+	  /* We only have two options, there's no
+	   * need for a switch here */
+	  if (c == 's')
+	    break;
+	  else if (c == 'n') {
+	    insert_data = 0;
+	    break;
+	  } 
+	  else
+	    printf("\nOpcao invalida");
+	}
+      }
 
-        while (insert_data) {
-          readData(&info);
-          writeData(file, &info);
+      fclose(file);
+      break;
+      
+    case 'c':
+      /* do something */
+      break;
 
-          while (1) {
-            printf("\nDeseja inserir mais uma entrada? (s)im, (n)ao? "); 
-            c = tolower(getchar());
-            flushBuffer();
+    case 'g':
+      html = fopen("list.hmtl", "a");
+      file = fopen("base01.dat", "a");
+      makeHtml(file, html);
+      break;
 
-            /* We only have two options, there's no
-             * need for a switch here */
-            if (c == 's')
-              break;
-            else if (c == 'n') {
-              insert_data = 0;
-              break;
-            } 
-	    else
-	      printf("\nOpcao invalida");
-          }
-        }
-
-        fclose(file);
-        break;
-	
-      case 's':
-        printf("Saindo...\n");
-        return 0;
+    case 's':
+      printf("Saindo...\n");
+      return 0;
     }
   }
 
