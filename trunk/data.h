@@ -8,7 +8,7 @@
 #define YEAR 4
 #define VALUE 12
 #define IMG 9
-
+#define REG_SIZE 450
 
 typedef struct
 {
