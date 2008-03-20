@@ -84,7 +84,7 @@ static int validateIdentifier(const char* name)
   int i;
 
   i = strtol(name, &endptr, 10);
-  if ((endptr == '\0') || strlen(endptr) != 3 || ((strncmp(endptr, "jpg", 3)) &&
+  if ((endptr == name) || (endptr == '\0') || strlen(endptr) != 3 || ((strncmp(endptr, "jpg", 3)) &&
         strncmp(endptr, "gif", 3) && (strncmp(endptr, "png", 3))))
     return 1;
   else
