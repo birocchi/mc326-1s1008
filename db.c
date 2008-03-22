@@ -32,11 +32,11 @@ int makeIndex(FILE * base, FILE * index, char * pkindex){
 
   numreg = size/REG_SIZE;
 
-  pk = (char*)malloc(NAME);
+  pk = (char*)malloc(NAME_LENGTH);
 
   for(i = 0; i < numreg; i++){
     fseek(base, i*REG_SIZE , 0);
-    fread(pk, 1, NAME, base);
+    fread(pk, 1, NAME_LENGTH, base);
     fprintf(index, "%-200s%05d", pk, i);
   }
 
