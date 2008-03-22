@@ -3,13 +3,63 @@
 #include <string.h>
 #include "io.h"
 
-/*
- * readInt
- *
- * Reads input and checks if it's a valid integer. If not,
- * read it until a valid integer is entered.
- */
-static void readInt(const char* inputText, int* dest, size_t length)
+void flushBuffer(void) {
+  int c;
+
+  while ((c = getchar()) != '\n' && c != EOF)
+    continue;
+}
+
+int makeHtml(FILE *base, FILE *html)
+{
+  if (!base || !html){
+    return 1;
+  }
+
+  fprintf(html, "<html>\n<head>\n</head><body>\n");
+  fprintf(html, "<p>teste\n");
+
+  /* get base's size to know how many entries..
+     then read that many entries part by part
+     fprinting its data adequately.*/  
+
+  fprintf(html, "</body>\n</html>\n");
+
+  return 0;
+}
+
+int readData(artwork_info *info) {
+  char img[IMG_LENGTH + 1];
+
+  /* Returns an error if the pointer is NULL. */
+  if (!info)
+    return 1;
+
+  readString("\n   Por favor, digite o titulo da obra: ", info->title, NAME_LENGTH);
+  readString("\n   Por favor, digite o tipo da obra: ", info->type, TYPE_LENGTH);
+  readString("\n   Por favor, digite o autor da obra: ", info->author, AUTHOR_LENGTH);
+
+  readInt("\n   Por favor, digite o ano da obra: ", &(info->year), YEAR_LENGTH);
+  readInt("\n   Por favor, digite o valor da obra: ", &(info->value), VALUE_LENGTH);
+
+  while (1) {
+    readString("\n   Por favor, digite o identificador da obra: ", img, IMG_LENGTH);
+
+    /* Validate the image identifier */
+    if (!validateIdentifier(img)) {
+      strncpy(info->img, img, IMG_LENGTH + 1);
+      break;
+    }
+    else {
+      printf("   Entrada invalida.");
+      continue;
+    }
+  }
+
+  return 0;
+}
+
+void readInt(const char* inputText, int* dest, size_t length)
 {
   char* endptr;
   char tmp[length+1];
@@ -29,13 +79,7 @@ static void readInt(const char* inputText, int* dest, size_t length)
   }
 }
 
-/*
- * readString
- *
- * Read input without much validation. If it is a null entry,
- * read it again.
- */
-static void readString(const char* inputText, char* dest, size_t length)
+void readString(const char* inputText, char* dest, size_t length)
 {
   while (1) {
     printf(inputText);
@@ -49,14 +93,16 @@ static void readString(const char* inputText, char* dest, size_t length)
   }
 }
 
-/*
- * stripNewLine
- *
- * This function looks for a trailing '\n' character in a string,
- * replaces it with a '\0' and returns 1.
- * If there is no trailing newline, returns 0.
- */
-static int stripNewLine(char s[]) {
+void readValue(char s[], size_t length) {
+  /* fgets reads n-1 characters from the stream, so we
+   * use length+1 to make readValue calls keep making sense. */
+  fgets(s, length+1, stdin);
+
+  if (!stripNewLine(s))
+    flushBuffer();
+}
+
+int stripNewLine(char s[]) {
   int pos;
 
   for (pos = 0; pos < strlen(s); pos++) {
@@ -69,16 +115,7 @@ static int stripNewLine(char s[]) {
   return 0;
 }
 
-/*
- * validateIdentifier
- *
- * Checks if the image identifier is valid.
- * This time we use strtol to get past the digits and also
- * check the file extension.
- *
- * Returns 1 on error and 0 for OK.
- */
-static int validateIdentifier(const char* name)
+int validateIdentifier(const char* name)
 {
   char* endptr;
   int i;
@@ -91,81 +128,6 @@ static int validateIdentifier(const char* name)
     return 0;
 }
 
-/* 
- * flushBuffer
- *
- * Flushes stdin to remove any leftover characters
- * which may still be lying around
- */
-void flushBuffer(void) {
-  int c;
-
-  while ((c = getchar()) != '\n' && c != EOF)
-    continue;
-}
-
-/* 
- * readData
- *
- * Reads the input from the user for one
- * artwork only and puts all the obtained data
- * into the struct pointed by the parameter pointer.
- * Return 1 on error and 0 for OK.
- */
-int readData(artwork_info *info) {
-  char img[IMG + 1];
-
-  /* Returns an error if the pointer is NULL. */
-  if (!info)
-    return 1;
-
-  readString("\n   Por favor, digite o titulo da obra: ", info->title, NAME);
-  readString("\n   Por favor, digite o tipo da obra: ", info->type, TYPE);
-  readString("\n   Por favor, digite o autor da obra: ", info->author, AUTHOR);
-
-  readInt("\n   Por favor, digite o ano da obra: ", &(info->year), YEAR);
-  readInt("\n   Por favor, digite o valor da obra: ", &(info->value), VALUE);
-
-  while (1) {
-    readString("\n   Por favor, digite o identificador da obra: ", img, IMG);
-
-    /* Validate the image identifier */
-    if (!validateIdentifier(img)) {
-      strncpy(info->img, img, IMG + 1);
-      break;
-    }
-    else {
-      printf("   Entrada invalida.");
-      continue;
-    }
-  }
-
-  return 0;
-}
-
-/*
- * readValue
- *
- * Reads at most length bytes from stdin and
- * strips the trailing newline if it is present.
- * Otherwise, clear the input buffer before leaving.
- */
-void readValue(char s[], size_t length) {
-  /* fgets reads n-1 characters from the stream, so we
-   * use length+1 to make readValue calls keep making sense. */
-  fgets(s, length+1, stdin);
-
-  if (!stripNewLine(s))
-    flushBuffer();
-}
-
-/*
- * writeData
- *
- * Writes the data from the struct pointed at by *info
- * to the file pointed at by *file.
- * Writes it according to the requested parameters.
- */
 int writeData(FILE *file, artwork_info *info) {
   /* Return error if the file or struct pointers are NULL. */
   if (!file || !info) {
@@ -178,37 +140,6 @@ int writeData(FILE *file, artwork_info *info) {
   fprintf(file, "%04d",     info->year);
   fprintf(file, "%012d",     info->value);
   fprintf(file, "%s",     info->img);
-
-  return 0;
-}
-
-/*
- * makeHtml
- *
- * Generates a html format file for browser viewing.
- * FILE *base is our database.
- * FILE *html is the html destination file pointer.
- */
-
-int makeHtml(FILE *base, FILE *html){
-
-  if (!base || !html){
-    return 1;
-  }
-
-
-  fprintf(html, "<html>\n<head>\n</head><body>\n");
-  fprintf(html, "<p>teste\n");
-
-  
-
-  /* get base's size to know how many entries..
-     then read that many entries part by part
-     fprinting its data adequately.*/
-  
-
-  fprintf(html, "</body>\n</html>\n");
-
 
   return 0;
 }
