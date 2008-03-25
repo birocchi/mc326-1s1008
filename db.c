@@ -16,7 +16,7 @@ int getFileSize(FILE * file){
 
 }
 
-int makeIndex(FILE * base, FILE * index, char * pkindex){
+int makeFileIndex(FILE * base, FILE * index, char ** pkindex){
   
   int i = 0, size, numreg;
   char * pk;
@@ -47,12 +47,22 @@ int main(){
 
   FILE * base;
   FILE * out;
-  char * pkindex;
-
+  char ** pkindex;
+  int i, size;
+  
   base = fopen("base01.dat", "r");
   out = fopen("out.dat", "a");
 
-  makeIndex(base, out, pkindex);
+  size = getFileSize(base) / REG_SIZE;
+
+  pkindex = (char**)malloc(sizeof(char**) * size);
+  for(i = 0; i < size; i++){
+    pkindex[i] = (char*)malloc(sizeof(char*NAME + 1));
+  }
+
+  
+
+  makeFileIndex(base, out, pkindex);
   
   return 0;
 }
