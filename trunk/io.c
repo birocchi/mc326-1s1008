@@ -64,8 +64,13 @@ int readData(artwork_info *info) {
 
 void readInt(const char* inputText, int* dest, size_t length)
 {
+  /* In a 32-bit system, INT_MAX = 2147483647, which
+   * has 10 digits. We can have a '-', which makes 11
+   * characters.
+   * 11 characters are probably enough for an integer.
+   */
+  char tmp[11+1];
   char* endptr;
-  char tmp[length+1];
 
   while (1) {
     printf(inputText);
