@@ -3,13 +3,13 @@
 #include <string.h>
 #include "io.h"
 
-void flushBuffer(void) {
+void flushBuffer(void)
+{
   int c;
 
   while ((c = getchar()) != '\n' && c != EOF)
     continue;
 }
-
 
 int makeHtml(FILE *base, FILE *html)
 {
@@ -29,23 +29,29 @@ int makeHtml(FILE *base, FILE *html)
   return 0;
 }
 
-
-int readData(artwork_info *info) {
+int readData(artwork_info *info)
+{
   char img[IMG_LENGTH + 1];
 
   /* Returns an error if the pointer is NULL. */
   if (!info)
     return 1;
 
-  readString("\n   Por favor, digite o titulo da obra (Max: 200 caracteres): ", info->title, NAME_LENGTH);
-  readString("\n   Por favor, digite o tipo da obra (Max: 100 caracteres): ", info->type, TYPE_LENGTH);
-  readString("\n   Por favor, digite o autor da obra (Max: 125 caracteres): ", info->author, AUTHOR_LENGTH);
+  readString("\n   Por favor, digite o titulo da obra (Max: 200 caracteres): ",
+      info->title, NAME_LENGTH);
+  readString("\n   Por favor, digite o tipo da obra (Max: 100 caracteres): ",
+      info->type, TYPE_LENGTH);
+  readString("\n   Por favor, digite o autor da obra (Max: 125 caracteres): ",
+      info->author, AUTHOR_LENGTH);
 
-  readInt("\n   Por favor, digite o ano da obra (Max: 4 caracteres): ", &(info->year), YEAR_LENGTH);
-  readInt("\n   Por favor, digite o valor da obra (Max: 12 caracteres): ", &(info->value), VALUE_LENGTH);
+  readInt("\n   Por favor, digite o ano da obra (Max: 4 caracteres): ",
+      &(info->year), YEAR_LENGTH);
+  readInt("\n   Por favor, digite o valor da obra (Max: 12 caracteres): ",
+      &(info->value), VALUE_LENGTH);
 
   while (1) {
-    readString("\n   Por favor, digite o identificador da obra (Max: 9 caracteres): ", img, IMG_LENGTH);
+    readString("\n   Por favor, digite o identificador da obra (Max: 9 caracteres): ",
+        img, IMG_LENGTH);
 
     /* Validate the image identifier */
     if (!validateIdentifier(img)) {
@@ -60,7 +66,6 @@ int readData(artwork_info *info) {
 
   return 0;
 }
-
 
 void readInt(const char* inputText, int* dest, size_t length)
 {
@@ -87,7 +92,6 @@ void readInt(const char* inputText, int* dest, size_t length)
   }
 }
 
-
 void readString(const char* inputText, char* dest, size_t length)
 {
   while (1) {
@@ -102,8 +106,8 @@ void readString(const char* inputText, char* dest, size_t length)
   }
 }
 
-
-void readValue(char s[], size_t length) {
+void readValue(char s[], size_t length)
+{
   /* fgets reads n-1 characters from the stream, so we
    * use length+1 to make readValue calls keep making sense. */
   fgets(s, length+1, stdin);
@@ -112,8 +116,8 @@ void readValue(char s[], size_t length) {
     flushBuffer();
 }
 
-
-int stripNewLine(char s[]) {
+int stripNewLine(char s[])
+{
   int pos;
 
   for (pos = 0; pos < strlen(s); pos++) {
@@ -125,7 +129,6 @@ int stripNewLine(char s[]) {
 
   return 0;
 }
-
 
 int validateIdentifier(const char* name)
 {
@@ -140,9 +143,8 @@ int validateIdentifier(const char* name)
     return 0;
 }
 
-
-int writeData(FILE *file, artwork_info *info) {
-
+int writeData(FILE *file, artwork_info *info)
+{
   /* Return error if the file or struct pointers are NULL. */
   if (!file || !info) {
     return 1;
