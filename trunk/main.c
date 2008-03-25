@@ -66,7 +66,7 @@ int main(int argc, char* argv[]) {
 
     case 'g':
       printf("Gerando lista de obras...\n");
-      html = fopen("list.hmtl", "a");
+      html = fopen("list.html", "w");
       file = fopen("base01.dat", "a");
       if(makeHtml(file, html))
 	printf("Erro ao gerar lista de obras!\n");
