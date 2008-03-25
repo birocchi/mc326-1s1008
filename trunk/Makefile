@@ -28,9 +28,6 @@ main.o: main.c data.h menu.h io.h
 menu.o: menu.c menu.h
 	$(CC) $(CFLAGS) $<
 
-report: report.tex
-	pdflatex report.tex
-
 clean:
 	cp -v base01.dat base01.dat.back ; \
 	rm -rf *.o art base01.dat ; \
