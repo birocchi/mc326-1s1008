@@ -10,14 +10,15 @@
 #define YEAR_LENGTH 4
 #define VALUE_LENGTH 12
 #define IMG_LENGTH 9
-#define NRR 10
+#define RRN 10 /* Relative record number */
 
 /* Total size of a register. */
 #define REG_SIZE (NAME_LENGTH + TYPE_LENGTH + AUTHOR_LENGTH + \
                   YEAR_LENGTH + VALUE_LENGTH + IMG_LENGTH)
 
+
 /* Total size of a primary key. */
-#define PK_SIZE (NAME_LENGTH + NRR)
+#define PK_SIZE (NAME_LENGTH + RRN)
 
 /* The main structure which holds data about
  * each register in the database */
