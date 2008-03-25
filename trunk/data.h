@@ -25,24 +25,5 @@ typedef struct
 	char img[IMG_LENGTH];           /* The register's identifier */
 } artwork_info;
 
-/*
- * writeData
- *
- * Writes the data from the struct pointed at by *info
- * to the file pointed at by *file.
- * Writes it according to the requested parameters.
- */
-int writeData(FILE *file, artwork_info *info);
-
-/*
- * validateIdentifier
- *
- * Checks if the image identifier is valid.
- * This time we use strtol to get past the digits and also
- * check the file extension.
- *
- * Returns 1 on error and 0 for OK.
- */
-int validateIdentifier(const char* name);
 
 #endif
