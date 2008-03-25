@@ -8,7 +8,7 @@
 #
 
 CC=gcc
-CFLAGS=-c -Wall -g -ansi
+CFLAGS=-c -Wall -g -ansi -pedantic -lefence
 LDFLAGS=
 
 all: art moveart
