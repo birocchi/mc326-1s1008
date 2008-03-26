@@ -13,8 +13,6 @@ char* getValidImagePath(char* s) {
   file[6] = '.';
   strncpy(file+7, s+6, 3);
 
-/*   s[6] = '\0'; */
-
   return file;
 }
 
