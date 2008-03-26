@@ -65,10 +65,10 @@ int loadPkFile(char **pkindex, FILE * pkfile){
     return 1;
   
   int size, numpk,i;
-  char file_array[210];
+  char file_array[PK_SIZE];
 
   size = getFileSize(pkfile);
-  numpk = size/210;
+  numpk = size/PK_SIZE;
 
 /*   /\* Create the pk table in the memory*\/ */
 /*   pkindex = (char**)malloc(sizeof(char*) * numpk); */
@@ -79,7 +79,7 @@ int loadPkFile(char **pkindex, FILE * pkfile){
   /* Copy the primary keys of the pkfile and put them in the memory pk table*/
 
   for(i=0; i<numpk; i++){
-    fgets(file_array, 211, pkfile);
+    fgets(file_array, PK_SIZE +1, pkfile);
 
     /*Essa porra aqui fica lendo lixo no file_array, se eh que le alguma coisa... */
   }
