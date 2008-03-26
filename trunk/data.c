@@ -3,32 +3,18 @@
 #include <string.h>
 #include "data.h"
 
-char* getValidImagePath(char* s) {
-  
+char* getValidImagePath(const char* s) {
   char *file;
 
-  file = (char*)malloc(sizeof(char) * IMG_LENGTH+2);
+  file = (char*)calloc(IMG_LENGTH+2, sizeof(char));
 
   strncpy(file, s, 6);
   file[6] = '.';
   strncpy(file+7, s+6, 3);
   file[10] = '\0';
+
   return file;
 }
-
-/*
-void printArtworkRecord(artwork_info* info)
-{
-  if (info) {
-    printf("  Titulo: %s\n", info->title);
-    printf("  Tipo: %s\n", info->type);
-    printf("  Autor: %s\n", info->author);
-    printf("  Ano de criacao: %04d\n", info->year);
-    printf("  Valor: %012d\n", info->value);
-    printf("  Identificador: %s", info->img);
-  }
-}
-*/
 
 int readArtworkRecord(FILE *base, artwork_info *info)
 {
