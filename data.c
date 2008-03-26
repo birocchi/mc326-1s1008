@@ -7,12 +7,12 @@ char* getValidImagePath(char* s) {
   
   char *file;
 
-  file = (char*)malloc(sizeof(char) * IMG_LENGTH+1);
+  file = (char*)malloc(sizeof(char) * IMG_LENGTH+2);
 
   strncpy(file, s, 6);
   file[6] = '.';
   strncpy(file+7, s+6, 3);
-
+  file[10] = '\0';
   return file;
 }
 
