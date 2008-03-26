@@ -1,5 +1,5 @@
-#ifndef __DATA_H
-#define __DATA_H
+#ifndef __DB_H
+#define __DB_H
 
 #include <stdio.h>
 
