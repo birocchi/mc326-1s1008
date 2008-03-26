@@ -4,10 +4,8 @@
 #include <string.h>
 
 
-void readValue(char s[], size_t length, FILE * base)
-{
+void readValue(char s[], size_t length, FILE * base){
   fgets(s, length+1, base);
-
 }
 
 int getFileSize(FILE * file){
@@ -59,33 +57,23 @@ int makeFilePKIndex(char ** pkindex, FILE * out, int numreg){
   return 0;
 }
 
-int loadPkFile(char **pkindex, FILE * pkfile){
+int loadPkFile(char ** pkindex, FILE * pkfile){
 
   if(!pkfile)
     return 1;
   
   int size, numpk,i;
-  char file_array[PK_SIZE];
 
   size = getFileSize(pkfile);
   numpk = size/PK_SIZE;
 
-/*   /\* Create the pk table in the memory*\/ */
-/*   pkindex = (char**)malloc(sizeof(char*) * numpk); */
-/*   for( i = 0; i < numpk; i++){ */
-/*     pkindex[i] = (char*)malloc(sizeof(char) * 210); */
-/*   } */
+  fseek(pkfile, 0, SEEK_SET);
 
-  /* Copy the primary keys of the pkfile and put them in the memory pk table*/
+  memset(file_array, 0, sizeof(file_array));
 
-  for(i=0; i<numpk; i++){
-    fgets(file_array, PK_SIZE +1, pkfile);
-
-    /*Essa porra aqui fica lendo lixo no file_array, se eh que le alguma coisa... */
-  }
-  
-  for(i =0; i< numpk; i++){
-    printf("%s\n", pkindex[i]);
+  for(i = 0; i < numpk; i++){
+    fgets(pkindex[i], PK_SIZE+1, pkfile);
+/*     printf("%s\n", pkindex[i]); */
   }
 
   return 0;
