@@ -25,12 +25,15 @@ int cmpstring(char **p1, char **p2){
   return strcmp((const char*) *p1, (const char*) *p2);
 }
 
-int makeArrayPKIndex(char **pkindex, FILE * base, int numreg){
+int makeArrayPKIndex(char **pkindex, FILE * base){
 
-  int i;
+  int i, numpk;
 
   if(!base)
     return 1;
+
+  numpk = getFileSize(base) / REG_SIZE;
+  
 
   fseek(base, 0, SEEK_SET);
 

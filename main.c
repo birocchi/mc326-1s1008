@@ -7,14 +7,27 @@
 
 int main(int argc, char* argv[]) {
 
-  FILE *file;
-  FILE *html;
+  FILE *base; /* base01.dat basically*/
+  FILE *html; /* Every single report will be printed here */
+  FILE *pkfile; /* File with the primary key table. */ 
   artwork_info info;    /* Holds the artwork data. */
   char c;               /* Holds the user's choice from the menus. */
   char input[2];        /* Holds the full user input from the menu. */
   int insert_data = 1;  /* Whether or not to insert more data into the dat file. */
-  char name[NAME_LENGTH];
+  char name[NAME_LENGTH]; /* Holds the name for which to search. */
+  char ** pkindex; /* Primary Key search table. */
 
+  /* Loading the primary key tables. */
+  printf("Carregando tabela de chaves primárias...\n");
+  pkfile = fopen("pkfile.pk", "r");
+  if(!pkfile){
+    printf("Arquivo de chaves primárias não pode ser carregado.\n");
+    makeArrayPKIndex(pkindex, base);
+  }
+  else{
+    loadPkFile(pkindex, pkfile);
+  }
+  
 
   printWelcome();
 
@@ -37,11 +50,11 @@ int main(int argc, char* argv[]) {
     case 'i':
       /* Open the file for appending. */
       insert_data = 1;
-      file = fopen("base01.dat", "a");
+      base = fopen("base01.dat", "a");
       
       while (insert_data) {
 	readData(&info);
-	writeData(file, &info);
+	writeData(base, &info);
 	  
 	while (1) {
 	  printf("\nDeseja inserir mais uma entrada? (s)im, (n)ao? "); 
@@ -59,7 +72,7 @@ int main(int argc, char* argv[]) {
 	}
       }
 
-      fclose(file);
+      fclose(base);
       break;
       
     case 'c':
@@ -72,8 +85,8 @@ int main(int argc, char* argv[]) {
     case 'g':
       printf("Gerando lista de obras...\n");
       html = fopen("list.html", "w");
-      file = fopen("base01.dat", "a");
-      if(makeHtml(file, html))
+      base = fopen("base01.dat", "a");
+      if(makeHtml(base, html))
 	printf("Erro ao gerar lista de obras!\n");
       else{
 	printf("Lista gerada com sucesso.\n");
