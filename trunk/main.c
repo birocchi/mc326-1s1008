@@ -133,7 +133,7 @@ int main(int argc, char* argv[]) {
       }
 
       printf("   Lista gerada com sucesso.\n");
-      printf("   Deseja vizualisar a lista em seu browser? (s)im, (n)ao? ");
+/*       printf("   Deseja vizualisar a lista em seu browser? (s)im, (n)ao? "); */
 /*
       while (1) {
         c = readChar();
