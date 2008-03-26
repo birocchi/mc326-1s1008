@@ -127,6 +127,7 @@ int main(int argc, char* argv[]) {
       fseek(base, 0, SEEK_SET);
 
       for (i = 0; i < numreg; i++) {
+	fseek(base, (pk_index[i].rrn) * REG_SIZE, SEEK_SET);
         readArtworkRecord(base, &info);
         htmlWriteRecordInfo(htmlfile, &info);
       }

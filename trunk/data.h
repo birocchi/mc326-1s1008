@@ -31,6 +31,14 @@ typedef struct
 	char img[IMG_LENGTH];           /* The register's identifier */
 } artwork_info;
 
+
+/*
+ * getValidImagePath
+ *
+ * Receives the image identifier and returns it with the '.' before
+ * the extension.
+ * One must save the returned pointer and free it after using it.
+ */
 char* getValidImagePath(char* s);
 void printArtworkRecord(artwork_info* info);
 int readArtworkRecord(FILE* base, artwork_info* info);
