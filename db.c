@@ -55,7 +55,7 @@ int findEntry(primary_key* index, const char* key, int numreg) {
 }
 
 primary_key* loadPKFile(FILE* pkfile, int* regcount) {
-  char tmpname[NAME_LENGTH], tmprrn[RRN_LENGTH+1];
+  char tmpname[NAME_LENGTH+1], tmprrn[RRN_LENGTH+1];
   int i, numreg, rrn;
   primary_key* index;
 
@@ -71,7 +71,6 @@ primary_key* loadPKFile(FILE* pkfile, int* regcount) {
     fgets(tmpname, NAME_LENGTH+1, pkfile);
     fgets(tmprrn, RRN_LENGTH+1, pkfile);
     rrn = atoi(tmprrn);
-    printf("%d %d %s %s\n", i, numreg, tmprrn, tmpname);
     strncpy(index[i].name, tmpname, NAME_LENGTH-1);
     index[i].rrn = rrn;
   }
@@ -90,7 +89,6 @@ void writePKToFile(primary_key* index, FILE* pkfile, int numreg) {
   if (pkfile) {
     for (i = 0; i < numreg; i++) {
       sprintf(write_str, "%%-%ds%%0%dd", NAME_LENGTH, RRN_LENGTH);
-      printf("%s %d\n", index[i].name, index[i].rrn);
       fprintf(pkfile, write_str, index[i].name, index[i].rrn);
     }
   }
