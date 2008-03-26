@@ -22,16 +22,16 @@ int cmpstring(char **p1, char **p2){
 
 int makeArrayPKIndex(char **pkindex, FILE * base){
 
-  int i, numpk;
+  int i, numreg;
 
   if(!base)
     return 1;
 
-  numpk = getFileSize(base) / REG_SIZE;
+  numreg = getFileSize(base) / REG_SIZE;
 
   fseek(base, 0, SEEK_SET);
 
-  for( i = 0; i<numreg; i++){
+  for( i = 0; i < numreg; i++){
     fgets(pkindex[i], NAME_LENGTH+1, base);
     fseek(base, 250, SEEK_CUR);
     sprintf(&pkindex[i][200], "%010d", i);
@@ -43,7 +43,7 @@ int makeArrayPKIndex(char **pkindex, FILE * base){
 
 }
 
-int makeFilePKIndex(char ** pkindex, FILE * out){
+int makeFilePKIndex(char ** pkindex, FILE * out, int numreg){
   
   int i;
 
@@ -66,11 +66,16 @@ int loadPkFile(char ** pkindex, FILE * pkfile){
 
   fseek(pkfile, 0, SEEK_SET);
 
-  memset(file_array, 0, sizeof(file_array));
-
   for(i = 0; i < numpk; i++){
     fgets(pkindex[i], PK_SIZE+1, pkfile);
   }
 
   return 0;
+}
+
+
+char ** search(char **pkindex, char * key, int numreg){
+
+  return bsearch(key, pkindex, numreg, sizeof(char*), (int)cmpstring);
+
 }

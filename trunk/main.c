@@ -17,8 +17,9 @@ int main(int argc, char* argv[]) {
   int insert_data = 1;  /* Whether or not to insert more data into the dat file. */
   char name[NAME_LENGTH]; /* Holds the name for which to search. */
   char ** pkindex; /* Primary Key search table. */
-  int numreg; /* Number of entries in our database. */
-
+  int i, numreg; /* Number of entries in our database. */
+  char **find;
+  
   /* Load database for size-check. */
   base = fopen("base01.dat", "r");
   numreg = getFileSize(base) / REG_SIZE;
@@ -92,7 +93,8 @@ int main(int argc, char* argv[]) {
     case 'c':
       readString("\n   Por favor, digite o titulo da obra (Max: 200 caracteres): ",
 		 name, NAME_LENGTH);
-      /*search for it in the array....*/
+      find = search(pkindex, name, numreg);
+      printf("%s\n", *find);
       /* do something */
       break;
 
@@ -124,7 +126,7 @@ int main(int argc, char* argv[]) {
     case 's':
       printf("Salvando tabela de chaves de busca...\n");
       pkfile = fopen("pkfile.pk", "w");
-      makeFilePKIndex(pkindex, pkfile);
+      makeFilePKIndex(pkindex, pkfile, numreg);
       fclose(pkfile);
       
       for(i = 0; i < numreg; i++){
