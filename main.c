@@ -75,6 +75,8 @@ int main(int argc, char* argv[]) {
       while (insert_data) {
         readData(&info);
         writeData(base, &info);
+/* 	numreg++; */
+	pk_index = incrementPK(pk_index, numreg, &info);
 
         while (1) {
           printf("\nDeseja inserir mais uma entrada? (s)im, (n)ao? ");

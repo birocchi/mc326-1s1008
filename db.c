@@ -44,6 +44,19 @@ primary_key* createPKFromBase(FILE* base, int* regcount) {
   return index;
 }
 
+primary_key* incrementPK(primary_key* index, int regcount, artwork_info * info){
+
+  if(index){
+    index = realloc(index, regcount * PK_REG_SIZE);
+    index[regcount].rrn = regcount;
+    strncpy(index[regcount].name, info->title, NAME_LENGTH);
+    qsort(index, regcount, sizeof(primary_key), pk_cmpfunc);
+    return index;
+  }
+  
+  return NULL;
+}
+
 int findEntry(primary_key* index, const char* key, int numreg) {
   primary_key* match;
 
