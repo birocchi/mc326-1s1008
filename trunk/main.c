@@ -3,58 +3,57 @@
 #include <stdlib.h>
 #include "data.h"
 #include "db.h"
+#include "html.h"
 #include "io.h"
 #include "menu.h"
 
 #define DBFILE "base01.dat" /* The database file name. */
+#define HTMLFILE "lista.html"
 #define PKFILE "pkfile.pk"  /* The primary key file name. */
 
 int main(int argc, char* argv[]) {
   FILE *base;             /* base01.dat basically*/
-  FILE *html;             /* Every single report will be printed here */
+  FILE *htmlfile;             /* Every single report will be printed here */
   FILE *pkfile;           /* File with the primary key table. */
 
   artwork_info info;      /* Holds the artwork data. */
 
-  char c;                 /* Holds the user's choice from the menus. */
-  char input[2];          /* Holds the full user input from the menu. */
+  char input[2];
+  char c = 0;                 /* Holds the user's choice from the menus. */
   int insert_data = 1;    /* Whether or not to insert more data into the dat file. */
 
   char name[NAME_LENGTH]; /* Holds the name for which to search. */
-  char ** pkindex;        /* Primary Key search table. */
   int i, numreg;          /* Number of entries in our database. */
-  char **find;
+  int match_pos;
 
-  /* Load database for size-check. */
-  base = fopen(DBFILE, "r");
-  numreg = getFileSize(base) / REG_SIZE;
-  fclose(base);
+  primary_key* pk_index;
 
-  /* Allocating some memory for our PK table. */
-  pkindex = (char**)malloc(sizeof(char*) * numreg);
-  for ( i = 0; i < numreg; i++){
-    pkindex[i] = (char*)malloc(sizeof(char) * PK_REGSIZE);
-  }
+  base = fopen(DBFILE, "r+");
 
   /* Loading the primary key tables. */
-  printf("Loading primary key table...\n");
-  pkfile = fopen(PKFILE, "r");
-  if (!pkfile){
-    printf("Arquivo de chaves primárias não pode ser carregado.\n");
-    makeArrayPKIndex(pkindex, base);
+  printf("Carregando tabela de chaves primarias...\n");
+  if (!fileExists(PKFILE)) {
+    printf("A tabela de chaves primarias esta sendo criada.\n");
+    pk_index = createPKFromBase(base, &numreg);
+  } else {
+    pkfile = fopen(PKFILE, "r");
+    pk_index = loadPKFile(pkfile, &numreg);
+    fclose(pkfile);
   }
-  else{
-    loadPkFile(pkindex, pkfile);
-  }
-  fclose(pkfile);
-
 
   printWelcome();
 
   while (1) {
     printMenu();
 
-    /* We read n+1 from the input to be able to check
+#if 0
+    c = readChar();
+    if (c == -1) {
+      printf("\nErro: Opcao invalida.\n");
+      continue;
+    }
+#endif
+      /* We read n+1 from the input to be able to check
      * if the user has written exactly n characters */
     readValue(input, 2);
     if (strlen(input) != 1) {
@@ -62,9 +61,10 @@ int main(int argc, char* argv[]) {
       continue;
     }
 
+
     switch (tolower(input[0])) {
     default:
-      printf("\n(%c): Opcao invalida.\n", c);
+      printf("\n(%c): Opcao invalida.\n", input[0]);
       break;
 
     case 'i':
@@ -78,8 +78,10 @@ int main(int argc, char* argv[]) {
 
         while (1) {
           printf("\nDeseja inserir mais uma entrada? (s)im, (n)ao? ");
-          c = tolower(getchar());
-          flushBuffer();
+
+          c = tolower(readChar());
+          if (c == -1)
+            printf("\nOpcao invalida");
 
           if (c == 's')
             break;
@@ -92,52 +94,75 @@ int main(int argc, char* argv[]) {
         }
       }
 
-      fclose(base);
       break;
 
     case 'c':
-      readString("\n   Por favor, digite o titulo da obra (Max: 200 caracteres): ",
+      readString("\n    Por favor, digite o titulo da obra (Max: 200 caracteres): ",
                  name, NAME_LENGTH);
-      find = search(pkindex, name, numreg);
-      printf("%s\n", *find);
-      /* do something */
+      match_pos = findEntry(pk_index, name, numreg);
+
+      if (match_pos == -1)
+        printf("\n    Nao foi encontrada nenhuma obra com titulo \"%s\".\n", name);
+      else {
+        htmlfile = fopen(HTMLFILE, "w");
+        htmlBegin(htmlfile);
+
+        fseek(base, match_pos*REG_SIZE, SEEK_SET);
+        readArtworkRecord(base, &info);
+
+        htmlWriteRecordInfo(htmlfile, &info);
+
+        htmlEnd(htmlfile);
+        fclose(htmlfile);
+      }
+
       break;
 
     case 'g':
-      printf("Gerando lista de obras...\n");
-      html = fopen("list.html", "w");
-      base = fopen("base01.dat", "a");
-      if (makeHtml(base, html))
-        printf("Erro ao gerar lista de obras!\n");
-      else{
-        printf("Lista gerada com sucesso.\n");
-        printf("Deseja vizualisar a lista em seu browser? (s)im, (n)ao? ");
-        c = tolower(getchar());
-        flushBuffer();
+      printf("   Gerando lista de obras...\n");
 
-        if (c == 's'){
+      htmlfile = fopen(HTMLFILE, "w");
+      htmlBegin(htmlfile);
+
+      fseek(base, 0, SEEK_SET);
+
+      for (i = 0; i < numreg; i++) {
+        readArtworkRecord(base, &info);
+        htmlWriteRecordInfo(htmlfile, &info);
+      }
+
+      printf("   Lista gerada com sucesso.\n");
+      printf("   Deseja vizualisar a lista em seu browser? (s)im, (n)ao? ");
+/*
+      while (1) {
+        c = readChar();
+        if (c == -1)
+          printf("\n   Opcao invalida\n");
+
+        if (c == 's') {
           system("firefox list.html &");
           break;
         }
-        else if (c == 'n') {
+        else if (c == 'n')
           break;
-        }
         else
-          printf("\nOpcao invalida");
-      }
+          printf("\n   Opcao invalida\n");
+      }*/
+
+      htmlEnd(htmlfile);
+      fclose(htmlfile);
 
       break;
 
     case 's':
       printf("Salvando tabela de chaves de busca...\n");
-      pkfile = fopen("pkfile.pk", "w");
-      makeFilePKIndex(pkindex, pkfile, numreg);
-      fclose(pkfile);
 
-      for (i = 0; i < numreg; i++){
-        free(pkindex[i]);
-      }
-      free(pkindex);
+      pkfile = fopen(PKFILE, "w");
+      writePKToFile(pk_index, pkfile, numreg);
+
+      free(pk_index);
+      fclose(pkfile);
+      fclose(base);
 
       printf("Saindo...\n");
       return 0;

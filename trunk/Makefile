@@ -10,7 +10,7 @@
 CC=gcc
 CFLAGS=-c -Wall -g -ansi -pedantic -lefence
 LDFLAGS=
-OFILES=data.o io.o main.o menu.o db.o
+OFILES=data.o io.o html.o main.o menu.o db.o
 
 all: art
 
@@ -18,6 +18,9 @@ art: $(OFILES)
 	$(CC) $(LDFLAGS) $(OFILES) -o art 
 
 data.o: data.c data.h
+	$(CC) $(CFLAGS) $<
+
+html.o: html.c html.h
 	$(CC) $(CFLAGS) $<
 
 io.o: io.c io.h

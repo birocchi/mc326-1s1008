@@ -3,6 +3,40 @@
 #include <string.h>
 #include "data.h"
 
+char* getValidImagePath(char* s) {
+  return s;
+}
+
+/*
+void printArtworkRecord(artwork_info* info)
+{
+  if (info) {
+    printf("  Titulo: %s\n", info->title);
+    printf("  Tipo: %s\n", info->type);
+    printf("  Autor: %s\n", info->author);
+    printf("  Ano de criacao: %04d\n", info->year);
+    printf("  Valor: %012d\n", info->value);
+    printf("  Identificador: %s", info->img);
+  }
+}
+*/
+
+int readArtworkRecord(FILE *base, artwork_info *info)
+{
+  if (!base || !info) {
+    return 1;
+  }
+
+  fgets(info->title, NAME_LENGTH, base);
+  fgets(info->type, TYPE_LENGTH, base);
+  fgets(info->author, AUTHOR_LENGTH, base);
+  fscanf(base, "%04d", &(info->year));
+  fscanf(base, "%012d", &(info->value));
+  fgets(info->img, IMG_LENGTH+1, base);
+
+  return 0;
+}
+
 int writeData(FILE *file, artwork_info *info)
 {
   /* Return error if the file or struct pointers are NULL. */
