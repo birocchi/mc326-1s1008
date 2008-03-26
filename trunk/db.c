@@ -69,8 +69,9 @@ primary_key* loadPKFile(FILE* pkfile, int* regcount) {
 
   for (i = 0; i < numreg; i++) {
     fgets(tmpname, NAME_LENGTH+1, pkfile);
-    fgets(tmprrn, RRN_LENGTH+1, pkfile);
-    rrn = atoi(tmprrn);
+    /*fgets(tmprrn, RRN_LENGTH+1, pkfile);
+    rrn = atoi(tmprrn);*/
+    fscanf(pkfile, "%04d", &rrn);
     strncpy(index[rrn].name, tmpname, NAME_LENGTH);
     index[rrn].rrn = rrn;
   }
