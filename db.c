@@ -4,19 +4,20 @@
 #include <string.h>
 
 int getFileSize(FILE * file){
+  int file_size;
 
-  if(!file){
-    printf("Erro ao verificar tamanho do arquivo.\n");
-    return 1;
+  if(!file) {
+    fprintf(stderr, "getFileSize: Invalid file.\n");
+    return -1;
   }
 
-  fseek(file, 0, SEEK_END);
-  return ftell(file);
+  file_size = fseek(file, 0, SEEK_END);
+  fseek(file, 0, SEEK_SET);
 
+  return file_size;
 }
 
-int cmpstring(char **p1, char **p2){
-
+int cmpstring(char **p1, char **p2) {
   return strcmp((const char*) *p1, (const char*) *p2);
 }
 

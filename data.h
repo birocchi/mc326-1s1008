@@ -16,7 +16,6 @@
 #define REG_SIZE (NAME_LENGTH + TYPE_LENGTH + AUTHOR_LENGTH + \
                   YEAR_LENGTH + VALUE_LENGTH + IMG_LENGTH)
 
-
 /* Total size of a primary key. */
 #define PK_SIZE (NAME_LENGTH + RRN)
 
