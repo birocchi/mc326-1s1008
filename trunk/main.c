@@ -120,20 +120,27 @@ int main(int argc, char* argv[]) {
 
     case 'g':
       printf("   Gerando lista de obras...\n");
-
-      htmlfile = fopen(HTMLFILE, "w");
-      htmlBegin(htmlfile);
-
-      fseek(base, 0, SEEK_SET);
-
-      for (i = 0; i < numreg; i++) {
-	fseek(base, (pk_index[i].rrn) * REG_SIZE, SEEK_SET);
-        readArtworkRecord(base, &info);
-        htmlWriteRecordInfo(htmlfile, &info);
+      
+      if(!base){
+	printf("     Nao existe nenhuma obra ainda.\n");
       }
-
-      printf("   Lista gerada com sucesso.\n");
-/*       printf("   Deseja vizualisar a lista em seu browser? (s)im, (n)ao? "); */
+      else{
+	htmlfile = fopen(HTMLFILE, "w");
+	htmlBegin(htmlfile);
+	
+	fseek(base, 0, SEEK_SET);
+	
+	for (i = 0; i < numreg; i++) {
+	  fseek(base, (pk_index[i].rrn) * REG_SIZE, SEEK_SET);
+	  readArtworkRecord(base, &info);
+	  htmlWriteRecordInfo(htmlfile, &info);
+	}
+	htmlEnd(htmlfile);
+	fclose(htmlfile);
+	
+	printf("   Lista gerada com sucesso.\n");
+      }
+      /*  printf("   Deseja vizualisar a lista em seu browser? (s)im, (n)ao? "); */
 /*
       while (1) {
         c = readChar();
@@ -150,8 +157,6 @@ int main(int argc, char* argv[]) {
           printf("\n   Opcao invalida\n");
       }*/
 
-      htmlEnd(htmlfile);
-      fclose(htmlfile);
 
       break;
 
@@ -163,7 +168,9 @@ int main(int argc, char* argv[]) {
 
       free(pk_index);
       fclose(pkfile);
-      fclose(base);
+
+      if(base)
+	fclose(base);
 
       printf("Saindo...\n");
       return 0;
