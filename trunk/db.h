@@ -3,6 +3,8 @@
 
 #include <stdio.h>
 
+#define PK_REGSIZE 210 /* The size of a primary key record. */
+
 int getFileSize(FILE * file);
 int cmpstring(char **p1, char **p2);
 int makeArrayPKIndex(char **pkindex, FILE * base);
