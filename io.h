@@ -21,6 +21,7 @@ void flushBuffer(void);
  */
 int makeHtml(FILE *base, FILE *html);
 
+int readChar();
 /* 
  * readData
  *

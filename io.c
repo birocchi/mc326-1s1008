@@ -29,6 +29,19 @@ int makeHtml(FILE *base, FILE *html)
   return 0;
 }
 
+int readChar() {
+  char input[2];
+
+  /* We read n+1 from the input to be able to check
+   * if the user has written exactly n characters */
+  readValue(input, 2);
+
+  if (strlen(input) != 1)
+    return -1;
+  else
+    return input[0];
+}
+
 int readData(artwork_info *info)
 {
   char img[IMG_LENGTH + 1];
