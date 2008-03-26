@@ -13,6 +13,8 @@ int main(int argc, char* argv[]) {
   char c;               /* Holds the user's choice from the menus. */
   char input[2];        /* Holds the full user input from the menu. */
   int insert_data = 1;  /* Whether or not to insert more data into the dat file. */
+  char name[NAME_LENGTH];
+
 
   printWelcome();
 
@@ -61,6 +63,9 @@ int main(int argc, char* argv[]) {
       break;
       
     case 'c':
+      readString("\n   Por favor, digite o titulo da obra (Max: 200 caracteres): ",
+		 name, NAME_LENGTH);
+      /*search for it in the array....*/
       /* do something */
       break;
 
