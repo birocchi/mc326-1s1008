@@ -4,6 +4,7 @@
 #include "data.h"
 #include "io.h"
 #include "menu.h"
+#include "db.h"
 
 int main(int argc, char* argv[]) {
 
@@ -16,6 +17,18 @@ int main(int argc, char* argv[]) {
   int insert_data = 1;  /* Whether or not to insert more data into the dat file. */
   char name[NAME_LENGTH]; /* Holds the name for which to search. */
   char ** pkindex; /* Primary Key search table. */
+  int numreg; /* Number of entries in our database. */
+
+  /* Load database for size-check. */
+  base = fopen("base01.dat", "r");
+  numreg = getFileSize(base) / REG_SIZE;
+  fclose(base);
+
+  /* Allocating some memory for our PK table. */
+  pkindex = (char**)malloc(sizeof(char*) * numreg);
+  for( i = 0; i < numreg; i++){
+    pkindex[i] = (char*)malloc(sizeof(char) * 210);
+  }
 
   /* Loading the primary key tables. */
   printf("Carregando tabela de chaves primárias...\n");
@@ -27,7 +40,8 @@ int main(int argc, char* argv[]) {
   else{
     loadPkFile(pkindex, pkfile);
   }
-  
+  fclose(pkfile);
+
 
   printWelcome();
 
@@ -108,6 +122,16 @@ int main(int argc, char* argv[]) {
       break;
 
     case 's':
+      printf("Salvando tabela de chaves de busca...\n");
+      pkfile = fopen("pkfile.pk", "w");
+      makeFilePKIndex(pkindex, pkfile);
+      fclose(pkfile);
+      
+      for(i = 0; i < numreg; i++){
+	free(pkindex[i]);
+      }
+      free(pkindex);
+
       printf("Saindo...\n");
       return 0;
     }

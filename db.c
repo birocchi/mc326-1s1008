@@ -3,11 +3,6 @@
 #include "data.h"
 #include <string.h>
 
-
-void readValue(char s[], size_t length, FILE * base){
-  fgets(s, length+1, base);
-}
-
 int getFileSize(FILE * file){
 
   if(!file){
@@ -33,12 +28,11 @@ int makeArrayPKIndex(char **pkindex, FILE * base){
     return 1;
 
   numpk = getFileSize(base) / REG_SIZE;
-  
 
   fseek(base, 0, SEEK_SET);
 
   for( i = 0; i<numreg; i++){
-    readValue(pkindex[i], 200, base);
+    fgets(pkindex[i], NAME_LENGTH+1, base);
     fseek(base, 250, SEEK_CUR);
     sprintf(&pkindex[i][200], "%010d", i);
   }
@@ -49,11 +43,11 @@ int makeArrayPKIndex(char **pkindex, FILE * base){
 
 }
 
-int makeFilePKIndex(char ** pkindex, FILE * out, int numreg){
+int makeFilePKIndex(char ** pkindex, FILE * out){
   
   int i;
 
-  for(i = 0; i< numreg; i++){
+  for(i = 0; i < numreg; i++){
     fprintf(out, "%-210s", pkindex[i]);
   }
 
@@ -76,65 +70,7 @@ int loadPkFile(char ** pkindex, FILE * pkfile){
 
   for(i = 0; i < numpk; i++){
     fgets(pkindex[i], PK_SIZE+1, pkfile);
-/*     printf("%s\n", pkindex[i]); */
   }
-
-  return 0;
-}
-
-int main(){
-
-  FILE * base;
-  FILE * out;
-  int i, size;
-  int numreg;
-  char **pkindex;
-  char **pkteste;
-
-
-  
-  base = fopen("base01.dat", "r");
-  out = fopen("out.dat", "w");
-
-  size = getFileSize(base);
-  
-  numreg = size / REG_SIZE;
-
-
-  /*Allocating some memory for our PK table.*/
-  pkindex = (char**)malloc(sizeof(char*) * numreg);
-
-  for( i = 0; i < numreg; i++){
-    pkindex[i] = (char*)malloc(sizeof(char) * 210);
-  }
-  /**/
-
-
-
-  makeArrayPKIndex(pkindex, base, numreg);
-
-
-
-  makeFilePKIndex(pkindex, out, numreg);
-
-  /*Printing for debugging... */
-  for( i = 0; i < numreg; i++){
-    printf("%s\n", pkindex[i]);
-  }
-
-  fclose(out);
-
-  /*Agora vem a parte de ler o arquivo na memoria.*/
-
-  out = fopen("out.dat", "r");
-
-  pkteste = (char**)malloc(sizeof(char*) * numreg);
-
-  for( i = 0; i < numreg; i++){
-    pkteste[i] = (char*)malloc(sizeof(char) * 210);
-  }
-
-  loadPkFile(pkteste, out);
 
   return 0;
 }
