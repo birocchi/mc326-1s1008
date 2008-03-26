@@ -39,7 +39,7 @@ typedef struct
  * the extension.
  * One must save the returned pointer and free it after using it.
  */
-char* getValidImagePath(char* s);
+char* getValidImagePath(const char* s);
 void printArtworkRecord(artwork_info* info);
 int readArtworkRecord(FILE* base, artwork_info* info);
 
