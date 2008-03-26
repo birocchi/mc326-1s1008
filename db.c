@@ -55,7 +55,7 @@ int findEntry(primary_key* index, const char* key, int numreg) {
 }
 
 primary_key* loadPKFile(FILE* pkfile, int* regcount) {
-  char tmpname[NAME_LENGTH], tmprrn[RRN_LENGTH];
+  char tmpname[NAME_LENGTH], tmprrn[RRN_LENGTH+1];
   int i, numreg, rrn;
   primary_key* index;
 
@@ -69,11 +69,11 @@ primary_key* loadPKFile(FILE* pkfile, int* regcount) {
 
   for (i = 0; i < numreg; i++) {
     fgets(tmpname, NAME_LENGTH+1, pkfile);
-    /*fgets(tmprrn, RRN_LENGTH+1, pkfile);
-    rrn = atoi(tmprrn);*/
-    fscanf(pkfile, "%04d", &rrn);
-    strncpy(index[rrn].name, tmpname, NAME_LENGTH);
-    index[rrn].rrn = rrn;
+    fgets(tmprrn, RRN_LENGTH+1, pkfile);
+    rrn = atoi(tmprrn);
+    printf("%d %d %s %s\n", i, numreg, tmprrn, tmpname);
+    strncpy(index[i].name, tmpname, NAME_LENGTH-1);
+    index[i].rrn = rrn;
   }
 
   fseek(pkfile, 0, SEEK_SET);
@@ -110,13 +110,17 @@ int fileExists(const char* filename) {
 
 int getFileSize(FILE * f){
   int file_size;
+  int prev_pos;
 
   if(!f)
     return -1;
 
+  prev_pos = ftell(f);
+
   fseek(f, 0, SEEK_END);
   file_size = ftell(f);
-  fseek(f, 0, SEEK_SET);
+
+  fseek(f, prev_pos, SEEK_SET);
 
   return file_size;
 }
