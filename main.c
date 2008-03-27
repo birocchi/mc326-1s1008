@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
   int insert_data = 1;    /* Whether or not to insert more data into the dat file. */
 
   char name[NAME_LENGTH]; /* Holds the name for which to search. */
-  int i, numreg;          /* Number of entries in our database. */
+  int i, numreg = 0;      /* Number of entries in our database. */
   int match_pos;
 
   primary_key* pk_index;
@@ -32,27 +32,32 @@ int main(int argc, char* argv[]) {
 
   /* Loading the primary key tables. */
   printf("Carregando tabela de chaves primarias...\n");
-  if (!fileExists(PKFILE)) {
+  if (!fileExists(PKFILE) && fileExists(DBFILE)) {
     printf("A tabela de chaves primarias esta sendo criada.\n");
     pk_index = createPKFromBase(base, &numreg);
-  } else {
+  } 
+  else if (!fileExists(PKFILE) && !fileExists(DBFILE)) {
+    pk_index = createFirstPK();
+  }
+  else {
     pkfile = fopen(PKFILE, "r");
     pk_index = loadPKFile(pkfile, &numreg);
     fclose(pkfile);
   }
-
+  if(base)
+    fclose(base);
   printWelcome();
 
   while (1) {
     printMenu();
 
-#if 0
-    c = readChar();
-    if (c == -1) {
-      printf("\nErro: Opcao invalida.\n");
-      continue;
-    }
-#endif
+/* #if 0 */
+/*     c = readChar(); */
+/*     if (c == -1) { */
+/*       printf("\nErro: Opcao invalida.\n"); */
+/*       continue; */
+/*     } */
+/* #endif */
       /* We read n+1 from the input to be able to check
      * if the user has written exactly n characters */
     readValue(input, 2);
@@ -75,8 +80,8 @@ int main(int argc, char* argv[]) {
       while (insert_data) {
         readData(&info);
         writeData(base, &info);
-/* 	numreg++; */
 	pk_index = incrementPK(pk_index, numreg, &info);
+	numreg++;
 
         while (1) {
           printf("\nDeseja inserir mais uma entrada? (s)im, (n)ao? ");
@@ -89,6 +94,8 @@ int main(int argc, char* argv[]) {
             break;
           else if (c == 'n') {
             insert_data = 0;
+	    if(base)
+	      fclose(base);
             break;
           }
           else
@@ -168,11 +175,10 @@ int main(int argc, char* argv[]) {
       pkfile = fopen(PKFILE, "w");
       writePKToFile(pk_index, pkfile, numreg);
 
-      free(pk_index);
-      fclose(pkfile);
-
-      if(base)
-	fclose(base);
+      if(pk_index)
+	free(pk_index);
+      if(pkfile)
+	fclose(pkfile);
 
       printf("Saindo...\n");
       return 0;
