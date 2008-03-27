@@ -2,29 +2,35 @@
 #include <string.h>
 #include <stdlib.h>
 #include "data.h"
-#include "db.h"
 #include "file.h"
 #include "html.h"
 #include "io.h"
 #include "menu.h"
+#include "pk.h"
 
 #define DBFILE "base01.dat" /* The database file name. */
 #define HTMLFILE "lista.html"
 #define PKFILE "pkfile.pk"  /* The primary key file name. */
 
 int main(int argc, char* argv[]) {
-  FILE *base;             /* base01.dat basically*/
-  FILE *htmlfile;             /* Every single report will be printed here */
-  FILE *pkfile;           /* File with the primary key table. */
+  FILE *base;               /* base01.dat basically */
+  FILE *htmlfile;           /* Every single report will be printed here */
+  FILE *pkfile;             /* File with the primary key table. */
 
-  artwork_info info;      /* Holds the artwork data. */
+  artwork_info info;        /* Holds the artwork data. */
+  PrimaryKeyList* pkindex;
 
-  char c;                 /* Holds the user's choice from the menus. */
-  int insert_data = 1;    /* Whether or not to insert more data into the dat file. */
+  char c;                   /* Holds the user's choice from the menus. */
+  int insert_data = 1;      /* Whether or not to insert more data into the dat file. */
   char name[NAME_LENGTH+1]; /* Holds the name for which to search. */
-  int i, numreg = 0;      /* Number of entries in our database. */
+  int i;                    /* Number of entries in our database. */
   int match_pos;
-  primary_key* pk_index;
+ 
+  pkindex = pkListInit();
+  if (pkindex == NULL) {
+    printf("Erro ao carregar chaves primarias. Saindo.\n");
+    exit(EXIT_FAILURE);
+  }
 
   base = fopen(DBFILE, "r+");
 
@@ -32,20 +38,12 @@ int main(int argc, char* argv[]) {
   printf("Carregando tabela de chaves primarias...\n");
   if (!fileExists(PKFILE) && fileExists(DBFILE)) {
     printf("A tabela de chaves primarias esta sendo criada.\n");
-    pk_index = createPKFromBase(base, &numreg);
+    pkListLoadFromBase(pkindex, base);
   }
-  else if (!fileExists(PKFILE) && !fileExists(DBFILE)) {
-    pk_index = createFirstPK();
-  }
-  else {
+  else if (fileExists(PKFILE) && fileExists(DBFILE)) {
     pkfile = fopen(PKFILE, "r");
-    pk_index = loadPKFile(pkfile, &numreg);
+    pkListLoadFromPK(pkindex, pkfile);
     fclose(pkfile);
-  }
-
-  if (pk_index == NULL) {
-    printf("Erro ao carregar chaves primarias. Saindo.\n");
-    exit(EXIT_FAILURE);
   }
 
   printWelcome();
@@ -100,7 +98,7 @@ int main(int argc, char* argv[]) {
     case 'c':
       readString("\n    Por favor, digite o titulo da obra (Max: 200 caracteres): ",
                  name, NAME_LENGTH);
-      match_pos = findEntry(pk_index, name, numreg);
+      match_pos = pkListFindByName(pkindex, name);
 
       if (match_pos == -1)
         printf("\n    Nao foi encontrada nenhuma obra com titulo \"%s\".\n", name);
@@ -124,9 +122,8 @@ int main(int argc, char* argv[]) {
     case 'g':
       printf("   Gerando lista de obras...\n");
 
-      /* TODO: Essa verificacao precisa melhorar ou nao existir */
-      if (!base) {
-        printf("     Nao existe nenhuma obra ainda.\n");
+      if (pkindex->regnum < 1) {
+        printf("     O catalogo ainda nao possui obras.\n");
       }
       else {
         htmlfile = fopen(HTMLFILE, "w");
@@ -134,8 +131,8 @@ int main(int argc, char* argv[]) {
 
         fseek(base, 0, SEEK_SET);
 
-        for (i = 0; i < numreg; i++) {
-          fseek(base, (pk_index[i].rrn) * REG_SIZE, SEEK_SET);
+        for (i = 0; i < pkindex->regnum; i++) {
+          fseek(base, (pkindex->pklist[i].rrn) * REG_SIZE, SEEK_SET);
           readArtworkRecord(base, &info);
           htmlWriteRecordInfo(htmlfile, &info);
         }
@@ -152,10 +149,10 @@ int main(int argc, char* argv[]) {
       printf("Salvando tabela de chaves de busca...\n");
 
       pkfile = fopen(PKFILE, "w");
-      writePKToFile(pk_index, pkfile, numreg);
+      pkListWriteToFile(pkindex, pkfile);
       fclose(pkfile);
 
-      free(pk_index);
+      pkListFree(pkindex);
 
       printf("Saindo...\n");
       return 0;
