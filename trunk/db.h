@@ -12,6 +12,9 @@ typedef struct {
 } primary_key;
 
 
+primary_key* createFirstPK();
+
+
 /*
  * pk_cmpfunc
  * Comparison function for the primary keys, used by bsearch.
@@ -87,5 +90,8 @@ int loadPkFile(char ** pkindex, FILE * pkfile);
  * to where it found the key.
  */
 char ** search(char **pkindex, char * key, int numreg);
+
+primary_key* incrementPK(primary_key* index, int regcount, artwork_info * info);
+
 
 #endif

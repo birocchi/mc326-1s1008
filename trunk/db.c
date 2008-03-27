@@ -19,6 +19,15 @@ int pk_cmpfunc2(const void* a, const void* b)
   return strncmp( (char*)a, ((primary_key*)b)->name, MIN(strlen(a), NAME_LENGTH));
 }
 
+primary_key* createFirstPK(){
+
+  primary_key * index;
+  
+  index = (primary_key*)calloc(20, sizeof(primary_key));
+
+  return index;
+}
+
 primary_key* createPKFromBase(FILE* base, int* regcount) {
   int i, numreg;
   primary_key* index;
@@ -47,7 +56,11 @@ primary_key* createPKFromBase(FILE* base, int* regcount) {
 primary_key* incrementPK(primary_key* index, int regcount, artwork_info * info){
 
   if(index){
-    index = realloc(index, regcount * PK_REG_SIZE);
+    
+    if(regcount && !(regcount % 20)){
+      index = realloc(index, (regcount + 20) * PK_REG_SIZE);
+    }
+    
     index[regcount].rrn = regcount;
     strncpy(index[regcount].name, info->title, NAME_LENGTH);
     qsort(index, regcount, sizeof(primary_key), pk_cmpfunc);
@@ -161,17 +174,6 @@ int makeArrayPKIndex(char **pkindex, FILE * base){
   return 0;
 }
 
-int makeFilePKIndex(char ** pkindex, FILE * out, int numreg){
-  
-  int i;
-
-  for(i = 0; i < numreg; i++){
-    fprintf(out, "%-210s", pkindex[i]);
-  }
-
-  return 0;
-}
-
 int loadPkFile(char ** pkindex, FILE * pkfile){
 
   if(!pkfile)
@@ -183,7 +185,7 @@ int loadPkFile(char ** pkindex, FILE * pkfile){
   numpk = size/PK_SIZE;
 
   fseek(pkfile, 0, SEEK_SET);
-
+2
   for(i = 0; i < numpk; i++) {
     fgets(pkindex[i], PK_SIZE+1, pkfile);
   }
