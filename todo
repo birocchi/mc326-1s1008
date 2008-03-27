@@ -1,22 +1,10 @@
 Cada vez que insere tem que aumentar 'numreg'
 Dai tem que realocar a tabela 'pkindex' e ordenar denovo.
 
-Fazer a busca pela pk funcionar com bsearch.
-
-Fazer a consulta funcionar perfeitamente, testar pra ver se a tabela
-ta sendo montada certo, eu soh dei uma olhada e parecia ok.
-
 + Ao inserir entradas, o identificador tem 9 caracteres, mas os 2 primeiros sao o id do grupo e nao devem ser entrados pelo usuario. Precisamos nao usar numeros magicos e aceitar 7 caracteres.
 
 + Refatorar main.c:58:62 numa função que retorna um inteiro (se deu certo ler ou não) e armazena num ponteiro pra char a letra lida
 
-+ ler o pk ja escrito da merda
-
 + ler opcoes do teclado as vezes da merda
 
 + IMPORTANTE: ATUALIZAR A INSERCAO PRA NAO PERMITIR TITULO IGUAL
-
-Boa sorte.
-
-Tem mais coisa mas eu nao lembro...
-
