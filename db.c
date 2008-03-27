@@ -82,9 +82,10 @@ primary_key* incrementPK(primary_key* index, int regcount, artwork_info * info){
 }
 
 int findEntry(primary_key* index, const char* key, int numreg) {
-  primary_key* match;
+  primary_key* match = bsearch(key, index,
+                               numreg, sizeof(primary_key),
+                               __bsort_compare);
 
-  match = bsearch(key, index, numreg, sizeof(primary_key), __bsort_compare);
   if (match == NULL)
     return -1;
   else
@@ -127,5 +128,4 @@ void writePKToFile(primary_key* index, FILE* pkfile, int numreg) {
       fprintf(pkfile, write_str, index[i].name, index[i].rrn);
     }
   }
-} 
-
+}
