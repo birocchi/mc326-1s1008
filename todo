@@ -8,3 +8,6 @@ Dai tem que realocar a tabela 'pkindex' e ordenar denovo.
 + ler opcoes do teclado as vezes da merda
 
 + IMPORTANTE: ATUALIZAR A INSERCAO PRA NAO PERMITIR TITULO IGUAL
+
++ Refatorar a struct primary_key: ela deve ser uma struct interna a uma outra maior que contém
+  o número de registros junto e outras metainformações que forem necessárias
