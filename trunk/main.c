@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "data.h"
 #include "db.h"
+#include "file.h"
 #include "html.h"
 #include "io.h"
 #include "menu.h"

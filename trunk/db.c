@@ -1,22 +1,31 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
 #include "data.h"
 #include "db.h"
+#include "file.h"
 
-#define MIN(a,b) (a<b?a:b)
-
-int pk_cmpfunc(const void* a, const void* b)
-{
-  return strncmp( ((primary_key*)a)->name, ((primary_key*)b)->name, NAME_LENGTH);
-}
-
-int pk_cmpfunc2(const void* a, const void* b)
+/*
+ * __bsort_compare
+ *
+ * Comparison function used when we call bsort to look for a key in our array.
+ * It works like __qsort_compare, however /a/ is just a character here, but a
+ * primary_key structure in __qsort_compare.
+ */
+static int __bsort_compare(const void* a, const void* b)
 {
   return strncmp( (char*)a, ((primary_key*)b)->name, strlen(a));
+}
+
+/*
+ * __qsort_compare
+ *
+ * Comparison function used when we call qsort in our primary keys array.
+ * It just calls strncmp on primary_key's name member.
+ */
+static int __qsort_compare(const void* a, const void* b)
+{
+  return strncmp( ((primary_key*)a)->name, ((primary_key*)b)->name, NAME_LENGTH);
 }
 
 primary_key* createFirstPK(){
@@ -34,6 +43,7 @@ primary_key* createPKFromBase(FILE* base, int* regcount) {
 
   if (base == NULL)
     return NULL;
+
   numreg = getFileSize(base) / REG_SIZE;
   *regcount = numreg;
 
@@ -47,7 +57,9 @@ primary_key* createPKFromBase(FILE* base, int* regcount) {
     fseek(base, (REG_SIZE - NAME_LENGTH)+1, SEEK_CUR);
   }
 
-  qsort(index, numreg, sizeof(primary_key), pk_cmpfunc);
+  qsort(index, numreg, sizeof(primary_key), __qsort_compare);
+
+  fseek(base, 0, SEEK_SET);
 
   return index;
 }
@@ -62,7 +74,7 @@ primary_key* incrementPK(primary_key* index, int regcount, artwork_info * info){
     
     index[regcount].rrn = regcount;
     strncpy(index[regcount].name, info->title, NAME_LENGTH);
-    qsort(index, regcount, sizeof(primary_key), pk_cmpfunc);
+    qsort(index, regcount, sizeof(primary_key), __qsort_compare);
     return index;
   }
   
@@ -72,7 +84,7 @@ primary_key* incrementPK(primary_key* index, int regcount, artwork_info * info){
 int findEntry(primary_key* index, const char* key, int numreg) {
   primary_key* match;
 
-  match = bsearch(key, index, numreg, sizeof(primary_key), pk_cmpfunc2);
+  match = bsearch(key, index, numreg, sizeof(primary_key), __bsort_compare);
   if (match == NULL)
     return -1;
   else
@@ -86,9 +98,9 @@ primary_key* loadPKFile(FILE* pkfile, int* regcount) {
 
   if (pkfile == NULL)
     return NULL;
+
   numreg = getFileSize(pkfile) / PK_REG_SIZE;
   *regcount = numreg;
-  printf("--> %d %d\n", numreg, *regcount);
 
   index = (primary_key*)calloc(numreg, sizeof(primary_key));
   if (index == NULL)
@@ -117,31 +129,3 @@ void writePKToFile(primary_key* index, FILE* pkfile, int numreg) {
   }
 } 
 
-int fileExists(const char* filename) {
-  struct stat buf;
-
-  if (stat(filename, &buf) != 0)
-    return 0;
-
-  if (!S_ISREG(buf.st_mode))
-    return 0;
-
-  return 1;
-}
-
-int getFileSize(FILE * f){
-  int file_size;
-  int prev_pos;
-
-  if(!f)
-    return -1;
-
-  prev_pos = ftell(f);
-
-  fseek(f, 0, SEEK_END);
-  file_size = ftell(f);
-
-  fseek(f, prev_pos, SEEK_SET);
-
-  return file_size;
-}

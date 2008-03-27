@@ -37,7 +37,7 @@ int findEntry(primary_key* index, const char* key, int numreg);
  * loadPKFile
  * Makes the table os primary keys from the pk file.
  */
-primary_key* loadPKFile(FILE* pkfile, int* regcount);
+primary_key* loadPKFile(FILE* pkfilename, int* regcount);
 
 /*
  * writePKToFile
