@@ -26,11 +26,10 @@ typedef struct
 	char title[NAME_LENGTH];        /* The artwork's title */
 	char type[TYPE_LENGTH];         /* The artwork's type  */
 	char author[AUTHOR_LENGTH];     /* The artworks author */
-	int year;                       /* The year the artwork was made */
-	int value;                      /* The artwork's value */
+	int year;                         /* The year the artwork was made */
+	int value;                        /* The artwork's value */
 	char img[IMG_LENGTH];           /* The register's identifier */
 } artwork_info;
-
 
 /*
  * getValidImagePath

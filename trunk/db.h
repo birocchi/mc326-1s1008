@@ -8,12 +8,11 @@
 
 typedef struct {
   int rrn;
-  char name[NAME_LENGTH];
+  char name[NAME_LENGTH+1];
 } primary_key;
 
 
 primary_key* createFirstPK();
-
 
 /*
  * pk_cmpfunc
