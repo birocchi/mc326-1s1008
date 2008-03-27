@@ -16,7 +16,7 @@ int pk_cmpfunc(const void* a, const void* b)
 
 int pk_cmpfunc2(const void* a, const void* b)
 {
-  return strncmp( (char*)a, ((primary_key*)b)->name, MIN(strlen(a), NAME_LENGTH));
+  return strncmp( (char*)a, ((primary_key*)b)->name, strlen(a));
 }
 
 primary_key* createFirstPK(){
@@ -35,6 +35,7 @@ primary_key* createPKFromBase(FILE* base, int* regcount) {
   if (base == NULL)
     return NULL;
   numreg = getFileSize(base) / REG_SIZE;
+  *regcount = numreg;
 
   index = (primary_key*)calloc(numreg, sizeof(primary_key));
   if (index == NULL)
@@ -47,8 +48,6 @@ primary_key* createPKFromBase(FILE* base, int* regcount) {
   }
 
   qsort(index, numreg, sizeof(primary_key), pk_cmpfunc);
-
-  *regcount = numreg;
 
   return index;
 }
@@ -88,6 +87,8 @@ primary_key* loadPKFile(FILE* pkfile, int* regcount) {
   if (pkfile == NULL)
     return NULL;
   numreg = getFileSize(pkfile) / PK_REG_SIZE;
+  *regcount = numreg;
+  printf("--> %d %d\n", numreg, *regcount);
 
   index = (primary_key*)calloc(numreg, sizeof(primary_key));
   if (index == NULL)
@@ -97,13 +98,9 @@ primary_key* loadPKFile(FILE* pkfile, int* regcount) {
     fgets(tmpname, NAME_LENGTH+1, pkfile);
     fgets(tmprrn, RRN_LENGTH+1, pkfile);
     rrn = atoi(tmprrn);
-    strncpy(index[i].name, tmpname, NAME_LENGTH-1);
+    strncpy(index[i].name, tmpname, NAME_LENGTH);
     index[i].rrn = rrn;
   }
-
-  fseek(pkfile, 0, SEEK_SET);
-
-  *regcount = numreg;
 
   return index;
 }
@@ -148,55 +145,3 @@ int getFileSize(FILE * f){
 
   return file_size;
 }
-
-#if 0
-int cmpstring(char **p1, char **p2) {
-  return strcmp((const char*) *p1, (const char*) *p2);
-}
-
-int makeArrayPKIndex(char **pkindex, FILE * base){
-
-  int i, numreg;
-
-  if(!base)
-    return 1;
-
-  numreg = getFileSize(base) / REG_SIZE;
-
-  for( i = 0; i < numreg; i++){
-    fgets(pkindex[i], NAME_LENGTH+1, base); /* NAME_LENGTH+1 because fgets reads n-1 characters */
-    fseek(base, REG_SIZE-NAME_LENGTH, SEEK_CUR);
-    sprintf(&pkindex[i][PK_NAME_LENGTH], "%010d", i);
-  }
-
-  qsort(pkindex, numreg, sizeof(char*), cmpstring);
-
-  return 0;
-}
-
-int loadPkFile(char ** pkindex, FILE * pkfile){
-
-  if(!pkfile)
-    return 1;
-  
-  int size, numpk,i;
-
-  size = getFileSize(pkfile);
-  numpk = size/PK_SIZE;
-
-  fseek(pkfile, 0, SEEK_SET);
-2
-  for(i = 0; i < numpk; i++) {
-    fgets(pkindex[i], PK_SIZE+1, pkfile);
-  }
-
-  return 0;
-}
-
-
-char ** search(char **pkindex, char * key, int numreg){
-
-  return bsearch(key, pkindex, numreg, sizeof(char*), (int)cmpstring);
-
-}
-#endif

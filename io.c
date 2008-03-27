@@ -11,40 +11,24 @@ void flushBuffer(void)
     continue;
 }
 
-int makeHtml(FILE *base, FILE *html)
-{
-  if (!base || !html){
-    return 1;
-  }
-
-  fprintf(html, "<html>\n<head>\n</head><body>\n");
-  fprintf(html, "<p>teste: <img src=\"./img/012426.png\">\n");
-
-  /* get base's size to know how many entries..
-     then read that many entries part by part
-     fprinting its data adequately.*/  
-
-  fprintf(html, "</body>\n</html>\n");
-
-  return 0;
-}
-
-int readChar() {
-  char input[2];
+int readChar(char* c) {
+  char input[3];
 
   /* We read n+1 from the input to be able to check
    * if the user has written exactly n characters */
   readValue(input, 2);
 
   if (strlen(input) != 1)
-    return -1;
-  else
-    return input[0];
+    return 1;
+  else {
+    *c = input[0];
+    return 0;
+  }
 }
 
 int readData(artwork_info *info)
 {
-  char img[IMG_LENGTH + 1];
+  char img[IMG_LENGTH+1];
 
   /* Returns an error if the pointer is NULL. */
   if (!info)
@@ -68,7 +52,7 @@ int readData(artwork_info *info)
 
     /* Validate the image identifier */
     if (!validateIdentifier(img)) {
-      strncpy(info->img, img, IMG_LENGTH + 1);
+      strncpy(info->img, img, IMG_LENGTH+1);
       break;
     }
     else {

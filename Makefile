@@ -8,8 +8,8 @@
 #
 
 CC=gcc
-CFLAGS=-c -Wall -g -ansi -pedantic -lefence
-LDFLAGS=
+CFLAGS=-c -Wall -g -ansi -pedantic
+LDFLAGS=-lefence
 OFILES=data.o io.o html.o main.o menu.o db.o
 
 all: art

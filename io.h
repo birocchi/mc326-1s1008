@@ -12,16 +12,7 @@
  */
 void flushBuffer(void);
 
-/*
- * makeHtml
- *
- * Generates a html format file for browser viewing.
- * FILE *base is our database.
- * FILE *html is the html destination file pointer.
- */
-int makeHtml(FILE *base, FILE *html);
-
-int readChar();
+int readChar(char* c);
 /* 
  * readData
  *

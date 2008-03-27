@@ -19,13 +19,11 @@ int main(int argc, char* argv[]) {
   artwork_info info;      /* Holds the artwork data. */
 
   char input[2];
-  char c = 0;                 /* Holds the user's choice from the menus. */
+  char c=0;                 /* Holds the user's choice from the menus. */
   int insert_data = 1;    /* Whether or not to insert more data into the dat file. */
-
   char name[NAME_LENGTH]; /* Holds the name for which to search. */
   int i, numreg = 0;      /* Number of entries in our database. */
   int match_pos;
-
   primary_key* pk_index;
 
   base = fopen(DBFILE, "r+");
@@ -35,7 +33,7 @@ int main(int argc, char* argv[]) {
   if (!fileExists(PKFILE) && fileExists(DBFILE)) {
     printf("A tabela de chaves primarias esta sendo criada.\n");
     pk_index = createPKFromBase(base, &numreg);
-  } 
+  }
   else if (!fileExists(PKFILE) && !fileExists(DBFILE)) {
     pk_index = createFirstPK();
   }
@@ -44,35 +42,29 @@ int main(int argc, char* argv[]) {
     pk_index = loadPKFile(pkfile, &numreg);
     fclose(pkfile);
   }
-  if(base)
-    fclose(base);
+
+  if (pk_index == NULL) {
+    printf("Erro ao carregar chaves primarias. Saindo.\n");
+    exit(EXIT_FAILURE);
+  }
+
   printWelcome();
 
   while (1) {
     printMenu();
 
-/* #if 0 */
-/*     c = readChar(); */
-/*     if (c == -1) { */
-/*       printf("\nErro: Opcao invalida.\n"); */
-/*       continue; */
-/*     } */
-/* #endif */
-      /* We read n+1 from the input to be able to check
-     * if the user has written exactly n characters */
-    readValue(input, 2);
-    if (strlen(input) != 1) {
+    if (readChar(&c)) {
       printf("\nErro: Opcao invalida.\n");
       continue;
     }
 
-
-    switch (tolower(input[0])) {
+    switch (tolower(c)) {
     default:
-      printf("\n(%c): Opcao invalida.\n", input[0]);
+      printf("\n(%c): Opcao invalida.\n", c);
       break;
 
     case 'i':
+#if 0
       /* Open the file for appending. */
       insert_data = 1;
       base = fopen("base01.dat", "a");
@@ -80,8 +72,8 @@ int main(int argc, char* argv[]) {
       while (insert_data) {
         readData(&info);
         writeData(base, &info);
-	pk_index = incrementPK(pk_index, numreg, &info);
-	numreg++;
+        pk_index = incrementPK(pk_index, numreg, &info);
+        numreg++;
 
         while (1) {
           printf("\nDeseja inserir mais uma entrada? (s)im, (n)ao? ");
@@ -94,15 +86,15 @@ int main(int argc, char* argv[]) {
             break;
           else if (c == 'n') {
             insert_data = 0;
-	    if(base)
-	      fclose(base);
+            if (base)
+              fclose(base);
             break;
           }
           else
             printf("\nOpcao invalida");
         }
       }
-
+#endif
       break;
 
     case 'c':
@@ -129,44 +121,27 @@ int main(int argc, char* argv[]) {
 
     case 'g':
       printf("   Gerando lista de obras...\n");
-      
-      if(!base){
-	printf("     Nao existe nenhuma obra ainda.\n");
+
+      if (!base){
+        printf("     Nao existe nenhuma obra ainda.\n");
       }
       else{
-	htmlfile = fopen(HTMLFILE, "w");
-	htmlBegin(htmlfile);
-	
-	fseek(base, 0, SEEK_SET);
-	
-	for (i = 0; i < numreg; i++) {
-	  fseek(base, (pk_index[i].rrn) * REG_SIZE, SEEK_SET);
-	  readArtworkRecord(base, &info);
-	  htmlWriteRecordInfo(htmlfile, &info);
-	}
-	htmlEnd(htmlfile);
-	fclose(htmlfile);
-	
-	printf("   Lista gerada com sucesso.\n");
-      }
-      /*  printf("   Deseja vizualisar a lista em seu browser? (s)im, (n)ao? "); */
-/*
-      while (1) {
-        c = readChar();
-        if (c == -1)
-          printf("\n   Opcao invalida\n");
+        htmlfile = fopen(HTMLFILE, "w");
+        htmlBegin(htmlfile);
 
-        if (c == 's') {
-          system("firefox list.html &");
-          break;
+        fseek(base, 0, SEEK_SET);
+
+        for (i = 0; i < numreg; i++) {
+          fseek(base, (pk_index[i].rrn) * REG_SIZE, SEEK_SET);
+          readArtworkRecord(base, &info);
+          htmlWriteRecordInfo(htmlfile, &info);
         }
-        else if (c == 'n')
-          break;
-        else
-          printf("\n   Opcao invalida\n");
-      }*/
 
+        htmlEnd(htmlfile);
+        fclose(htmlfile);
 
+        printf("   Lista gerada com sucesso.\n");
+      }
       break;
 
     case 's':
@@ -174,11 +149,9 @@ int main(int argc, char* argv[]) {
 
       pkfile = fopen(PKFILE, "w");
       writePKToFile(pk_index, pkfile, numreg);
+      fclose(pkfile);
 
-      if(pk_index)
-	free(pk_index);
-      if(pkfile)
-	fclose(pkfile);
+      free(pk_index);
 
       printf("Saindo...\n");
       return 0;
