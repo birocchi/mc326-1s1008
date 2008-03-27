@@ -19,10 +19,9 @@ int main(int argc, char* argv[]) {
 
   artwork_info info;      /* Holds the artwork data. */
 
-  char input[2];
-  char c=0;                 /* Holds the user's choice from the menus. */
+  char c;                 /* Holds the user's choice from the menus. */
   int insert_data = 1;    /* Whether or not to insert more data into the dat file. */
-  char name[NAME_LENGTH]; /* Holds the name for which to search. */
+  char name[NAME_LENGTH+1]; /* Holds the name for which to search. */
   int i, numreg = 0;      /* Number of entries in our database. */
   int match_pos;
   primary_key* pk_index;
@@ -116,6 +115,8 @@ int main(int argc, char* argv[]) {
 
         htmlEnd(htmlfile);
         fclose(htmlfile);
+
+        printf("\n    As informacoes da obra \"%s\" foram salvas em \"%s\".\n", name, HTMLFILE);
       }
 
       break;
@@ -123,10 +124,11 @@ int main(int argc, char* argv[]) {
     case 'g':
       printf("   Gerando lista de obras...\n");
 
-      if (!base){
+      /* TODO: Essa verificacao precisa melhorar ou nao existir */
+      if (!base) {
         printf("     Nao existe nenhuma obra ainda.\n");
       }
-      else{
+      else {
         htmlfile = fopen(HTMLFILE, "w");
         htmlBegin(htmlfile);
 
@@ -143,6 +145,7 @@ int main(int argc, char* argv[]) {
 
         printf("   Lista gerada com sucesso.\n");
       }
+
       break;
 
     case 's':
