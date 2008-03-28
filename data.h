@@ -4,13 +4,13 @@
 #include <stdio.h>
 
 /* Defining the sizes of each field. */
-#define NAME_LENGTH 200
-#define TYPE_LENGTH 100
+#define NAME_LENGTH   200
+#define TYPE_LENGTH   100
 #define AUTHOR_LENGTH 125
-#define YEAR_LENGTH 4
-#define VALUE_LENGTH 12
-#define IMG_LENGTH 9
-#define RRN_LENGTH 4 /* Relative record number. 32-bit integer (4 bytes) */
+#define YEAR_LENGTH   4
+#define VALUE_LENGTH  12
+#define IMG_LENGTH    9
+#define RRN_LENGTH    4 /* Relative record number. 32-bit integer (4 bytes) */
 
 /* Total size of a register. */
 #define REG_SIZE (NAME_LENGTH + TYPE_LENGTH + AUTHOR_LENGTH + \
@@ -23,12 +23,12 @@
  * each register in the database */
 typedef struct
 {
-	char title[NAME_LENGTH];        /* The artwork's title */
-	char type[TYPE_LENGTH];         /* The artwork's type  */
-	char author[AUTHOR_LENGTH];     /* The artworks author */
+	char title[NAME_LENGTH+1];        /* The artwork's title */
+	char type[TYPE_LENGTH+1];         /* The artwork's type  */
+	char author[AUTHOR_LENGTH+1];     /* The artworks author */
 	int year;                         /* The year the artwork was made */
 	int value;                        /* The artwork's value */
-	char img[IMG_LENGTH];           /* The register's identifier */
+	char img[IMG_LENGTH+1];           /* The register's identifier */
 } artwork_info;
 
 /*
@@ -39,7 +39,15 @@ typedef struct
  * One must save the returned pointer and free it after using it.
  */
 char* getValidImagePath(const char* s);
-void printArtworkRecord(artwork_info* info);
+
+/*
+ * readArtworkRecord
+ *
+ * Reads one record from the database file /base/ and
+ * stores it in /info/.
+ *
+ * Returns 0 on succes and 1 on error.
+ */
 int readArtworkRecord(FILE* base, artwork_info* info);
 
 /*
