@@ -2,11 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include "data.h"
+#include "mem.h"
 
 char* getValidImagePath(const char* s) {
-  char *file;
+  char* file;
 
-  file = (char*)calloc(IMG_LENGTH+2, sizeof(char));
+  file = MEM_ALLOC_N(char, IMG_LENGTH+2);
 
   strncpy(file, s, 6);
   file[6] = '.';
@@ -22,9 +23,9 @@ int readArtworkRecord(FILE *base, artwork_info *info)
     return 1;
   }
 
-  fgets(info->title, NAME_LENGTH, base);
-  fgets(info->type, TYPE_LENGTH, base);
-  fgets(info->author, AUTHOR_LENGTH, base);
+  fgets(info->title, NAME_LENGTH+1, base);
+  fgets(info->type, TYPE_LENGTH+1, base);
+  fgets(info->author, AUTHOR_LENGTH+1, base);
   fscanf(base, "%04d", &(info->year));
   fscanf(base, "%012d", &(info->value));
   fgets(info->img, IMG_LENGTH+1, base);
@@ -38,6 +39,8 @@ int writeData(FILE *file, artwork_info *info)
   if (!file || !info) {
     return 1;
   }
+
+  fseek(file, 0, SEEK_END);
 
   fprintf(file, "%-200s",   info->title);
   fprintf(file, "%-100s",   info->type);

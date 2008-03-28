@@ -1,13 +1,11 @@
-Cada vez que insere tem que aumentar 'numreg'
-Dai tem que realocar a tabela 'pkindex' e ordenar denovo.
++ É preciso testar o software MUITO
 
 + Ao inserir entradas, o identificador tem 9 caracteres, mas os 2 primeiros sao o id do grupo e nao devem ser entrados pelo usuario. Precisamos nao usar numeros magicos e aceitar 7 caracteres.
 
-+ Refatorar main.c:58:62 numa função que retorna um inteiro (se deu certo ler ou não) e armazena num ponteiro pra char a letra lida
++ Refatorar artwork_info nos moldes de PrimaryKeyList?
 
-+ ler opcoes do teclado as vezes da merda
++ Documentar todo o código novo
 
-+ IMPORTANTE: ATUALIZAR A INSERCAO PRA NAO PERMITIR TITULO IGUAL
++ Implementar um pkListForeach, mas dá preguiça e não tem muita utilidade por enquanto
 
-+ Refatorar a struct primary_key: ela deve ser uma struct interna a uma outra maior que contém
-  o número de registros junto e outras metainformações que forem necessárias
++ Talvez htmlWriteRecordInfo não devesse existir como é, mas ser usado com um wrapper e pkListForeach

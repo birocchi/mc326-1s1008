@@ -21,10 +21,8 @@ void htmlEnd(FILE* htmlfile) {
   }
 }
 
-void htmlWriteRecordInfo(FILE* htmlfile, artwork_info* info)
-{
-  
-  char * path = getValidImagePath(info->img);
+void htmlWriteRecordInfo(FILE* htmlfile, artwork_info* info) {
+  char* path = getValidImagePath(info->img);
 
   if (htmlfile && info) {
     fprintf(htmlfile, "<img src=\"img/%s\">", path);

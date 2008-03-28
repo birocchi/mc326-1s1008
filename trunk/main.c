@@ -8,9 +8,9 @@
 #include "menu.h"
 #include "pk.h"
 
-#define DBFILE "base01.dat" /* The database file name. */
-#define HTMLFILE "lista.html"
-#define PKFILE "pkfile.pk"  /* The primary key file name. */
+#define DBFILE   "base01.dat"   /* The database file name. */
+#define HTMLFILE "lista.html"   /* The HTML output. */
+#define PKFILE   "pkfile.pk"    /* The primary key file name. */
 
 int main(int argc, char* argv[]) {
   FILE *base;               /* base01.dat basically */
@@ -62,37 +62,36 @@ int main(int argc, char* argv[]) {
       break;
 
     case 'i':
-#if 0
-      /* Open the file for appending. */
-      insert_data = 1;
-      base = fopen("base01.dat", "a");
-
       while (insert_data) {
         readData(&info);
+
+        if (pkListFindByName(pkindex, info.title) != -1) {
+          printf("\nJa existe uma obra com titulo \"%s\".\n", info.title);
+          continue;
+        }
+
         writeData(base, &info);
-        pk_index = incrementPK(pk_index, numreg, &info);
-        numreg++;
+        pkListInsert(pkindex, info.title);
 
         while (1) {
           printf("\nDeseja inserir mais uma entrada? (s)im, (n)ao? ");
 
-          c = tolower(readChar());
-          if (c == -1)
+          if (readChar(&c) == -1)
             printf("\nOpcao invalida");
+
+          c = tolower(c);
 
           if (c == 's')
             break;
           else if (c == 'n') {
             insert_data = 0;
-            if (base)
-              fclose(base);
             break;
           }
           else
             printf("\nOpcao invalida");
         }
       }
-#endif
+
       break;
 
     case 'c':
@@ -122,7 +121,7 @@ int main(int argc, char* argv[]) {
     case 'g':
       printf("   Gerando lista de obras...\n");
 
-      if (pkindex->regnum < 1) {
+      if (pkListIsEmpty(pkindex)) {
         printf("     O catalogo ainda nao possui obras.\n");
       }
       else {
@@ -140,7 +139,7 @@ int main(int argc, char* argv[]) {
         htmlEnd(htmlfile);
         fclose(htmlfile);
 
-        printf("   Lista gerada com sucesso.\n");
+        printf("   Lista \"%s\" gerada com sucesso.\n", HTMLFILE);
       }
 
       break;

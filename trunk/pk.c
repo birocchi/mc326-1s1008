@@ -1,8 +1,10 @@
+#include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "data.h"
 #include "file.h"
+#include "mem.h"
 #include "pk.h"
 
 /*
@@ -29,20 +31,28 @@ static int __qsort_compare(const void* a, const void* b)
 }
 
 static int pkListInflateSize(PrimaryKeyList* index) {
+  PrimaryKeyRecord* tmp;
+
+  tmp = realloc(index->pklist, (index->maxregs*2)*sizeof(PrimaryKeyRecord));
+
+  if (tmp == NULL)
+    return 1;
+  else {
+    index->pklist = tmp;
+    index->maxregs = index->maxregs * 2;
+  };
+
   return 0;
 }
 
 PrimaryKeyList* pkListInit(void) {
   PrimaryKeyList* ret;
 
-  ret = (PrimaryKeyList*)malloc(sizeof(PrimaryKeyList));
-  if (ret == NULL)
-    return NULL;
-
+  ret = MEM_ALLOC(PrimaryKeyList);
   ret->regnum = 0;
   ret->maxregs = 20; /* Initial size of the base */
 
-  ret->pklist = (PrimaryKeyRecord*)calloc(ret->maxregs, sizeof(PrimaryKeyRecord));
+  ret->pklist = MEM_ALLOC_N(PrimaryKeyRecord, ret->maxregs);
   if (ret->pklist == NULL) {
     free(ret);
     return NULL;
@@ -72,7 +82,24 @@ int pkListFindByName(PrimaryKeyList* index, const char* key) {
     return match->rrn;
 }
 
-int pkListInsert(PrimaryKeyList* index, int rrn, const char* name) {
+int pkListInsert(PrimaryKeyList* index, const char* name) {
+  /* If the name is already on the list, do not add it again */
+  if (pkListFindByName(index, name) != -1)
+    return 1;
+
+  /* If we need more space on the list, inflate it */
+  if (index->regnum == index->maxregs) {
+    if (pkListInflateSize(index))
+      return 1;
+  }
+
+  index->pklist[index->regnum].rrn = index->regnum;
+  strncpy(index->pklist[index->regnum].name, name, NAME_LENGTH);
+
+  index->regnum++;
+
+  qsort(index->pklist, index->regnum, sizeof(PrimaryKeyRecord), __qsort_compare);
+
   return 0;
 }
 
