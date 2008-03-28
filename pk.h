@@ -13,7 +13,7 @@
  */
 typedef struct {
   int rrn;
-  char name[NAME_LENGTH+1];
+  char name[NAME_LENGTH+1]; 
 } PrimaryKeyRecord;
 
 /*
@@ -34,25 +34,82 @@ typedef struct {
  * pkListInit
  *
  * The list's "constructor": allocate memory for the
- * list's internal structure.
+ * list's internal structure, starting with 20 positions.
  *
  * Returns a pointer to the initialized list or NULL
  * if it could not be initialized.
  */
 PrimaryKeyList* pkListInit(void);
 
+
+/*
+ * pkListFindByName
+ *
+ * Searches for the key 'key' in the 'index' list.
+ *
+ * Returns the key's rrn if found or -1 case not.
+ */
 int pkListFindByName(PrimaryKeyList* index, const char* key);
 
+
+/*
+ * pkListFree
+ *
+ * Entirely frees the struct pointed by 'index'. 
+ * Frees the pointer to the list,
+ * and only then frees the struct itselft.
+ */
 void pkListFree(PrimaryKeyList* index);
 
+/*
+ * pkListInsert
+ *
+ * Takes the pointer to the PrimaryKeyList,
+ * and a string, the pk. Adds the new key
+ * to the PK index.
+ *
+ * Returns 0 if everything went ok 
+ * or 1 if the key was already in the list
+ * or if it had any problems inflating the table
+ * case it was already full.
+ */
 int pkListInsert(PrimaryKeyList* index, const char* name);
 
+/*
+ * pkListIsEmpty
+ *
+ * Checks if the PK table is empty.
+ *
+ * Returns 1 if the list is empty or 'index' is NULL, 0 otherwise.
+ */
 int pkListIsEmpty(PrimaryKeyList* index);
 
+/*
+ * pkListLoadFromBase
+ *
+ * Loads the primary keys from the registers at 'base'
+ * to 'index'. Leaves it sorted.
+ *
+ * Returns 1 if any problems ocurred, 0 otherwise.
+ */
 int pkListLoadFromBase(PrimaryKeyList* index, FILE* base);
 
+/*
+ * pkListLoadFromPK
+ *
+ * Loads the primary keys from the primary key index
+ * file 'pkfile' into 'index'.
+ *
+ * Returns 1 if any problems ocurres, 0 otherwise.
+ */
 int pkListLoadFromPK(PrimaryKeyList* index, FILE* pkfile);
 
+/*
+ * pkListWriteToFile
+ *
+ * Takes the primary key index 'index' and writes it properly
+ * to the file 'pkfile'.
+ */
 void pkListWriteToFile(PrimaryKeyList* index, FILE* pkfile);
 
 #endif

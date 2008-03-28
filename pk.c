@@ -33,14 +33,15 @@ static int __qsort_compare(const void* a, const void* b)
 static int pkListInflateSize(PrimaryKeyList* index) {
   PrimaryKeyRecord* tmp;
 
+  /* We realloc the array to twice it's previous size. */
   tmp = realloc(index->pklist, (index->maxregs*2)*sizeof(PrimaryKeyRecord));
 
-  if (tmp == NULL)
-    return 1;
-  else {
-    index->pklist = tmp;
-    index->maxregs = index->maxregs * 2;
-  };
+  if (tmp == NULL) /* If we had a problem reallocating it */
+    return 1; /* Return an error with nothing changed to 'index'. */
+  else { /* In the other hand, if it worked right */
+    index->pklist = tmp; /* Now index may receive the bigger array. */
+    index->maxregs = index->maxregs * 2; /* Now it has twice the storage space. */
+  }
 
   return 0;
 }
@@ -48,23 +49,28 @@ static int pkListInflateSize(PrimaryKeyList* index) {
 PrimaryKeyList* pkListInit(void) {
   PrimaryKeyList* ret;
 
-  ret = MEM_ALLOC(PrimaryKeyList);
+  ret = MEM_ALLOC(PrimaryKeyList); /* Alocating the PK list struct. */
   ret->regnum = 0;
   ret->maxregs = 20; /* Initial size of the base */
 
-  ret->pklist = MEM_ALLOC_N(PrimaryKeyRecord, ret->maxregs);
-  if (ret->pklist == NULL) {
-    free(ret);
-    return NULL;
+  /* Alocate the actual PK list, for the first time. */
+  ret->pklist = MEM_ALLOC_N(PrimaryKeyRecord, ret->maxregs); 
+
+  if (ret->pklist == NULL) { /* Checking the PK list alocation. */
+    free(ret); /* If not, then the struct is useless, free it. */
+    return NULL; 
   }
 
   return ret;
 }
 
 void pkListFree(PrimaryKeyList* index) {
+  /* PrimaryKeyList* points to a struct, 
+     so we must free the struct's pointers first*/
+  
   if (index) {
-    free(index->pklist);
-    free(index);
+    free(index->pklist); /* Free the pointer to the actual list. */
+    free(index); /* And then free the struct. */
     index = NULL;
   }
 }
@@ -72,14 +78,18 @@ void pkListFree(PrimaryKeyList* index) {
 int pkListFindByName(PrimaryKeyList* index, const char* key) {
   PrimaryKeyRecord* match;
 
+  /* This will use bsearch to find the key. */
+
   match = bsearch(key, index->pklist, index->regnum,
                   sizeof(PrimaryKeyRecord),
                   __bsort_compare);
 
+  /* bsearch returns NULL if it doesn't find it.
+     So we catch that and return -1. */
   if (match == NULL)
     return -1;
-  else
-    return match->rrn;
+  else /* In case it's a valid pointer...*/
+    return match->rrn; /* Return it's rrn. */
 }
 
 int pkListInsert(PrimaryKeyList* index, const char* name) {
@@ -89,16 +99,21 @@ int pkListInsert(PrimaryKeyList* index, const char* name) {
 
   /* If we need more space on the list, inflate it */
   if (index->regnum == index->maxregs) {
-    if (pkListInflateSize(index))
+    if (pkListInflateSize(index)) /* If we had problems inflating the index. */
       return 1;
   }
 
-  index->pklist[index->regnum].rrn = index->regnum;
+  /* New register's rrn is the number of registers, 
+     since it's added to the end. */
+  index->pklist[index->regnum].rrn = index->regnum; 
+  /* Then we copy the key, in this case the name, to the PK index. */
   strncpy(index->pklist[index->regnum].name, name, NAME_LENGTH);
 
   index->regnum++;
-
-  qsort(index->pklist, index->regnum, sizeof(PrimaryKeyRecord), __qsort_compare);
+  
+  /* Must keep it sorted. */
+  qsort(index->pklist, index->regnum, 
+	sizeof(PrimaryKeyRecord), __qsort_compare);
 
   return 0;
 }
@@ -117,22 +132,31 @@ int pkListLoadFromBase(PrimaryKeyList* index, FILE* base) {
   if ((base == NULL) || (index == NULL))
     return 1;
 
-  basepos = ftell(base);
-  index->regnum = getFileSize(base) / REG_SIZE;
+  basepos = ftell(base); /* Saves the current position at the base. */
+  index->regnum = getFileSize(base) / REG_SIZE; /* How many registers we have. */
 
+  /* While we have more registers to store than available space,
+     we keep inflating our list.*/
   while (index->regnum > index->maxregs) {
     if (pkListInflateSize(index))
       return 1;
   }
-
+  
+  /* Next we read the registers from our base. */
   for (i = 0; i < index->regnum; i++) {
-    fgets(index->pklist[i].name, NAME_LENGTH, base);
-    index->pklist[i].rrn = i;
+    fgets(index->pklist[i].name, NAME_LENGTH, base); /* Read the name. */
+    index->pklist[i].rrn = i; /* Set it's rrn to the current position. */
+
+    /* Since we need to skip the rest of the register, and have already
+       read NAME_LENGTH, we must go REG_SIZE - NAME_LENGTH positions ahead,
+       and yet one more for we must read the next name. */
     fseek(base, (REG_SIZE - NAME_LENGTH)+1, SEEK_CUR);
   }
 
+  /* After everything is added, it has to be sorted. */
   qsort(index->pklist, index->regnum, sizeof(PrimaryKeyRecord), __qsort_compare);
 
+  /* Leave the pointer on base at it's original position. */
   fseek(base, basepos, SEEK_SET);
 
   return 0;
@@ -146,22 +170,31 @@ int pkListLoadFromPK(PrimaryKeyList* index, FILE* pkfile) {
   if (pkfile == NULL)
     return 1;
 
+  /* Save the pointer's positions. */
   pkfilepos = ftell(pkfile);
+
+  /* How many registers we have. */
   index->regnum = getFileSize(pkfile) / PK_REG_SIZE;
 
+  /* While we have more registers to store than available space,
+     we keep inflating our list.*/
   while (index->regnum > index->maxregs) {
     if (pkListInflateSize(index))
       return 1;
   }
-
+  
+  /* For each register in the pkfile... */
   for (i = 0; i < index->regnum; i++) {
-    fgets(tmpname, NAME_LENGTH+1, pkfile);
-    fgets(tmprrn, RRN_LENGTH+1, pkfile);
-    rrn = atoi(tmprrn);
-    strncpy(index->pklist[i].name, tmpname, NAME_LENGTH);
+    fgets(tmpname, NAME_LENGTH+1, pkfile); /* Get the name to a temp. */
+    fgets(tmprrn, RRN_LENGTH+1, pkfile); /* And so do it with the pk. */
+    rrn = atoi(tmprrn); /* We change the string into a int. */
+    /* Put the temporary into the definite position. */
+    strncpy(index->pklist[i].name, tmpname, NAME_LENGTH); 
+    /* And save the rrn to the list. */
     index->pklist[i].rrn = rrn;
   }
 
+  /* Change the pointer to it's original position. */
   fseek(pkfile, pkfilepos, SEEK_SET);
 
   return 0;
@@ -171,9 +204,14 @@ void pkListWriteToFile(PrimaryKeyList* index, FILE* pkfile) {
   char write_str[20] = {'\0'};
   int i;
 
-  if (pkfile) {
+  
+  if (pkfile) { /* Check if the file is properly opened. */
     for (i = 0; i < index->regnum; i++) {
+      /* We write the format string for fprintf at write_str.
+	 This takes the sizes for the fields. */
       sprintf(write_str, "%%-%ds%%0%dd", NAME_LENGTH, RRN_LENGTH);
+      /* Using the format string, we call fprintf to write the
+	 name and rrn fields to the pkfile. */
       fprintf(pkfile, write_str, index->pklist[i].name, index->pklist[i].rrn);
     }
   }
