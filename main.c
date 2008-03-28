@@ -62,6 +62,8 @@ int main(int argc, char* argv[]) {
       break;
 
     case 'i':
+      insert_data = 1;
+
       while (insert_data) {
         readData(&info);
 
