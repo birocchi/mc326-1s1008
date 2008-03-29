@@ -29,7 +29,7 @@ int readData(artwork_info *info);
  * Reads input and checks if it's a valid integer. If not,
  * read it until a valid integer is entered.
  */
-void readInt(const char* inputText, int* dest, size_t length);
+void readInt(const char* inputText, char* dest, size_t length);
 
 /*
  * readString

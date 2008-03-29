@@ -13,17 +13,17 @@
 #define PKFILE   "pkfile.pk"    /* The primary key file name. */
 
 int main(int argc, char* argv[]) {
-  FILE *base;               /* base01.dat basically */
-  FILE *htmlfile;           /* Every single report will be printed here */
-  FILE *pkfile;             /* File with the primary key table. */
+  FILE *base;                 /* base01.dat basically */
+  FILE *htmlfile;             /* Every single report will be printed here */
+  FILE *pkfile;               /* File with the primary key table. */
 
-  artwork_info info;        /* Holds the artwork data. */
+  artwork_info info;          /* Holds the artwork data. */
   PrimaryKeyList* pkindex;
 
-  char c;                   /* Holds the user's choice from the menus. */
-  int insert_data = 1;      /* Whether or not to insert more data into the dat file. */
-  char name[TITLE_LENGTH+1]; /* Holds the name for which to search. */
-  int i;                    /* Number of entries in our database. */
+  char c;                     /* Holds the user's choice from the menus. */
+  int insert_data = 1;        /* Whether or not to insert more data into the dat file. */
+  char name[TITLE_LENGTH+1];  /* Holds the name for which to search. */
+  int i;                      /* Number of entries in our database. */
   int match_pos;
 
   base = fopen(DBFILE, "a+");
@@ -76,7 +76,7 @@ int main(int argc, char* argv[]) {
           continue;
         }
 
-        writeData(base, &info);
+        baseWriteData(base, &info);
         pkListInsert(pkindex, info.title);
 
         while (1) {
@@ -112,7 +112,7 @@ int main(int argc, char* argv[]) {
         htmlBegin(htmlfile);
 
         fseek(base, match_pos*REG_SIZE, SEEK_SET);
-        readArtworkRecord(base, &info);
+        baseReadArtworkRecord(base, &info);
 
         htmlWriteRecordInfo(htmlfile, &info);
 
@@ -138,7 +138,7 @@ int main(int argc, char* argv[]) {
 
         for (i = 0; i < pkindex->regnum; i++) {
           fseek(base, (pkindex->pklist[i].rrn) * REG_SIZE, SEEK_SET);
-          readArtworkRecord(base, &info);
+          baseReadArtworkRecord(base, &info);
           htmlWriteRecordInfo(htmlfile, &info);
         }
 
