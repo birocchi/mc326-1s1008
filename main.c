@@ -1,7 +1,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
-#include "data.h"
+#include "base.h"
 #include "file.h"
 #include "html.h"
 #include "io.h"
@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
 
   char c;                   /* Holds the user's choice from the menus. */
   int insert_data = 1;      /* Whether or not to insert more data into the dat file. */
-  char name[NAME_LENGTH+1]; /* Holds the name for which to search. */
+  char name[TITLE_LENGTH+1]; /* Holds the name for which to search. */
   int i;                    /* Number of entries in our database. */
   int match_pos;
 
@@ -102,7 +102,7 @@ int main(int argc, char* argv[]) {
 
     case 'c':
       readString("\n    Por favor, digite o titulo da obra (Max: 200 caracteres): ",
-                 name, NAME_LENGTH);
+                 name, TITLE_LENGTH);
       match_pos = pkListFindByName(pkindex, name);
 
       if (match_pos == -1)

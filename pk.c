@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "data.h"
+#include "base.h"
 #include "file.h"
 #include "mem.h"
 #include "pk.h"
@@ -27,7 +27,7 @@ static int __bsort_compare(const void* a, const void* b)
  */
 static int __qsort_compare(const void* a, const void* b)
 {
-  return strncmp( ((PrimaryKeyRecord*)a)->name, ((PrimaryKeyRecord*)b)->name, NAME_LENGTH);
+  return strncmp( ((PrimaryKeyRecord*)a)->name, ((PrimaryKeyRecord*)b)->name, TITLE_LENGTH);
 }
 
 static int pkListInflateSize(PrimaryKeyList* index) {
@@ -107,7 +107,7 @@ int pkListInsert(PrimaryKeyList* index, const char* name) {
      since it's added to the end. */
   index->pklist[index->regnum].rrn = index->regnum; 
   /* Then we copy the key, in this case the name, to the PK index. */
-  strncpy(index->pklist[index->regnum].name, name, NAME_LENGTH);
+  strncpy(index->pklist[index->regnum].name, name, TITLE_LENGTH);
 
   index->regnum++;
   
@@ -144,13 +144,13 @@ int pkListLoadFromBase(PrimaryKeyList* index, FILE* base) {
   
   /* Next we read the registers from our base. */
   for (i = 0; i < index->regnum; i++) {
-    fgets(index->pklist[i].name, NAME_LENGTH, base); /* Read the name. */
+    fgets(index->pklist[i].name, TITLE_LENGTH, base); /* Read the name. */
     index->pklist[i].rrn = i; /* Set it's rrn to the current position. */
 
     /* Since we need to skip the rest of the register, and have already
-       read NAME_LENGTH, we must go REG_SIZE - NAME_LENGTH positions ahead,
+       read TITLE_LENGTH, we must go REG_SIZE - TITLE_LENGTH positions ahead,
        and yet one more for we must read the next name. */
-    fseek(base, (REG_SIZE - NAME_LENGTH)+1, SEEK_CUR);
+    fseek(base, (REG_SIZE - TITLE_LENGTH)+1, SEEK_CUR);
   }
 
   /* After everything is added, it has to be sorted. */
@@ -163,7 +163,7 @@ int pkListLoadFromBase(PrimaryKeyList* index, FILE* base) {
 }
 
 int pkListLoadFromPK(PrimaryKeyList* index, FILE* pkfile) {
-  char tmpname[NAME_LENGTH+1], tmprrn[RRN_LENGTH+1];
+  char tmpname[TITLE_LENGTH+1], tmprrn[RRN_LENGTH+1];
   int i, rrn;
   int pkfilepos;
 
@@ -185,11 +185,11 @@ int pkListLoadFromPK(PrimaryKeyList* index, FILE* pkfile) {
   
   /* For each register in the pkfile... */
   for (i = 0; i < index->regnum; i++) {
-    fgets(tmpname, NAME_LENGTH+1, pkfile); /* Get the name to a temp. */
+    fgets(tmpname, TITLE_LENGTH+1, pkfile); /* Get the name to a temp. */
     fgets(tmprrn, RRN_LENGTH+1, pkfile); /* And so do it with the pk. */
     rrn = atoi(tmprrn); /* We change the string into a int. */
     /* Put the temporary into the definite position. */
-    strncpy(index->pklist[i].name, tmpname, NAME_LENGTH); 
+    strncpy(index->pklist[i].name, tmpname, TITLE_LENGTH); 
     /* And save the rrn to the list. */
     index->pklist[i].rrn = rrn;
   }
@@ -209,7 +209,7 @@ void pkListWriteToFile(PrimaryKeyList* index, FILE* pkfile) {
     for (i = 0; i < index->regnum; i++) {
       /* We write the format string for fprintf at write_str.
 	 This takes the sizes for the fields. */
-      sprintf(write_str, "%%-%ds%%0%dd", NAME_LENGTH, RRN_LENGTH);
+      sprintf(write_str, "%%-%ds%%0%dd", TITLE_LENGTH, RRN_LENGTH);
       /* Using the format string, we call fprintf to write the
 	 name and rrn fields to the pkfile. */
       fprintf(pkfile, write_str, index->pklist[i].name, index->pklist[i].rrn);
