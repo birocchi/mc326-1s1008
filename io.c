@@ -102,30 +102,27 @@ void readString(const char* inputText, char* dest, size_t length)
 
 void readValue(char s[], size_t length)
 {
-  /* fgets reads n-1 characters from the stream, so we
-   * use length+1 to make readValue calls keep making sense. */
   fgets(s, length+1, stdin);
 
-  if (!stripNewLine(s))
-    flushBuffer();
+  stripNewLine(s);
+  stripWhiteSpace(s);
 }
 
-int stripNewLine(char s[])
+void stripNewLine(char s[])
 {
   int pos;
 
   for (pos = 0; pos < strlen(s); pos++) {
     if (s[pos] == '\n') {
       s[pos] = '\0';
-      return 1;
+      return;
     }
   }
 
-  return 0;
+  flushBuffer();
 }
 
-int strip(char *str){
-  
+int stripWhiteSpace(char str[]){
   int len, i, j;
   char c;
 
@@ -135,7 +132,7 @@ int strip(char *str){
 
   /* Stripping spaces from the beggining. */
   c = str[0];
-  while(c == ' '){
+  while (isspace(c)) {
     i = 0;
     while(i <= len){
       str[i] = str[++i];
@@ -145,14 +142,14 @@ int strip(char *str){
   
   /* Stripping spaces from the end. */
   c = str[len];
-  while(c <= 32){
+  while (isspace(c)) {
     str[len] = '\0';
     c = str[--len];
   }
   /* Changing double or more spaces into one. */
   len = strlen(str);
   for(i = 0; i < len - 1; i++){
-    while (str[i] == ' ' && str[i+1] == ' '){
+    while (isspace(str[i]) && isspace(str[i+1])){
       for(j = i + 1; j < len - 1;){
 	str[j] = str[++j];
       }

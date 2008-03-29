@@ -6,8 +6,10 @@
 
 void htmlBegin(FILE* htmlfile) {
   if (htmlfile) {
+    fprintf(htmlfile, "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n");
     fprintf(htmlfile, "<html>\n");
     fprintf(htmlfile, "<head>\n");
+    fprintf(htmlfile, "  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n");
     fprintf(htmlfile, "  <title>TP2 Grupo 1</title>\n");
     fprintf(htmlfile, "</head>\n\n");
     fprintf(htmlfile, "<body>\n");
