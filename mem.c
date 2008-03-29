@@ -3,9 +3,9 @@
 #include <stdlib.h>
 
 void* __memAllocate(size_t numelem, size_t elemsize) {
-  void* chunk = calloc(numelem, elemsize);
+  void* chunk = calloc(numelem, elemsize); /* Aloc a new array. */
 
-  if (chunk == NULL) {
+  if (chunk == NULL) { /* If it didn't aloc, return error. */
     fprintf(stderr, "Erro ao alocar %d bytes. Abortando programa.\n", numelem*elemsize);
     exit(EXIT_FAILURE);
   }
