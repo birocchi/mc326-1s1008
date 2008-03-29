@@ -1,9 +1,9 @@
 #ifndef __PK_H
 #define __PK_H
 
-#include "data.h"
+#include "base.h"
 
-#define PK_REG_SIZE (NAME_LENGTH + RRN_LENGTH)   /* 4 bytes for a 32-bit integer */
+#define PK_REG_SIZE (TITLE_LENGTH + RRN_LENGTH)   /* 4 bytes for a 32-bit integer */
 
 /*
  * This is the internal structure used
@@ -13,7 +13,7 @@
  */
 typedef struct {
   int rrn;
-  char name[NAME_LENGTH+1]; 
+  char name[TITLE_LENGTH+1]; 
 } PrimaryKeyRecord;
 
 /*

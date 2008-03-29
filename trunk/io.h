@@ -1,7 +1,7 @@
 #ifndef __IO_H_
 #define __IO_H_
 
-#include "data.h"
+#include "base.h"
 #include <stdio.h>
 
 /* 

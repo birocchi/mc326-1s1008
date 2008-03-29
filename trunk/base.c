@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "data.h"
+#include "base.h"
 #include "mem.h"
 
 char* getValidImagePath(const char* s) {
@@ -23,7 +23,7 @@ int readArtworkRecord(FILE *base, artwork_info *info)
     return 1;
   }
 
-  fgets(info->title, NAME_LENGTH+1, base);
+  fgets(info->title, TITLE_LENGTH+1, base);
   fgets(info->type, TYPE_LENGTH+1, base);
   fgets(info->author, AUTHOR_LENGTH+1, base);
   fscanf(base, "%04d", &(info->year));

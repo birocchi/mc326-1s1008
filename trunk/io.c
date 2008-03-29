@@ -35,7 +35,7 @@ int readData(artwork_info *info)
     return 1;
 
   readString("\n   Por favor, digite o titulo da obra (Max: 200 caracteres): ",
-      info->title, NAME_LENGTH);
+      info->title, TITLE_LENGTH);
   readString("\n   Por favor, digite o tipo da obra (Max: 100 caracteres): ",
       info->type, TYPE_LENGTH);
   readString("\n   Por favor, digite o autor da obra (Max: 125 caracteres): ",
