@@ -44,4 +44,4 @@ pk.o: pk.c pk.h
 
 clean:
 	cp -v base01.dat base01.dat.back ; \
-	rm -rf *.o art base01.dat ; 
+	rm -rf *.o $(TP) base01.dat ; 
