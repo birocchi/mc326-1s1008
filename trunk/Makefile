@@ -11,11 +11,12 @@ CC=gcc
 CFLAGS=-c -Wall -g -ansi -pedantic
 LDFLAGS=-lefence
 OFILES=base.o file.o io.o html.o main.o mem.o menu.o pk.o
+TP=tp2
 
 all: art
 
 art: $(OFILES)
-	$(CC) $(LDFLAGS) $(OFILES) -o art 
+	$(CC) $(LDFLAGS) $(OFILES) -o $(TP)
 
 base.o: base.c base.h
 	$(CC) $(CFLAGS) $<
