@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
   int insert_data = 1;        /* Whether or not to insert more data into the dat file. */
   char name[TITLE_LENGTH+1];  /* Holds the name for which to search. */
   int i;                      /* Number of entries in our database. */
-  int match_pos;
+  int match_pos;              /* Will hold the rrn of the found register. */
 
   base = fopen(DBFILE, "r");
   if (!base) {
@@ -111,6 +111,7 @@ int main(int argc, char* argv[]) {
     case 'c':
       readString("\n    Por favor, digite o titulo da obra (Max: 200 caracteres): ",
                  name, TITLE_LENGTH);
+      /* Getting the rrn of the search. */
       match_pos = pkListFindByName(pkindex, name);
 
       if (match_pos == -1)
@@ -119,7 +120,9 @@ int main(int argc, char* argv[]) {
         htmlfile = fopen(HTMLFILE, "w");
         htmlBegin(htmlfile);
 
+	/* Go to the database position of the found rrn. */
         fseek(base, match_pos*REG_SIZE, SEEK_SET);
+	/* And then read that register. */
         baseReadArtworkRecord(base, &info);
 
         htmlWriteRecordInfo(htmlfile, &info);
