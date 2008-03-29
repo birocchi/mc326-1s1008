@@ -123,3 +123,42 @@ int stripNewLine(char s[])
 
   return 0;
 }
+
+int strip(char *str){
+  
+  int len, i, j;
+  char c;
+
+  len = strlen(str);
+  if(!len)
+    return 1;
+
+  /* Stripping spaces from the beggining. */
+  c = str[0];
+  while(c == ' '){
+    i = 0;
+    while(i <= len){
+      str[i] = str[++i];
+    }
+    c = str[0];
+  }
+  
+  /* Stripping spaces from the end. */
+  c = str[len];
+  while(c <= 32){
+    str[len] = '\0';
+    c = str[--len];
+  }
+  /* Changing double or more spaces into one. */
+  len = strlen(str);
+  for(i = 0; i < len - 1; i++){
+    while (str[i] == ' ' && str[i+1] == ' '){
+      for(j = i + 1; j < len - 1;){
+	str[j] = str[++j];
+      }
+      str[j] = '\0';
+    }
+  }
+
+  return 0;
+}
