@@ -25,34 +25,37 @@ int main(int argc, char* argv[]) {
   char name[NAME_LENGTH+1]; /* Holds the name for which to search. */
   int i;                    /* Number of entries in our database. */
   int match_pos;
- 
+
+  base = fopen(DBFILE, "a+");
+  if (!base) {
+    printf("Erro ao carregar base de dados. Saindo.\n");
+    exit(EXIT_FAILURE);
+  }
+
   pkindex = pkListInit();
   if (pkindex == NULL) {
     printf("Erro ao carregar chaves primarias. Saindo.\n");
     exit(EXIT_FAILURE);
   }
 
-  base = fopen(DBFILE, "r+");
-
   /* Loading the primary key tables. */
   printf("Carregando tabela de chaves primarias...\n");
-  if (!fileExists(PKFILE) && fileExists(DBFILE)) {
-    printf("A tabela de chaves primarias esta sendo criada.\n");
-    pkListLoadFromBase(pkindex, base);
-  }
-  else if (fileExists(PKFILE) && fileExists(DBFILE)) {
+  if (fileExists(PKFILE)) {
     pkfile = fopen(PKFILE, "r");
     pkListLoadFromPK(pkindex, pkfile);
     fclose(pkfile);
   }
-  if(base)
-    fclose(base);
+  else {
+    printf("A tabela de chaves primarias esta sendo criada.\n");
+    pkListLoadFromBase(pkindex, base);
+  }
+
   printWelcome();
 
   while (1) {
     printMenu();
 
-    if (readChar(&c)) {
+    if (readChar(&c) == -1) {
       printf("\nErro: Opcao invalida.\n");
       continue;
     }
@@ -64,7 +67,7 @@ int main(int argc, char* argv[]) {
 
     case 'i':
       insert_data = 1;
-      base = fopen(DBFILE, "a+");
+
       while (insert_data) {
         readData(&info);
 
@@ -88,9 +91,6 @@ int main(int argc, char* argv[]) {
             break;
           else if (c == 'n') {
             insert_data = 0;
-	    fflush(NULL);
-	    if(base)
-	      fclose(base);
             break;
           }
           else
@@ -110,13 +110,7 @@ int main(int argc, char* argv[]) {
       else {
         htmlfile = fopen(HTMLFILE, "w");
         htmlBegin(htmlfile);
-	
-	base = fopen(DBFILE, "r");
-	if(!base){
-	  printf("\n    Problemas na leitura da base de dados.\n");
-	  exit(1);
-	}
-	  
+
         fseek(base, match_pos*REG_SIZE, SEEK_SET);
         readArtworkRecord(base, &info);
 
@@ -124,7 +118,6 @@ int main(int argc, char* argv[]) {
 
         htmlEnd(htmlfile);
         fclose(htmlfile);
-	fclose(base);
 
         printf("\n    As informacoes da obra \"%s\" foram salvas em \"%s\".\n", name, HTMLFILE);
       }
@@ -141,10 +134,7 @@ int main(int argc, char* argv[]) {
         htmlfile = fopen(HTMLFILE, "w");
         htmlBegin(htmlfile);
 
-	base = fopen(DBFILE, "r");
-	
-	if(base)
-	  fseek(base, 0, SEEK_SET);
+        fseek(base, 0, SEEK_SET);
 
         for (i = 0; i < pkindex->regnum; i++) {
           fseek(base, (pkindex->pklist[i].rrn) * REG_SIZE, SEEK_SET);
@@ -154,8 +144,7 @@ int main(int argc, char* argv[]) {
 
         htmlEnd(htmlfile);
         fclose(htmlfile);
-	fclose(base);
-	
+
         printf("   Lista \"%s\" gerada com sucesso.\n", HTMLFILE);
       }
 
@@ -169,6 +158,7 @@ int main(int argc, char* argv[]) {
       fclose(pkfile);
 
       pkListFree(pkindex);
+      fclose(base);
 
       printf("Saindo...\n");
       return 0;

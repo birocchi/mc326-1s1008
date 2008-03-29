@@ -49,6 +49,8 @@ int writeData(FILE *file, artwork_info *info)
   fprintf(file, "%012d",    info->value);
   fprintf(file, "%s",       info->img);
 
+  fflush(file);
+
   return 0;
 }
 
