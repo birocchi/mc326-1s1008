@@ -8,15 +8,15 @@
 #include "pk.h"
 
 /*
- * __bsort_compare
+ * __bsearch_compare
  *
- * Comparison function used when we call bsort to look for a key in our array.
+ * Comparison function used when we call bsearch to look for a key in our array.
  * It works like __qsort_compare, however /a/ is just a character here, but a
  * primary_key structure in __qsort_compare.
  */
-static int __bsort_compare(const void* a, const void* b)
+static int __bsearch_compare(const void* a, const void* b)
 {
-  return strncmp( (char*)a, ((PrimaryKeyRecord*)b)->name, strlen(a));
+  return strcmp( (char*)a, ((PrimaryKeyRecord*)b)->name );
 }
 
 /*
@@ -27,7 +27,7 @@ static int __bsort_compare(const void* a, const void* b)
  */
 static int __qsort_compare(const void* a, const void* b)
 {
-  return strncmp( ((PrimaryKeyRecord*)a)->name, ((PrimaryKeyRecord*)b)->name, TITLE_LENGTH);
+  return strncmp( ((PrimaryKeyRecord*)a)->name, ((PrimaryKeyRecord*)b)->name, TITLE_LENGTH );
 }
 
 static int pkListInflateSize(PrimaryKeyList* index) {
@@ -79,10 +79,9 @@ int pkListFindByName(PrimaryKeyList* index, const char* key) {
   PrimaryKeyRecord* match;
 
   /* This will use bsearch to find the key. */
-
   match = bsearch(key, index->pklist, index->regnum,
                   sizeof(PrimaryKeyRecord),
-                  __bsort_compare);
+                  __bsearch_compare);
 
   /* bsearch returns NULL if it doesn't find it.
      So we catch that and return -1. */
@@ -203,7 +202,6 @@ int pkListLoadFromPK(PrimaryKeyList* index, FILE* pkfile) {
 void pkListWriteToFile(PrimaryKeyList* index, FILE* pkfile) {
   char write_str[20] = {'\0'};
   int i;
-
   
   if (pkfile) { /* Check if the file is properly opened. */
     for (i = 0; i < index->regnum; i++) {

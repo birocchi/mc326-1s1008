@@ -4,7 +4,7 @@
 #include "base.h"
 #include "mem.h"
 
-char* getValidImagePath(const char* s) {
+char* baseGetValidImagePath(const char* s) {
   char* file;
 
   file = MEM_ALLOC_N(char, IMG_LENGTH+2);
@@ -17,7 +17,19 @@ char* getValidImagePath(const char* s) {
   return file;
 }
 
-int readArtworkRecord(FILE *base, artwork_info *info)
+int baseIsValidIdentifier(const char* name) {
+  char* endptr;
+  int i;
+
+  i = strtol(name, &endptr, 10);
+  if ((endptr == name) || (endptr == '\0') || strlen(endptr) != 3 || ((strncmp(endptr, "jpg", 3)) &&
+        strncmp(endptr, "gif", 3) && (strncmp(endptr, "png", 3))))
+    return 1;
+  else
+    return 0;
+}
+
+int baseReadArtworkRecord(FILE *base, artwork_info *info)
 {
   if (!base || !info) {
     return 1;
@@ -26,14 +38,14 @@ int readArtworkRecord(FILE *base, artwork_info *info)
   fgets(info->title, TITLE_LENGTH+1, base);
   fgets(info->type, TYPE_LENGTH+1, base);
   fgets(info->author, AUTHOR_LENGTH+1, base);
-  fscanf(base, "%04d", &(info->year));
-  fscanf(base, "%012d", &(info->value));
+  fgets(info->year, YEAR_LENGTH+1, base);
+  fgets(info->value, VALUE_LENGTH+1, base);
   fgets(info->img, IMG_LENGTH+1, base);
 
   return 0;
 }
 
-int writeData(FILE *file, artwork_info *info)
+int baseWriteData(FILE *file, artwork_info *info)
 {
   /* Return error if the file or struct pointers are NULL. */
   if (!file || !info) {
@@ -45,24 +57,11 @@ int writeData(FILE *file, artwork_info *info)
   fprintf(file, "%-200s",   info->title);
   fprintf(file, "%-100s",   info->type);
   fprintf(file, "%-125s",   info->author);
-  fprintf(file, "%04d",     info->year);
-  fprintf(file, "%012d",    info->value);
-  fprintf(file, "%s",       info->img);
+  fprintf(file, "%-04s",     info->year);
+  fprintf(file, "%-012s",    info->value);
+  fprintf(file, "%-9s",     info->img);
 
   fflush(file);
 
   return 0;
-}
-
-int validateIdentifier(const char* name)
-{
-  char* endptr;
-  int i;
-
-  i = strtol(name, &endptr, 10);
-  if ((endptr == name) || (endptr == '\0') || strlen(endptr) != 3 || ((strncmp(endptr, "jpg", 3)) &&
-        strncmp(endptr, "gif", 3) && (strncmp(endptr, "png", 3))))
-    return 1;
-  else
-    return 0;
 }

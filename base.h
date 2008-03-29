@@ -16,9 +16,6 @@
 #define REG_SIZE (TITLE_LENGTH + TYPE_LENGTH + AUTHOR_LENGTH + \
                   YEAR_LENGTH + VALUE_LENGTH + IMG_LENGTH)
 
-/* Total size of a primary key. */
-#define PK_SIZE (TITLE_LENGTH + RRN_LENGTH)
-
 /* The main structure which holds data about
  * each register in the database */
 typedef struct
@@ -26,8 +23,8 @@ typedef struct
 	char title[TITLE_LENGTH+1];       /* The artwork's title */
 	char type[TYPE_LENGTH+1];         /* The artwork's type  */
 	char author[AUTHOR_LENGTH+1];     /* The artworks author */
-	int year;                         /* The year the artwork was made */
-	int value;                        /* The artwork's value */
+  char year[YEAR_LENGTH+1];         /* The year the artwork was made */
+	char value[VALUE_LENGTH+1];       /* The artwork's value */
 	char img[IMG_LENGTH+1];           /* The register's identifier */
 } artwork_info;
 
@@ -38,7 +35,18 @@ typedef struct
  * the extension.
  * One must save the returned pointer and free it after using it.
  */
-char* getValidImagePath(const char* s);
+char* baseGetValidImagePath(const char* s);
+
+/*
+ * baseIsValidIdentifier
+ *
+ * Checks if the image identifier is valid.
+ * This time we use strtol to get past the digits and also
+ * check the file extension.
+ *
+ * Returns 1 on error and 0 for OK.
+ */
+int baseIsValidIdentifier(const char* name);
 
 /*
  * readArtworkRecord
@@ -48,7 +56,7 @@ char* getValidImagePath(const char* s);
  *
  * Returns 0 on succes and 1 on error.
  */
-int readArtworkRecord(FILE* base, artwork_info* info);
+int baseReadArtworkRecord(FILE* base, artwork_info* info);
 
 /*
  * writeData
@@ -57,17 +65,6 @@ int readArtworkRecord(FILE* base, artwork_info* info);
  * to the file pointed at by *file.
  * Writes it according to the requested parameters.
  */
-int writeData(FILE *file, artwork_info *info);
-
-/*
- * validateIdentifier
- *
- * Checks if the image identifier is valid.
- * This time we use strtol to get past the digits and also
- * check the file extension.
- *
- * Returns 1 on error and 0 for OK.
- */
-int validateIdentifier(const char* name);
+int baseWriteData(FILE *file, artwork_info *info);
 
 #endif

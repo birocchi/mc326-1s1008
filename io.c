@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -42,16 +43,16 @@ int readData(artwork_info *info)
       info->author, AUTHOR_LENGTH);
 
   readInt("\n   Por favor, digite o ano da obra (Max: 4 caracteres): ",
-      &(info->year), YEAR_LENGTH);
+      info->year, YEAR_LENGTH);
   readInt("\n   Por favor, digite o valor da obra (Max: 12 caracteres): ",
-      &(info->value), VALUE_LENGTH);
+      info->value, VALUE_LENGTH);
 
   while (1) {
     readString("\n   Por favor, digite o identificador da obra (Max: 9 caracteres): ",
         img, IMG_LENGTH);
 
     /* Validate the image identifier */
-    if (!validateIdentifier(img)) {
+    if (!baseIsValidIdentifier(img)) {
       strncpy(info->img, img, IMG_LENGTH+1);
       break;
     }
@@ -64,28 +65,24 @@ int readData(artwork_info *info)
   return 0;
 }
 
-void readInt(const char* inputText, int* dest, size_t length)
+void readInt(const char* inputText, char* dest, size_t length)
 {
-  /* In a 32-bit system, INT_MAX = 2147483647, which
-   * has 10 digits. We can have a '-', which makes 11
-   * characters.
-   * 11 characters are probably enough for an integer.
-   */
-  char tmp[11+1];
-  char* endptr;
+  int i, invalid;
 
-  while (1) {
-    printf(inputText);
-    readValue(tmp, length);
+  invalid = 1;
 
-    *dest = strtol(tmp, &endptr, 10);
+  while (invalid) {
+    readString(inputText, dest, length);
 
-    /* If it is a null entry or if there are non-digits, read it again */
-    if ((endptr == tmp) || (*endptr != '\0')) {
-      printf("   Entrada invalida.");
-      continue;
-    } else
-      break;
+    for (i = 0; i < strlen(dest); i++) {
+      if (!isdigit(dest[i])) {
+        printf("Entrada invalida.\n");
+        invalid = 1;
+        break;
+      }
+    }
+
+    invalid = 0;
   }
 }
 
@@ -126,4 +123,3 @@ int stripNewLine(char s[])
 
   return 0;
 }
-
