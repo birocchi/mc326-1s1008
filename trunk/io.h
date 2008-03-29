@@ -55,7 +55,8 @@ void readValue(char s[], size_t length);
  * replaces it with a '\0' and returns 1.
  * If there is no trailing newline, returns 0.
  */
-int stripNewLine(char s[]);
+void stripNewLine(char s[]);
 
+int stripWhiteSpace(char str[]);
 
 #endif

@@ -45,13 +45,13 @@ int main(int argc, char* argv[]) {
     pkListLoadFromPK(pkindex, pkfile);
     fclose(pkfile);
   }
-  else if(fileExists(DBFILE)){
+  else if (fileExists(DBFILE)){
     printf("A tabela de chaves primarias esta sendo criada.\n");
     pkListLoadFromBase(pkindex, base);
   }
-  
+
   /* If there was a database, we now close it. */
-  if(base)
+  if (base)
     fclose(base);
 
   /* And now we can open it for appending so we can insert new registers. */
@@ -66,7 +66,7 @@ int main(int argc, char* argv[]) {
   while (1) {
     printMenu();
 
-    if (readChar(&c) == -1) {
+    if (readChar(&c)) {
       printf("\nErro: Opcao invalida.\n");
       continue;
     }
@@ -123,11 +123,11 @@ int main(int argc, char* argv[]) {
         htmlfile = fopen(HTMLFILE, "w");
         htmlBegin(htmlfile);
 
-	/* Go to the database position of the found rrn. */
+        /* Go to the database position of the found rrn. */
         fseek(base, match_pos*REG_SIZE, SEEK_SET);
-	/* And then read that register. */
+        /* And then read that register. */
         baseReadArtworkRecord(base, &info);
-	/* So we can write it to the html file. */
+        /* So we can write it to the html file. */
         htmlWriteRecordInfo(htmlfile, &info);
 
         htmlEnd(htmlfile);
@@ -150,13 +150,13 @@ int main(int argc, char* argv[]) {
 
         fseek(base, 0, SEEK_SET);
 
-	/* For each pk in the index, start from the beggining since it's sorted. */
+        /* For each pk in the index, start from the beggining since it's sorted. */
         for (i = 0; i < pkindex->regnum; i++) {
-	  /* Seek it into the database. */
-          fseek(base, (pkindex->pklist[i].rrn) * REG_SIZE, SEEK_SET); 
-	  /* Read it's contents. */
+          /* Seek it into the database. */
+          fseek(base, (pkindex->pklist[i].rrn) * REG_SIZE, SEEK_SET);
+          /* Read it's contents. */
           baseReadArtworkRecord(base, &info);
-	  /* And write it to the html file. */
+          /* And write it to the html file. */
           htmlWriteRecordInfo(htmlfile, &info);
         }
 
