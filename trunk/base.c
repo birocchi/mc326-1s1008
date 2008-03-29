@@ -57,8 +57,8 @@ int baseWriteData(FILE *file, artwork_info *info)
   fprintf(file, "%-200s",   info->title);
   fprintf(file, "%-100s",   info->type);
   fprintf(file, "%-125s",   info->author);
-  fprintf(file, "%-04s",     info->year);
-  fprintf(file, "%-012s",    info->value);
+  fprintf(file, "%-4s",     info->year);
+  fprintf(file, "%-12s",    info->value);
   fprintf(file, "%-9s",     info->img);
 
   fflush(file);
