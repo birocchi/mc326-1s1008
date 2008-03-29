@@ -26,10 +26,9 @@ int main(int argc, char* argv[]) {
   int i;                      /* Number of entries in our database. */
   int match_pos;
 
-  base = fopen(DBFILE, "a+");
+  base = fopen(DBFILE, "r");
   if (!base) {
-    printf("Erro ao carregar base de dados. Saindo.\n");
-    exit(EXIT_FAILURE);
+    printf("Base de dados ainda nao existe.\n");
   }
 
   pkindex = pkListInit();
@@ -40,14 +39,23 @@ int main(int argc, char* argv[]) {
 
   /* Loading the primary key tables. */
   printf("Carregando tabela de chaves primarias...\n");
-  if (fileExists(PKFILE)) {
+  if (fileExists(PKFILE) && fileExists(DBFILE)) {
     pkfile = fopen(PKFILE, "r");
     pkListLoadFromPK(pkindex, pkfile);
     fclose(pkfile);
   }
-  else {
+  else if(fileExists(DBFILE)){
     printf("A tabela de chaves primarias esta sendo criada.\n");
     pkListLoadFromBase(pkindex, base);
+  }
+
+  if(base)
+    fclose(base);
+
+  base = fopen(DBFILE, "a+");
+  if (!base) {
+    printf("Erro ao criar base de dados. Saindo...\n");
+    exit(EXIT_FAILURE);
   }
 
   printWelcome();
