@@ -26,6 +26,7 @@ int main(int argc, char* argv[]) {
   int i;                      /* Number of entries in our database. */
   int match_pos;              /* Will hold the rrn of the found register. */
 
+  /* Try to open it for reading. */
   base = fopen(DBFILE, "r");
   if (!base) {
     printf("Base de dados ainda nao existe.\n");
@@ -48,10 +49,12 @@ int main(int argc, char* argv[]) {
     printf("A tabela de chaves primarias esta sendo criada.\n");
     pkListLoadFromBase(pkindex, base);
   }
-
+  
+  /* If there was a database, we now close it. */
   if(base)
     fclose(base);
 
+  /* And now we can open it for appending so we can insert new registers. */
   base = fopen(DBFILE, "a+");
   if (!base) {
     printf("Erro ao criar base de dados. Saindo...\n");
@@ -124,7 +127,7 @@ int main(int argc, char* argv[]) {
         fseek(base, match_pos*REG_SIZE, SEEK_SET);
 	/* And then read that register. */
         baseReadArtworkRecord(base, &info);
-
+	/* So we can write it to the html file. */
         htmlWriteRecordInfo(htmlfile, &info);
 
         htmlEnd(htmlfile);
@@ -147,9 +150,13 @@ int main(int argc, char* argv[]) {
 
         fseek(base, 0, SEEK_SET);
 
+	/* For each pk in the index, start from the beggining since it's sorted. */
         for (i = 0; i < pkindex->regnum; i++) {
-          fseek(base, (pkindex->pklist[i].rrn) * REG_SIZE, SEEK_SET);
+	  /* Seek it into the database. */
+          fseek(base, (pkindex->pklist[i].rrn) * REG_SIZE, SEEK_SET); 
+	  /* Read it's contents. */
           baseReadArtworkRecord(base, &info);
+	  /* And write it to the html file. */
           htmlWriteRecordInfo(htmlfile, &info);
         }
 
@@ -164,10 +171,12 @@ int main(int argc, char* argv[]) {
     case 's':
       printf("Salvando tabela de chaves de busca...\n");
 
+      /* We always rewrite the pkfile since it must be sorted. */
       pkfile = fopen(PKFILE, "w");
       pkListWriteToFile(pkindex, pkfile);
       fclose(pkfile);
 
+      /* Free the alocated memory for the PK index. */
       pkListFree(pkindex);
       fclose(base);
 
