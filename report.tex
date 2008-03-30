@@ -22,9 +22,13 @@ Este programa deve ser capaz de fazer tudo o que o da primeira versão fazia, ad
 
 O programa gerado pelo \textit{Makefile} chama-se \textbf{tp2} e deve ser rodado a partir de um terminal. Seu menu inicial apresenta quatro opções: \textbf{inserir} uma nova entrada na base de dados, \textbf{consultar} uma obra existente no banco de dados, \textbf{gerar} uma lista com informações sobre todas as obras da base de dados e \textbf{sair}.
 
-Cada opção é selecionada digitando-se \textbf{i} para inserir, \textbf{c} para consultar, \textbf{g} para gerar a lista de obras e \textbf{s} para sair.
+Cada opção é selecionada digitando-se \textbf{i} para inserir, \textbf{c} para consultar, \textbf{g} para gerar a lista de obras e \textbf{s} para sair.\\
 
-No modo de inserção, o usuário deve digitar as informações para \textit{nome da obra}, \textit{tipo de obra}, \textit{autor da obra}, \textit{ano em que a obra foi feita}, \textit{valor da obra} e um \textit{identificador da obra}. Determinados campos possuem restrições: ano e valor devem conter apenas dígitos, e o identificador precisa terminar nas extensões \textit{png, jpg} ou \textit{gif} e ser precedido por até quatro dígitos. Caso já exista uma obra com mesmo nome na base de dados, o usuário deve entrar com outros dados de obra. Feita a inserção, o usuário pode escolher inserir uma nova obra ou voltar para o menu principal.
+No modo de \textbf{inserção}, o usuário deve digitar as informações para \textit{nome da obra}, \textit{tipo de obra}, \textit{autor da obra}, \textit{ano em que a obra foi feita}, \textit{valor da obra} e um \textit{identificador da obra}. Determinados campos possuem restrições: ano e valor devem conter apenas dígitos, e o identificador precisa terminar nas extensões \textit{png, jpg} ou \textit{gif} e ser precedido por até quatro dígitos. Caso já exista uma obra com mesmo nome na base de dados, o usuário deve entrar com outros dados de obra. Feita a inserção, o usuário pode escolher inserir uma nova obra ou voltar para o menu principal.\\
+
+No modo de \textbf{consulta}, o usuário deve entrar com o nome da obra cujas informações deseja obter. Deve-se tomar atenção, pois a consulta é \textit{case-sensitive}, ou seja, diferencia maiúsculas e minúsculas. Caso uma obra com o título desejado seja encontrada, suas informações (título, tipo, autor, ano de criação, valor e identificador) são escritas no arquivo \textbf{lista.html} para exibição. Se não houver nenhuma obra com esse nome no banco de dados, é exibida uma mensagem de erro.\\
+
+No modo de \textbf{geração de lista}, escreve-se no arquivo \textbf{lista.html} uma lista com as informações (título, tipo, autor, ano de criação, valor e identificador) de todas as obras cadastradas na base de dados. Caso não haja nenhuma obra na base de dados, exibe-se uma mensagem de erro.
 
 \section{Descrição do Trabalho}\
 
