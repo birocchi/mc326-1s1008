@@ -10,7 +10,6 @@
 #define YEAR_LENGTH    4
 #define VALUE_LENGTH   12
 #define IMG_LENGTH     9
-#define RRN_LENGTH     4 /* Relative record number. 32-bit integer (4 bytes) */
 
 /* Total size of a register. */
 #define REG_SIZE (TITLE_LENGTH + TYPE_LENGTH + AUTHOR_LENGTH + \

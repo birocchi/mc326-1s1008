@@ -36,20 +36,20 @@ int readData(artwork_info *info)
     return 1;
 
   readString("\n   Por favor, digite o titulo da obra (Max: 200 caracteres): ",
-      info->title, TITLE_LENGTH);
+             info->title, TITLE_LENGTH);
   readString("\n   Por favor, digite o tipo da obra (Max: 100 caracteres): ",
-      info->type, TYPE_LENGTH);
+             info->type, TYPE_LENGTH);
   readString("\n   Por favor, digite o autor da obra (Max: 125 caracteres): ",
-      info->author, AUTHOR_LENGTH);
+             info->author, AUTHOR_LENGTH);
 
   readInt("\n   Por favor, digite o ano da obra (Max: 4 caracteres): ",
-      info->year, YEAR_LENGTH);
+          info->year, YEAR_LENGTH);
   readInt("\n   Por favor, digite o valor da obra (Max: 12 caracteres): ",
-      info->value, VALUE_LENGTH);
+          info->value, VALUE_LENGTH);
 
   while (1) {
     readString("\n   Por favor, digite o identificador da obra (Max: 9 caracteres): ",
-        img, IMG_LENGTH);
+               img, IMG_LENGTH);
 
     /* Validate the image identifier */
     if (!baseIsValidIdentifier(img)) {
@@ -110,52 +110,44 @@ void readValue(char s[], size_t length)
 
 void stripNewLine(char s[])
 {
-  int pos;
+  char* pos = strchr(s, '\n');
 
-  for (pos = 0; pos < strlen(s); pos++) {
-    if (s[pos] == '\n') {
-      s[pos] = '\0';
-      return;
-    }
-  }
-
-  flushBuffer();
+  if (!pos)
+    flushBuffer();
+  else
+    *pos = '\0';
 }
 
-int stripWhiteSpace(char str[]){
-  int len, i, j;
-  char c;
+void stripWhiteSpace(char str[]) {
+  int i, j, pos, space;
+  int len;
+  char* buffer;
 
   len = strlen(str);
-  if(!len)
-    return 1;
+  if (len < 1)
+    return;
 
-  /* Stripping spaces from the beggining. */
-  c = str[0];
-  while (isspace(c)) {
-    i = 0;
-    while(i <= len){
-      str[i] = str[++i];
-    }
-    c = str[0];
-  }
-  
-  /* Stripping spaces from the end. */
-  c = str[len];
-  while (isspace(c)) {
-    str[len] = '\0';
-    c = str[--len];
-  }
-  /* Changing double or more spaces into one. */
-  len = strlen(str);
-  for(i = 0; i < len - 1; i++){
-    while (isspace(str[i]) && isspace(str[i+1])){
-      for(j = i + 1; j < len - 1;){
-	str[j] = str[++j];
+  buffer = (char*)calloc(len, sizeof(char));
+  if (buffer) {
+    for (i = 0; i < len && isspace(str[i]); i++);
+    for (j = len-1; j > i && isspace(str[j]); j--);
+
+    space = 0;
+    pos = 0;
+    for (; i <= j; i++) {
+      if (isspace(str[i]) && !space) {
+        buffer[pos++] = str[i];
+        space = 1;
       }
-      str[j] = '\0';
+      else if (isspace(str[i]) && space)
+        pos++;
+      else {
+        buffer[pos++] = str[i];
+        space = 0;
+      }
     }
-  }
 
-  return 0;
+    strncpy(str, buffer, pos);
+    free(buffer);
+  }
 }

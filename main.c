@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
   PrimaryKeyList* pkindex;
 
   char c;                     /* Holds the user's choice from the menus. */
-  int insert_data = 1;        /* Whether or not to insert more data into the dat file. */
+  int insert_data;            /* Whether or not to insert more data into the dat file. */
   char name[TITLE_LENGTH+1];  /* Holds the name for which to search. */
   int i;                      /* Number of entries in our database. */
   int match_pos;              /* Will hold the rrn of the found register. */
@@ -114,6 +114,7 @@ int main(int argc, char* argv[]) {
     case 'c':
       readString("\n    Por favor, digite o titulo da obra (Max: 200 caracteres): ",
                  name, TITLE_LENGTH);
+
       /* Getting the rrn of the search. */
       match_pos = pkListFindByName(pkindex, name);
 
