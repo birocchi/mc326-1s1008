@@ -32,30 +32,56 @@ No modo de \textbf{geração de lista}, escreve-se no arquivo \textbf{lista.html
 
 \section{Descrição do Trabalho}\
 
-Desde a versão anterior que foi definida uma divisão dos códigos fonte para melhor manutenção e escalabilidade. Com o crescimento das funcionalidades e necessidade de melhor base para algumas destas, acabou-se modificando a estrutura dos arquivos para melhor adequação. Atualmente, os seguintes arquivos compõem o programa:
+Desde a versão anterior foi definida uma divisão dos códigos fonte para melhor manutenção e escalabilidade. Com o crescimento das funcionalidades e necessidade de melhor base para algumas destas, acabou-se modificando a estrutura dos arquivos para melhor adequação. Atualmente, os seguintes arquivos compõem o programa:
 
 \begin{itemize}
  \item \textbf{base.c, base.h}\\
-       bbbb
+	Contêm as funções referentes à manipulação da base de dados e definições relacionadas, como o tamanho dos campos da base de dados e a estrutura que representa uma entrada na base de dados. As funções validam o identificador, lêem uma entrada, escrevem uma entrada e manipulam o identificador para retornar um caminho válido.
+
+ \item \textbf{file.c, file.h}\\
+	Contêm funções relacionadas à manipulação de arquivos quaisquer: atualmente, apenas checa se determinado arquivo existe e retorna o tamanho de determinado arquivo.
+
+ \item \textbf{html.c, html.h}\\
+	Contêm as funções relacionadas à manipulação e geração de arquivos HTML para consultas e listas usadas pelo programa, para automatizar o processo de escrita de dados. Atualmente, cria o começo e o fim de um arquivo HTML e escreve as informações de uma entrada no banco de dados em formato HTML.
+
+ \item \textbf{io.c, io.h}\\
+	Controlam a leitura e escrita de dados entrados pelo usuário. Foram implementadas também funções para limpar os espaços em branco no começo e no fim da strings, além daqueles espaços duplicados no meio, além de uma função para ler caracteres entrados pelo usuário. Continuam todas as funções do Trabalho Prático 1 para validação de entrada.
+
+ \item \textbf{main.c}\\
+	Contém a lógica de execução do programa. Inicia a base de dados e a lista de chaves primárias e depois recebe as opções de operações desejadas pelo usuário, tratando-as e chamando as funções necesśarias em outros arquivos.
+
+ \item \textbf{mem.c, mem.h}\\
+	Contém macros e funções para facilitar a alocação de memória para o programa: basicamente, as macros alocam o número desejado de bytes na memória e já abortam o programa em caso de erro. Assim, em vez de
+	\texttt{
+	\begin{tabbing}
+		char* c \= = (char*)malloc(5, sizeof(char)); \\
+		if (!c) exit(EXIT\_FAILURE);
+	\end{tabbing}
+	}
+
+	Tem-se
+	\texttt{
+	\begin{tabbing}
+		char* c = MEM\_ALLOC\_N(char, 5);
+	\end{tabbing}
+	}
+
+ \item \textbf{menu.c, menu.h}\\
+	Continuam a possuir as duas funções existentes no Trabalho Prático 1: exibir uma mensagem inicial e o menu de opções para o usuário, agora com mais opções disponíveis.
+
+ \item \textbf{pk.c, pk.h}\\
+	Principal adição deste Trabalho Prático. Responsáveis pela manipulação da estrutura de indexação com chaves primárias. Maiores detalhes seguem depois no relatório.
 \end{itemize}
 
-O arquivo \textbf{base.h} contêm vários defines para tamanhos de campos. Ali define-se também a estrutura que carrega cada informação das obras de arte. Os cabeçalhos das funções correspondem àquelas implementadas em \textbf{base.c}. Essas funções fazem o básico, que é ler um registro da base de dados, escrever um registro na base e validar o campo identificador da imagem.
+\section{Chaves primárias}\
 
-Os arquivos \textbf{io.c} e \textbf{io.h} controlam a leitura e escrita de dados entrados pelo usuário. Foi implementada também uma função para limpar os espaços em branco no começo e no fim da strings, além daqueles espaços duplicados no meio. Continuam todas as funções do Trabalho Prático 1 para validação de entrada.
+Decidiu-se utilizar uma estrutura \textit{PrimaryKeyList} para armazenar as chaves primárias composta pelo número atual de registros armazenados (\textit{regnum}), o número máximo de registros que podem ser armazenados (\textit{maxregs}) e uma estrutura interna (\textit{PrimaryKeyRecord}) para armazenamento do número relativo de registro (\textit{rrn}) e o nome da entrada (\textit{name}).
 
-Os arquivos \textbf{menu.c} e \textbf{menu.h} carregam as funções de impressão de boas vindas e do menu de opções para o usuário. A única modificação nesses arquivos foi a adição das opções de consulta e geração de lista de obras de arte.
+Optou-se por essa estrutura devido à sua facilidade de manutenção e expansão para os futuros trabalhos, caso sejam adicionados novos campos. Inicialmente, utilizou-se apenas um ponteiro para ponteiro que separava número relativo de registro e nome em suas estruturas. Entretanto, a dificuldade de manutenção e utilização dessa estrutura e sua falta de escalabilidade também nos motivaram a buscar algo mais robusto.
 
-O código contido em \textbf{main.c} contém a lógica de execução do programa, que deve imprimir o menu, sair caso esta seja a opção do usuário, ou inserir uma obra de arte perguntando, logo após, se deseja inserir outro registro. Ali foram adicionados os casos de consulta e listagem das obras de arte. Nesses casos, dali já são chamadas as funções que escrevem cabeçalhos e rodapés do arquivo \textbf{lista.html}, além das funções que buscam e gravam as informações dos registros.
+A estrutura \textit{PrimaryKeyRecord} é de uso interno das bibliotecas do programa, e o usuário tem contato somente com os campos que ela contém (\textit{rrn} e \textit{name}) quando executa operações em \textit{PrimaryKeyList}.
 
-Para melhor manutenção de código foram criados os arquivos \textbf{file.c} e \textbf{file.h}. Neles, pode-se encontrar funções para verificação da existência e checagem do tamanho de um arquivo.
-
-Novos também, são \textbf{mem.c} e \textbf{mem.h}. Neste há definições de macros para maior facilidade no uso da função cujo cabeçalho também é definido ali. A finalidade de tudo isso é a clareza e facilidade para alocação dinâmica de memória.
-
-Os fontes \textbf{html.h} e \textbf{html.c} são responsáveis pela escrita do arquivo de saída das consultas. Temos uma função que escreve o começo do \textit{html}, e outra que escreve o final. Entre as chamadas delas, pode-se chamar quantas vezes for necessário a função dedicada a escreves as informações de um único registro. Assim, com um simples loop podemos escrever as informações de quantas obras for necessário.
-
-A principal adição deste Trabalho Prático é, com certeza, o conjunto \textbf{pk.h} e \textbf{pk.c}. Estes são responsáveis por toda a manipulação da estrutura de indexação com chaves primárias.
-
-Em \textbf{pk.h} há definições dos tamanhos dos campos e da própria estrutura de chave primária. Esta contém um campo que é o número relativo do registro(RRN) e outro que é o nome completo da obra(chave primária). Além disso, foi criada uma estrutura que carrega o número de registros carregados na memória, o máximo de registros que podem ser carregados com a alocação de memória corrente, e o vetor de estruturas de chaves primárias. 
+No header \textbf{pk.h} há definições dos tamanhos dos campos e da própria estrutura de chave primária. Esta contém um campo que é o número relativo do registro(RRN) e outro que é o nome completo da obra(chave primária). Além disso, foi criada uma estrutura que carrega o número de registros carregados na memória, o máximo de registros que podem ser carregados com a alocação de memória corrente, e o vetor de estruturas de chaves primárias. 
 
 Uma decisão importante durante o desenvolvimento deste TP foi o de criar uma estrutura para as chaves primárias. Outra solução encontrada para problemas que tínhamos foi o de criar uma estrutura para carregas o vetor de estruturas de chaves primárias. Assim, fica muito fácil o controle de quantos registros existem e quantos podem existir sem precisar expandir o vetor.
 
