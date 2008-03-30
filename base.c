@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "base.h"
+#include "io.h"
 #include "mem.h"
 
 char* baseGetValidImagePath(const char* s) {
@@ -36,11 +37,17 @@ int baseReadArtworkRecord(FILE *base, artwork_info *info)
   }
 
   fgets(info->title, TITLE_LENGTH+1, base);
+  stripWhiteSpace(info->title);
   fgets(info->type, TYPE_LENGTH+1, base);
+  stripWhiteSpace(info->type);
   fgets(info->author, AUTHOR_LENGTH+1, base);
+  stripWhiteSpace(info->author);
   fgets(info->year, YEAR_LENGTH+1, base);
+  stripWhiteSpace(info->year);
   fgets(info->value, VALUE_LENGTH+1, base);
+  stripWhiteSpace(info->value);
   fgets(info->img, IMG_LENGTH+1, base);
+  stripWhiteSpace(info->img);
 
   return 0;
 }
