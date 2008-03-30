@@ -1,0 +1,7 @@
++ Refatorar artwork_info nos moldes de PrimaryKeyList?
+
++ Implementar um pkListForeach, mas dá preguiça e não tem muita utilidade por enquanto
+
++ Talvez htmlWriteRecordInfo não devesse existir como é, mas ser usado com um wrapper e pkListForeach
+
++ Checar se a entrada de identificador leva a uma imagem válida, usando as funções de manipulação de diretório do Unix
