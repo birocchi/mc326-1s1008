@@ -20,6 +20,7 @@ svn export -q . $TPOUTPUT
 
 echo ">> Gerando relatório..."
 pdflatex report.tex 2>&1>/dev/null
+rm report.{aux,log}
 
 echo ">> Adicionando report.pdf à árvore..."
 cp report.pdf $TPOUTPUT
