@@ -8,7 +8,7 @@
 #
 
 TPNAME="tp2.zip"
-TPOUTPUT="tpzip"
+TPOUTPUT="tp02_grupo01"
 
 if [ -f $TPNAME ]; then
   echo ">> Apagando zip anterior..."
