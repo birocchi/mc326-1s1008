@@ -28,12 +28,12 @@ void htmlWriteRecordInfo(FILE* htmlfile, artwork_info* info) {
 
   if (htmlfile && info) {
     fprintf(htmlfile, "<img src=\"img/%s\">", path);
-    fprintf(htmlfile, "<p><b>Titulo: %s</b></p>\n", info->title);
-    fprintf(htmlfile, "<p><b>Tipo: %s</b></p>\n", info->type);
-    fprintf(htmlfile, "<p><b>Autor: %s</b></p>\n", info->author);
-    fprintf(htmlfile, "<p><b>Ano: %s</b></p>\n", info->year);
-    fprintf(htmlfile, "<p><b>Valor: %s</b></p>\n", info->value);
-    fprintf(htmlfile, "<p><b>Identificador: %s</b></p>\n", info->img);
+    fprintf(htmlfile, "<p><b>Titulo:</b> %s</p>\n", info->title);
+    fprintf(htmlfile, "<p><b>Tipo:</b> %s</p>\n", info->type);
+    fprintf(htmlfile, "<p><b>Autor:</b> %s</p>\n", info->author);
+    fprintf(htmlfile, "<p><b>Ano:</b> %s</p>\n", info->year);
+    fprintf(htmlfile, "<p><b>Valor:</b> %s</p>\n", info->value);
+    fprintf(htmlfile, "<p><b>Identificador:</b> %s</p>\n", info->img);
   }
 
   free(path);
