@@ -75,14 +75,14 @@ Desde a versão anterior foi definida uma divisão dos códigos fonte para melho
 
 Em \textbf{base.h} (antigo \textbf{data.h}), alterou-se o tipo dos campos \textit{year} e \textit{value} da estrutura \textit{artwork\_info} de \textit{int} para um array de \textit{char} para possibilitar a entrada de números grandes (um inteiro de 4 bytes tinha dificuldades em conter um número de 12 dígitos como \textit{value}). Em decorrência, esses campos não são mais preenchidos com zeros quando não estão em seu tamanho máximo, mas com espaços.
 
-\section{Arquivos gerados}\
+\section{Arquivos gerados e existentes}\
 
 \begin{itemize}
  \item \textbf{base01.dat}: Base de dados utilizada pelo programa.
- \item \textbf{pkfile.pk}: Arquivo de ``cache'' das chaves primárias.
+ \item \textbf{entrada.in}: Entradas usadas para popular a base dados.
  \item \textbf{lista.html}: Resultado das consultas à base de dados.
+ \item \textbf{pkfile.pk}: Arquivo de ``cache'' das chaves primárias.
 \end{itemize}
-
 
 \section{Chaves primárias}\
 
