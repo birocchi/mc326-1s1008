@@ -4,6 +4,8 @@
 #include <string.h>
 #include "io.h"
 
+#define GROUP_NUMBER "01"
+
 void flushBuffer(void)
 {
   int c;
@@ -13,7 +15,7 @@ void flushBuffer(void)
 }
 
 int readChar(char* c) {
-  char input[3];
+  char input[2+1];
 
   /* We read n+1 from the input to be able to check
    * if the user has written exactly n characters */
@@ -29,7 +31,11 @@ int readChar(char* c) {
 
 int readData(artwork_info *info)
 {
-  char img[IMG_LENGTH+1];
+  /* We use IMG_LENGTH-2 here because we exclude the first
+   * two characters in the identifier (the group number)
+   * since it's constant.
+   */
+  char img[ (IMG_LENGTH-2)+1 ];
 
   /* Returns an error if the pointer is NULL. */
   if (!info)
@@ -49,11 +55,12 @@ int readData(artwork_info *info)
 
   while (1) {
     readString("\n   Por favor, digite o identificador da obra (Max: 9 caracteres): ",
-               img, IMG_LENGTH);
+               img, IMG_LENGTH-2);
 
     /* Validate the image identifier */
     if (!baseIsValidIdentifier(img)) {
-      strncpy(info->img, img, IMG_LENGTH+1);
+      strncpy(info->img, GROUP_NUMBER, 2);
+      strncpy(info->img+2, img, (IMG_LENGTH-2)+1);
       break;
     }
     else {
@@ -65,6 +72,10 @@ int readData(artwork_info *info)
   return 0;
 }
 
+/* This is basically a wrapper around readString
+ * which checks if there are only digits in the
+ * string read and loops back if not.
+ */
 void readInt(const char* inputText, char* dest, size_t length)
 {
   int i, invalid;
@@ -119,35 +130,50 @@ void stripNewLine(char s[])
 }
 
 void stripWhiteSpace(char str[]) {
-  int i, j, pos, space;
+  int i, j, pos;
   int len;
+  int space; /* Flag used to indicate if a space has already been immediately read */
   char* buffer;
 
+  /* We cannot allocate memory for 0 bytes, so
+   * we abort the function
+   */
   len = strlen(str);
   if (len < 1)
     return;
 
   buffer = (char*)calloc(len, sizeof(char));
   if (buffer) {
+    /* Skip whitespace at the beginning */
     for (i = 0; i < len && isspace(str[i]); i++);
+
+    /* Skip whitespace at the end */
     for (j = len-1; j > i && isspace(str[j]); j--);
 
-    space = 0;
-    pos = 0;
+    pos = 0; space = 0;
     for (; i <= j; i++) {
+      /* If this is the first whitespace we see,
+       * add it to the final string and trigger
+       * our whitespace-already-seen flag.
+       */
       if (isspace(str[i]) && !space) {
         buffer[pos++] = str[i];
         space = 1;
       }
-      else if (isspace(str[i]) && space)
-        pos++;
-      else {
+      /* If this is not a whitespace, copy
+       * the character to the final string and
+       * disable our whitespace-already-seen flag.
+       */
+      else if (!isspace(str[i])) {
         buffer[pos++] = str[i];
         space = 0;
       }
     }
 
+    /* Replace the original string with the manipulated one. */
     strncpy(str, buffer, pos);
+    str[pos] = '\0';
+
     free(buffer);
   }
 }
