@@ -54,7 +54,7 @@ int readData(artwork_info *info)
           info->value, VALUE_LENGTH);
 
   while (1) {
-    readString("\n   Por favor, digite o identificador da obra (Max: 9 caracteres): ",
+    readString("\n   Por favor, digite o identificador da obra (Max: 7 caracteres): ",
                img, IMG_LENGTH-2);
 
     /* Validate the image identifier */

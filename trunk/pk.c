@@ -30,6 +30,14 @@ static int __qsort_compare(const void* a, const void* b)
   return strncmp( ((PrimaryKeyRecord*)a)->name, ((PrimaryKeyRecord*)b)->name, TITLE_LENGTH );
 }
 
+/*
+ * pkListInflateSize
+ *
+ * Function used internally. It allocates more memory for our primary keys
+ * list, doubling the space used each time it is called.
+ *
+ * Returns 1 on error and 0 otherwise.
+ */
 static int pkListInflateSize(PrimaryKeyList* index) {
   PrimaryKeyRecord* tmp;
 
