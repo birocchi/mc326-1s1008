@@ -56,10 +56,14 @@ Uma decisão importante durante o desenvolvimento deste TP foi o de criar uma es
 
 Há funções para diversas finalidads relacionadas às chaves primárias. Inicialização das estruturas, liberação de memória, inserção são algumas. Além dessas, busca por uma chave, carregar o arquivo salvo das chaves primárias, montar as estruturas a partir de uma base de dados e escrever as informações da memória para o disco são outras.
 
+Foi decidido por começar com um vetor de 20 posições para as chaves. Cada vez que esse vetor é preenchido, dobra-se o tamanho do mesmo.
+
 \section{Resultado final}\
 
-Conseguimos fazer um programa funcional, sem vazamentos de memória e sem bugs conhecidos. O ponto mais crítico nesta fase inicial do sistema foi a validação das entradas do usuário, conhecidamente um dos aspectos mais perigosos para programadores C novatos.
+Conseguimos fazer um programa sem bugs conhecidos e sem vazamentos de memória encontrados. As consultas e listagem de obras funcionam perfeitamente.
 
-É feita uma checagem de entradas nulas e se dados inteiros contêm apenas dígitos. Entretanto, não é checada a presença de entradas repetidas ou de identificadores que correspondam a imagens inexistentes, visto que o trabalho para isso, pelo menos por enquanto, é grande e fora do escopo desta tarefa, por envolver a criação de estruturas de dados apenas para a busca de repetições e funções de manipulação de diretórios.
+As maiores dificuldades foram encontradas durante a implementaçãodas funções de manipulação de chaves primárias. Desde a escolha da melhor estrutura de dados até a perfeição do sistema de controle de alocação de memória encontramos várias possibilidades diferentes de implementação, e isso caracterizou boa parte do desafio desse Trabalho Prático.
+
+A parte de geração de um arquivo \textit{html} foi de extrema facilidade, sendo que ainda assim causa uma melhoria muito grande na forma como o programa trabalha. O fato de poder ver as imagens num browser ao invés de só ver as informações num terminal deixou o resultado final muito mais interessante.
 
 \end{document}
