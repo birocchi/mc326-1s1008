@@ -73,6 +73,17 @@ Desde a versão anterior foi definida uma divisão dos códigos fonte para melho
 	Principal adição deste Trabalho Prático. Responsáveis pela manipulação da estrutura de indexação com chaves primárias. Maiores detalhes seguem depois no relatório.
 \end{itemize}
 
+Em \textbf{base.h} (antigo \textbf{data.h}), alterou-se o tipo dos campos \textit{year} e \textit{value} da estrutura \textit{artwork\_info} de \textit{int} para um array de \textit{char} para possibilitar a entrada de números grandes (um inteiro de 4 bytes tinha dificuldades em conter um número de 12 dígitos como \textit{value}). Em decorrência, esses campos não são mais preenchidos com zeros quando não estão em seu tamanho máximo, mas com espaços.
+
+\section{Arquivos gerados}\
+
+\begin{itemize}
+ \item \textbf{base01.dat}: Base de dados utilizada pelo programa.
+ \item \textbf{pkfile.pk}: Arquivo de ``cache'' das chaves primárias.
+ \item \textbf{lista.html}: Resultado das consultas à base de dados.
+\end{itemize}
+
+
 \section{Chaves primárias}\
 
 Decidiu-se utilizar uma estrutura \textit{PrimaryKeyList} para armazenar as chaves primárias composta pelo número atual de registros armazenados (\textit{regnum}), o número máximo de registros que podem ser armazenados (\textit{maxregs}) e uma estrutura interna (\textit{PrimaryKeyRecord}) para armazenamento do número relativo de registro (\textit{rrn}) e o nome da entrada (\textit{name}).
@@ -81,20 +92,30 @@ Optou-se por essa estrutura devido à sua facilidade de manutenção e expansão
 
 A estrutura \textit{PrimaryKeyRecord} é de uso interno das bibliotecas do programa, e o usuário tem contato somente com os campos que ela contém (\textit{rrn} e \textit{name}) quando executa operações em \textit{PrimaryKeyList}.
 
-No header \textbf{pk.h} há definições dos tamanhos dos campos e da própria estrutura de chave primária. Esta contém um campo que é o número relativo do registro(RRN) e outro que é o nome completo da obra(chave primária). Além disso, foi criada uma estrutura que carrega o número de registros carregados na memória, o máximo de registros que podem ser carregados com a alocação de memória corrente, e o vetor de estruturas de chaves primárias. 
+Para se iniciar uma instância de \textit{PrimaryKeyList} utiliza-se um equivalente a um ``construtor'', \textit{pkListInit}, responsável por alocar memória para a lista interna e iniciar os valores de número de registros e máximo de registros permitidos. Ao fim do uso, deve-se chamar \textit{pkListFree} no objeto criado, de modo a desalocar a memória utilizada.
 
-Uma decisão importante durante o desenvolvimento deste TP foi o de criar uma estrutura para as chaves primárias. Outra solução encontrada para problemas que tínhamos foi o de criar uma estrutura para carregas o vetor de estruturas de chaves primárias. Assim, fica muito fácil o controle de quantos registros existem e quantos podem existir sem precisar expandir o vetor.
+Em certa medida, o uso de estruturas internas e funções para criação e destruição de objetos baseia-se no código de softwares livres como a biblioteca GTK+, disponível em \textit{www.gtk.org}. Como foi dito, isso facilita a manutenção e a escalabilidade das estruturas utilizadas e implementa um certo nível de abstração e orientação a objetos ao utilizar uma forma rudimentar de encapsulamento.
 
-Há funções para diversas finalidads relacionadas às chaves primárias. Inicialização das estruturas, liberação de memória, inserção são algumas. Além dessas, busca por uma chave, carregar o arquivo salvo das chaves primárias, montar as estruturas a partir de uma base de dados e escrever as informações da memória para o disco são outras.
+Como documentado em \textbf{pk.h}, há diversas funções para manipulação da lista de chaves primárias para inserção e busca dos dados. Para este trabalho prático, não foram implementadas operações de remoção.
 
-Foi decidido por começar com um vetor de 20 posições para as chaves. Cada vez que esse vetor é preenchido, dobra-se o tamanho do mesmo.
+Sempre que a lista de chaves primárias é carregada a partir da base de dados ou quando insere-se uma nova entrada, a lista, presente na memória, é organizada utilizando-se a função \textit{qsort} em ordem alfabética, para possibilitar uma posterior busca binária por nome das entradas.
 
-\section{Resultado final}\
+Ainda em relação à inserção de entradas, sempre é realizada uma checagem de número de entradas disponíveis na lista antes da inserção. Desse modo, quando a lista já está cheia com entradas e uma nova entrada deve ser inserida, chama-se a função estática \textit{pkListInflateSize}, que duplica o número de ``slots'' de memória alocados para entradas na lista. Foi decidido por começar a lista com 20 ``slots'' alocados, pois é o número mínimo de registros exigidos para a base de dados.
+
+\section{Resultado final e comentários}\
 
 Conseguimos fazer um programa sem bugs conhecidos e sem vazamentos de memória encontrados. As consultas e listagem de obras funcionam perfeitamente.
 
 As maiores dificuldades foram encontradas durante a implementaçãodas funções de manipulação de chaves primárias. Desde a escolha da melhor estrutura de dados até a perfeição do sistema de controle de alocação de memória encontramos várias possibilidades diferentes de implementação, e isso caracterizou boa parte do desafio desse Trabalho Prático.
 
-A parte de geração de um arquivo \textit{html} foi de extrema facilidade, sendo que ainda assim causa uma melhoria muito grande na forma como o programa trabalha. O fato de poder ver as imagens num browser ao invés de só ver as informações num terminal deixou o resultado final muito mais interessante.
+Além disso, persistiu a dificuldade do Trabalho Prático 1 de \textit{fgets} e \textit{strncpy}. Devido à maneira como a linguagem C trata strings, deve-se sempre tomar cuidado com o parâmetro de tamanho passado para as funções.
+
+A parte de geração de um arquivo HTML foi de extrema facilidade, sendo que ainda assim causa uma melhoria muito grande na forma como o programa trabalha. O fato de poder ver as imagens num browser ao invés de só ver as informações num terminal deixou o resultado final muito mais interessante.
+
+Deve-se notar também a implementação das funções \textit{stripNewLine} e \textit{stripWhiteSpace}. Atualmente, são duas funções separadas devido à necessidade de se substituir apenas o caractere de ``newline'', \\n, por um ``null character'', \\0 nas strings lidas por \textit{fgets} e, se nenhum ``newline'' for encontrado, chamar a função \textit{flushBuffer}, já que isso indica que há caracteres não lidos por \textit{fgets}. A implementação de \textit{stripNewLine} tem uma performance de O(n) no pior caso, pois chama a função \textit{strchr} que percorre a string toda buscando a primeira ocorrência do caractere desejado. Em seguida, a função \textit{stripWhiteSpace} percorre novamente a string toda para eliminar espaços em excesso. No fim, tem-se O(2n) para cada entrada lida por \textit{readValue}. Por enquanto, isso não representa um problema devido ao pequeno número de entradas, mas, caso a base de dados cresça muito, essa complexidade pode representar um \textit{bottleneck} difícil de detectar.
+
+Ainda em relação a \textit{stripWhiteSpace}, não era necessária sua implementação neste Trabalho Prático. Deve-se atentar para o fato de que, caso o usuário entre com uma string com espaços que ultrapassem o limite de caracteres pedido e houverem caracteres válidos depois desses espaços, eles não serão lidos por \textit{fgets} e não constarão nem mesmo na string com os espaços removidos. Para evitar que isso acontecesse, a forma de recepção das entradas do usuário deveria mudar radicalmente, uma vez que seriam permitidas entradas quase infinitas devido ao número de espaços que seriam depois removidos. Acredita-se que isso esteja fora do escopo deste Trabalho Prático.
+
+Finalmente, é preciso tomar cuidado com a consistência entre a base de dados e o ``cache'' de chaves primárias: o programa sempre carrega as chaves primárias do arquivo de chaves caso ele exista, e só recorre à base de dados caso não haja um ``cache''. Isso pode levar a inconsistências nos resultados caso o \textit{cache} esteja desatualizado em relação à base.
 
 \end{document}
