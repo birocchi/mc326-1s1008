@@ -1,7 +1,5 @@
 + É preciso testar o software MUITO
 
-+ Ao inserir entradas, o identificador tem 9 caracteres, mas os 2 primeiros sao o id do grupo e nao devem ser entrados pelo usuario. Precisamos nao usar numeros magicos e aceitar 7 caracteres.
-
 + Refatorar artwork_info nos moldes de PrimaryKeyList?
 
 + Documentar todo o código novo
