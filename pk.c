@@ -4,6 +4,7 @@
 #include <string.h>
 #include "base.h"
 #include "file.h"
+#include "io.h"
 #include "mem.h"
 #include "pk.h"
 
@@ -151,6 +152,9 @@ int pkListLoadFromBase(PrimaryKeyList* index, FILE* base) {
     fgets(index->pklist[i].name, TITLE_LENGTH, base);
     index->pklist[i].rrn = i;
 
+    /* Strip trailing whitespaces from the name */
+    stripWhiteSpace(index->pklist[i].name);
+
     /* Since we need to skip the rest of the register, and have already
      * read TITLE_LENGTH, we must go REG_SIZE - TITLE_LENGTH positions ahead,
      * and yet one more for we must read the next name. */
@@ -186,7 +190,10 @@ int pkListLoadFromPK(PrimaryKeyList* index, FILE* pkfile) {
   
   for (i = 0; i < index->regnum; i++) {
     fgets(tmpname, TITLE_LENGTH+1, pkfile);
-    strncpy(index->pklist[i].name, tmpname, TITLE_LENGTH); 
+    strncpy(index->pklist[i].name, tmpname, TITLE_LENGTH);
+
+    /* Strip trailing whitespaces from the name */
+    stripWhiteSpace(index->pklist[i].name);
 
     fgets(tmprrn, RRN_LENGTH+1, pkfile);
     rrn = atoi(tmprrn);
