@@ -3,6 +3,7 @@
 
 #include "base.h"
 
+#define RRN_LENGTH  4                             /* Relative record number. 32-bit integer (4 bytes) */
 #define PK_REG_SIZE (TITLE_LENGTH + RRN_LENGTH)   /* 4 bytes for a 32-bit integer */
 
 /*

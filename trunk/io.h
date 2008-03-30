@@ -12,7 +12,15 @@
  */
 void flushBuffer(void);
 
+/*
+ * readChar
+ *
+ * Wrapper around readValue to read a single character (and
+ * make sure no more than one character was passed).
+ * Returns 0 if everything was OK, and -1 otherwise.
+ */
 int readChar(char* c);
+
 /* 
  * readData
  *
@@ -51,12 +59,19 @@ void readValue(char s[], size_t length);
 /*
  * stripNewLine
  *
- * This function looks for a trailing '\n' character in a string,
- * replaces it with a '\0' and returns 1.
- * If there is no trailing newline, returns 0.
+ * This function replaces a trailing '\n' character (if it exists)
+ * in a string with '\0'.
+ * If a newline character is not found, it flushes the input buffer.
  */
 void stripNewLine(char s[]);
 
-int stripWhiteSpace(char str[]);
+/*
+ * stripWhiteSpace
+ *
+ * This function removes trailing whitespaces at the beginning
+ * and at the end of the string /str/, and also removes duplicate
+ * whitespaces in the middle of the string.
+ */
+void stripWhiteSpace(char str[]);
 
 #endif
