@@ -16,7 +16,10 @@
                   YEAR_LENGTH + VALUE_LENGTH + IMG_LENGTH)
 
 /* The main structure which holds data about
- * each register in the database */
+ * each register in the database
+ * We use FIELD_LENGTH+1 because we need one more
+ * byte to hold the '\0' when using fgets.
+ */
 typedef struct
 {
 	char title[TITLE_LENGTH+1];       /* The artwork's title */
