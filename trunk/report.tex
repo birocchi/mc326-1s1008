@@ -12,13 +12,21 @@
 
 \maketitle
 
-\section*{Objetivo}\
+\section{Objetivo}\
 
-Neste trabalho prático deve ser implementado um sistema de consulta por chaves primarias numa base de dados. A estrutura desta base é uma modificação da base feita no trabalho prático um. Além da consulta, pede-se que o usuário tenha a possibilidade de gerar uma lista de todas as obras de arte na base de dados.
+Neste trabalho prático deve ser implementado um sistema de consulta por chaves primarias numa base de dados. A estrutura desta base é uma modificação da base feita no Trabalho Prático 1. Além da consulta, pede-se que o usuário tenha a possibilidade de gerar uma lista de todas as obras de arte na base de dados.
 
 Este programa deve ser capaz de fazer tudo o que o da primeira versão fazia, adicionando-se as funcionalidades supra-citadas.
 
-\section*{Descrição do Trabalho}\
+\section{Uso da interface}\
+
+O programa gerado pelo \textit{Makefile} chama-se \textbf{tp2} e deve ser rodado a partir de um terminal. Seu menu inicial apresenta quatro opções: \textbf{inserir} uma nova entrada na base de dados, \textbf{consultar} uma obra existente no banco de dados, \textbf{gerar} uma lista com informações sobre todas as obras da base de dados e \textbf{sair}.
+
+Cada opção é selecionada digitando-se \textbf{i} para inserir, \textbf{c} para consultar, \textbf{g} para gerar a lista de obras e \textbf{s} para sair.
+
+No modo de inserção, o usuário deve digitar as informações para \textit{nome da obra}, \textit{tipo de obra}, \textit{autor da obra}, \textit{ano em que a obra foi feita}, \textit{valor da obra} e um \textit{identificador da obra}. Determinados campos possuem restrições: ano e valor devem conter apenas dígitos, e o identificador precisa terminar nas extensões \textit{png, jpg} ou \textit{gif} e ser precedido por até quatro dígitos. Caso já exista uma obra com mesmo nome na base de dados, o usuário deve entrar com outros dados de obra. Feita a inserção, o usuário pode escolher inserir uma nova obra ou voltar para o menu principal.
+
+\section{Descrição do Trabalho}\
 
 Desde a versão anterior que foi definida uma divisão dos códigos fonte para melhor manutenção e escalabilidade. Com o crescimento das funcionalidades e necessidade de melhor base para algumas destas, acabou-se modificando a estrutura dos arquivos para melhor adequação. /*Colocar aqui quais sao os novos arquivos..*/
 
@@ -40,7 +48,7 @@ O código contido em \textbf{main.c} contém a lógica de execução do programa
 
 Por enquanto, o loop de leitura da opção desejada pelo usuário está todo em \textbf{main.c}, mas, devido à escalabilidade quando novas opções forem inseridas, ele pode ser transferido para uma função à parte. Tentou-se validar a entrada do usuário da melhor forma possível, inclusive usando um \textit{char input[2]}, com espaço para dois caracteres, para se ter certeza de que o usuário entrou com apenas uma letra. Como a leitura do menu não é case-sensitive, foi usada a função \textit{tolower}, definida em \textbf{ctype.h} para transformar qualquer entrada em minúscula.
 
-\section*{Resultado final}\
+\section{Resultado final}\
 
 Conseguimos fazer um programa funcional, sem vazamentos de memória e sem bugs conhecidos. O ponto mais crítico nesta fase inicial do sistema foi a validação das entradas do usuário, conhecidamente um dos aspectos mais perigosos para programadores C novatos.
 

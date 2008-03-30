@@ -43,18 +43,18 @@ int readData(artwork_info *info)
 
   readString("\n   Por favor, digite o titulo da obra (Max: 200 caracteres): ",
              info->title, TITLE_LENGTH);
-  readString("\n   Por favor, digite o tipo da obra (Max: 100 caracteres): ",
+  readString("   Por favor, digite o tipo da obra (Max: 100 caracteres): ",
              info->type, TYPE_LENGTH);
-  readString("\n   Por favor, digite o autor da obra (Max: 125 caracteres): ",
+  readString("   Por favor, digite o autor da obra (Max: 125 caracteres): ",
              info->author, AUTHOR_LENGTH);
 
-  readInt("\n   Por favor, digite o ano da obra (Max: 4 caracteres): ",
+  readInt("   Por favor, digite o ano da obra (Max: 4 caracteres): ",
           info->year, YEAR_LENGTH);
-  readInt("\n   Por favor, digite o valor da obra (Max: 12 caracteres): ",
+  readInt("   Por favor, digite o valor da obra (Max: 12 caracteres): ",
           info->value, VALUE_LENGTH);
 
   while (1) {
-    readString("\n   Por favor, digite o identificador da obra (Max: 7 caracteres): ",
+    readString("   Por favor, digite o identificador da obra (Max: 7 caracteres): ",
                img, IMG_LENGTH-2);
 
     /* Validate the image identifier */
