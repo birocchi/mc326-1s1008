@@ -3,21 +3,22 @@
 
 #include <stdio.h>
 
-/*
- * fileExists
+/**
+ * Checks for the existence of a file with name filename.
  *
- * Checks for the existence of a file with
- * name /filename/.
+ * @param filename The name of the file we need to check.
  *
- * Returns 1 if it exists, and 0 otherwise.
+ * @retval 0 File does not exist.
+ * @retval 1 File exists.
  */
 int fileExists(const char* filename);
 
-/*
- * getFileSize
+/**
+ * Returns the size of a file.
  *
- * Returns the size in bytes of a file /f/
- * if /f/ is a valid file, and -1 otherwise.
+ * @param f The file whose size needs to be determined.
+ *
+ * @return The size in bytes of the file, -1 if f is an invalid file.
  */
 int getFileSize(FILE* f);
 

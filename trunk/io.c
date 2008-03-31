@@ -4,8 +4,6 @@
 #include <string.h>
 #include "io.h"
 
-#define GROUP_NUMBER "01"
-
 void flushBuffer(void)
 {
   int c;
