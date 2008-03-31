@@ -4,73 +4,90 @@
 #include "base.h"
 #include <stdio.h>
 
-/* 
- * flushBuffer
- *
- * Flushes stdin to remove any leftover characters
- * which may still be lying around
+/**
+ * The group number used in the image identifier.
+ */
+#define GROUP_NUMBER "01" 
+
+/**
+ * Flushes stdin to remove any leftover characters which
+ * may still be lying around.
  */
 void flushBuffer(void);
 
-/*
- * readChar
- *
+/**
  * Wrapper around readValue to read a single character (and
  * make sure no more than one character was passed).
- * Returns 0 if everything was OK, and -1 otherwise.
+ *
+ * Removes trailing spaces before and after the text.
+ *
+ * @param c Pointer to store the character read.
+ *
+ * @retval -1 Error.
+ * @retval 0 Success.
  */
 int readChar(char* c);
 
-/* 
- * readData
+/**
+ * Reads the input from the user with information about
+ * one artwork entry.
  *
- * Reads the input from the user for one
- * artwork only and puts all the obtained data
- * into the struct pointed by the parameter pointer.
- * Return 1 on error and 0 for OK.
+ * @param info Pointer to the place we want to store the data read.
+ *
+ * @retval 0 Success.
+ * @retval 1 Error.
  */
 int readData(artwork_info *info);
 
-/*
- * readInt
- *
+/**
  * Reads input and checks if it's a valid integer. If not,
  * read it until a valid integer is entered.
+ *
+ * Removes all trailing spaces before checking if the text is valid.
+ *
+ * @param inputText The text to print before waiting for input.
+ * @param dest      Pointer to the place where we want to store the input.
+ * @param length    The maximum number of characters that can be stored.
  */
 void readInt(const char* inputText, char* dest, size_t length);
 
-/*
- * readString
+/**
+ * Read input from the user until it is not null.
  *
- * Read input without much validation. If it is a null entry,
- * read it again.
+ * Removes all trailing whitespace before checking if the text is null.
+ *
+ * @param inputText The text to print before waiting for input.
+ * @param dest      Pointer to the place where we want to store the input.
+ * @param length    The maximum number of characters that can be stored.
  */
 void readString(const char* inputText, char* dest, size_t length);
 
-/*
- * readValue
+/**
+ * Read at most length bytes frm stdin. Strip trailing whitespace and
+ * newline character if they're present.
  *
- * Reads at most length bytes from stdin and
- * strips the trailing newline if it is present.
- * Otherwise, clear the input buffer before leaving.
+ * If no newline is found, clear the input buffer before leaving.
+ *
+ * @param s       Where to store the input.
+ * @param length  The maximum number of characters that can be stored.
  */
 void readValue(char s[], size_t length);
 
-/*
- * stripNewLine
+/**
+ * Replaces the trailing '\\n' character (if it exists) in a string
+ * with '\\0'.
  *
- * This function replaces a trailing '\n' character (if it exists)
- * in a string with '\0'.
  * If a newline character is not found, it flushes the input buffer.
+ *
+ * @param s The string which should be stripped.
  */
 void stripNewLine(char s[]);
 
-/*
- * stripWhiteSpace
+/**
+ * Removes whitespace from the beginning and the end of the string,
+ * and also duplicate whitespace in the middle of the text.
  *
- * This function removes trailing whitespaces at the beginning
- * and at the end of the string /str/, and also removes duplicate
- * whitespaces in the middle of the string.
+ * @param str The string which should be stripped.
  */
 void stripWhiteSpace(char str[]);
 
