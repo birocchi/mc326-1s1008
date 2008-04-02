@@ -3,28 +3,25 @@
 
 #include <stdlib.h>
 
-/*
- * MEM_ALLOC
- *
+/**
  * Wrapper over MEM_ALLOC_N. Equivalent to allocating
  * memory for 1 entry of type /type/.
  */
 #define MEM_ALLOC(type) (MEM_ALLOC_N(type, 1))
 
-/*
- * MEM_ALLOC_N
- *
+/**
  * Allocates memory for /numelem/ elements of type /type/.
  */
 #define MEM_ALLOC_N(type, numelem) ((type*)__memAllocate(numelem, sizeof(type)))
 
-/*
- * __memAllocate
- *
+/**
  * This function should not be called directly. It's a wrapper
  * over calloc.
  * If memory can't be properly allocated, it displays an error
  * message and exits the program.
+ *
+ * @params numelem The number of the elements in the array.
+ * @params elemsize The size of each element.
  */
 void* __memAllocate(size_t numelem, size_t elemsize);
 
