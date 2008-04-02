@@ -45,7 +45,7 @@ typedef struct
  * 
  * @param s The name identifier string.
  *
- * @retval Pointer to the correct string. One must free this pointer later on.
+ * @return Pointer to the correct string. One must free this pointer later on.
  *
  */
 char* baseGetValidImagePath(const char* s);
@@ -57,7 +57,7 @@ char* baseGetValidImagePath(const char* s);
  *
  * @param name The image identifier string.
  * 
- * @retval Returns 1 on error and 0 for OK.
+ * @return Returns 1 on error and 0 for OK.
  */
 int baseIsValidIdentifier(const char* name);
 
@@ -68,7 +68,7 @@ int baseIsValidIdentifier(const char* name);
  * @param base File pointer to the database.
  * @param info Pointer to artwork_info structure with info about the register.
  *
- * @retval Returns 0 on succes and 1 on error.
+ * @return Returns 0 on succes and 1 on error.
  */
 int baseReadArtworkRecord(FILE* base, artwork_info* info);
 
@@ -80,7 +80,7 @@ int baseReadArtworkRecord(FILE* base, artwork_info* info);
  * @param file File pointer to the database.
  * @param info Pointer to artwork_info structure with info about the register.
  *
- * @retval Returns 0 on succes and 1 on error.
+ * @return Returns 0 on succes and 1 on error.
  */
 int baseWriteData(FILE *file, artwork_info *info);
 
