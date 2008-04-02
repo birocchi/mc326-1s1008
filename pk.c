@@ -118,7 +118,40 @@ int pkListInsert(PrimaryKeyList* index, const char* name) {
   
   /* Must keep it sorted. */
   qsort(index->pklist, index->regnum, 
-	      sizeof(PrimaryKeyRecord), __qsort_compare);
+	sizeof(PrimaryKeyRecord), __qsort_compare);
+
+  return 0;
+}
+
+int pkListRemove(PrimaryKeyList* index, const char* name){
+  PrimaryKeyRecord* match;
+  int i = 0;
+
+  /* This will use bsearch to find the key. */
+  match = bsearch(key, index->pklist, index->regnum,
+                  sizeof(PrimaryKeyRecord),
+                  __bsearch_compare);
+
+  /* If the name isn't there, we can't remove it. */
+  if (!match) 
+    return 1;
+
+  /* Find the register in index->pklist. */
+  while(index->pklist[i] != match && i < index->regnum){
+    i++;
+  }
+  /* Move all the subsequent register back one place. */
+  if (index->pklist[i] == match) {
+    for(j = i; j < index->regnum - 1; j++){
+      index->pklist[j] = index->pklist[j+1];
+    }
+  }
+  
+  index->regnum--;
+
+  /* Must keep it sorted. */
+  qsort(index->pklist, index->regnum, 
+	sizeof(PrimaryKeyRecord), __qsort_compare);
 
   return 0;
 }
