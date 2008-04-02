@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-/**  Defining the sizes of each field. */
+
 #define TITLE_LENGTH   200 
 #define TYPE_LENGTH    100 
 #define AUTHOR_LENGTH  125 
@@ -11,23 +11,32 @@
 #define VALUE_LENGTH   12  
 #define IMG_LENGTH     9   
 
-/** Total size of a register. */
+/**
+ * Total size of the register.
+ */
 #define REG_SIZE (TITLE_LENGTH + TYPE_LENGTH + AUTHOR_LENGTH + \
                   YEAR_LENGTH + VALUE_LENGTH + IMG_LENGTH)
 
-/** The main structure which holds data about
+/**
+ * The main structure which holds data about
  * each register in the database
  * We use FIELD_LENGTH+1 because we need one more
- * byte to hold the '\0' when using fgets.
+ * byte to hold the '\\0' when using fgets.
  */
 typedef struct
 {
-  char title[TITLE_LENGTH+1];       /** The artwork's title */
-  char type[TYPE_LENGTH+1];         /** The artwork's type  */
-  char author[AUTHOR_LENGTH+1];     /** The artworks author */
-  char year[YEAR_LENGTH+1];         /** The year the artwork was made */
-  char value[VALUE_LENGTH+1];       /** The artwork's value */
-  char img[IMG_LENGTH+1];           /** The register's identifier */
+  /** The artwork's title  */
+  char title[TITLE_LENGTH+1]; 
+  /** The artwork's type  */
+  char type[TYPE_LENGTH+1];
+  /** The artworks author */
+  char author[AUTHOR_LENGTH+1];
+  /** The year the artwork was made */
+  char year[YEAR_LENGTH+1];
+ /** The artwork's value */
+  char value[VALUE_LENGTH+1];      
+  /** The register's identifier */
+  char img[IMG_LENGTH+1];  
 } artwork_info;
 
 /**
