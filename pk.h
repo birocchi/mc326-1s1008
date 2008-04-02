@@ -51,30 +51,32 @@ PrimaryKeyList* pkListInit(void);
  * @param index Pointer to a PrimaryKeyList struct.
  * @param key The string to be searched as primary key.
  *
- * @retval Returns the key's rrn if found or -1 case not.
+ * @return Returns the key's rrn if found or -1 case not.
  */
 int pkListFindByName(PrimaryKeyList* index, const char* key);
 
 
 /**
- * pkListFree
- *
  * Entirely frees the struct pointed by 'index'. 
  * Frees the pointer to the list,
  * and only then frees the struct itselft.
+ *
+ * @param index Pointer to a PrimaryKeyList struct.
  */
 void pkListFree(PrimaryKeyList* index);
 
 /**
- * pkListInsert
- *
  * Takes the pointer to the PrimaryKeyList,
  * and a string, the pk. Adds the new key
  * to the PK index.
  *
- * Returns 0 if everything went ok 
- * or 1 if the key was already in the list
- * or if it had any problems inflating the table
+ * @param index Pointer the PrimaryKeyList struct.
+ *
+ * @param name String with the primary key.
+ *
+ * @return Returns 0 if everything went ok \
+ * or 1 if the key was already in the list \
+ * or if it had any problems inflating the table \
  * case it was already full.
  */
 int pkListInsert(PrimaryKeyList* index, const char* name);
