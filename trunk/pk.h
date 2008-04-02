@@ -83,8 +83,16 @@ int pkListInsert(PrimaryKeyList* index, const char* name);
 
 /**
  * Removes an entry from the Primary Key Index.
+ *
+ * @param index Pointer to the PrimaryKeyList struct.
+ *
+ * @param name The name (primary key) that will be removed.
+ *
+ * @retval 0 If removal went ok.
+ *
+ * @retval 1 If an error occurred.
  */
-int pkListRemove(PrimaryKeyList* index, const char* name){
+int pkListRemove(PrimaryKeyList* index, const char* name);
 
 /**
  * Checks if the PK table is empty.
