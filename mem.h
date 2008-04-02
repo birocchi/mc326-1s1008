@@ -20,8 +20,8 @@
  * If memory can't be properly allocated, it displays an error
  * message and exits the program.
  *
- * @params numelem The number of the elements in the array.
- * @params elemsize The size of each element.
+ * @param numelem The number of the elements in the array.
+ * @param elemsize The size of each element.
  */
 void* __memAllocate(size_t numelem, size_t elemsize);
 
