@@ -3,21 +3,25 @@
 
 #include "base.h"
 
-#define RRN_LENGTH  4                             /* Relative record number. 32-bit integer (4 bytes) */
-#define PK_REG_SIZE (TITLE_LENGTH + RRN_LENGTH)   /* 4 bytes for a 32-bit integer */
+/** Relative record number. 32-bit integer (4 bytes) */
+#define RRN_LENGTH  4
+/** 4 bytes for a 32-bit integer */
+#define PK_REG_SIZE (TITLE_LENGTH + RRN_LENGTH)
 
-/*
+/**
  * This is the internal structure used
  * by the primary keys list to store
  * each entry: it consists of a RRN and
  * one name.
  */
 typedef struct {
+  /** The Register Relative Number. */
   int rrn;
+  /** The primary key itself, the name, plus a '\\0' */
   char name[TITLE_LENGTH+1]; 
 } PrimaryKeyRecord;
 
-/*
+/**
  * This is the structure used everywhere
  * to handle primary keys.
  * There's the current number of entries,
@@ -31,29 +35,28 @@ typedef struct {
   PrimaryKeyRecord* pklist;
 } PrimaryKeyList;
 
-/*
- * pkListInit
- *
+/**
  * The list's "constructor": allocate memory for the
  * list's internal structure, starting with 20 positions.
  *
- * Returns a pointer to the initialized list or NULL
+ * @retval Returns a pointer to the initialized list or NULL
  * if it could not be initialized.
  */
 PrimaryKeyList* pkListInit(void);
 
 
-/*
- * pkListFindByName
- *
+/**
  * Searches for the key 'key' in the 'index' list.
  *
- * Returns the key's rrn if found or -1 case not.
+ * @param index Pointer to a PrimaryKeyList struct.
+ * @param key The string to be searched as primary key.
+ *
+ * @retval Returns the key's rrn if found or -1 case not.
  */
 int pkListFindByName(PrimaryKeyList* index, const char* key);
 
 
-/*
+/**
  * pkListFree
  *
  * Entirely frees the struct pointed by 'index'. 
@@ -62,7 +65,7 @@ int pkListFindByName(PrimaryKeyList* index, const char* key);
  */
 void pkListFree(PrimaryKeyList* index);
 
-/*
+/**
  * pkListInsert
  *
  * Takes the pointer to the PrimaryKeyList,
@@ -76,7 +79,7 @@ void pkListFree(PrimaryKeyList* index);
  */
 int pkListInsert(PrimaryKeyList* index, const char* name);
 
-/*
+/**
  * pkListIsEmpty
  *
  * Checks if the PK table is empty.
@@ -85,7 +88,7 @@ int pkListInsert(PrimaryKeyList* index, const char* name);
  */
 int pkListIsEmpty(PrimaryKeyList* index);
 
-/*
+/**
  * pkListLoadFromBase
  *
  * Loads the primary keys from the registers at 'base'
@@ -95,7 +98,7 @@ int pkListIsEmpty(PrimaryKeyList* index);
  */
 int pkListLoadFromBase(PrimaryKeyList* index, FILE* base);
 
-/*
+/**
  * pkListLoadFromPK
  *
  * Loads the primary keys from the primary key index
@@ -105,7 +108,7 @@ int pkListLoadFromBase(PrimaryKeyList* index, FILE* base);
  */
 int pkListLoadFromPK(PrimaryKeyList* index, FILE* pkfile);
 
-/*
+/**
  * pkListWriteToFile
  *
  * Takes the primary key index 'index' and writes it properly
