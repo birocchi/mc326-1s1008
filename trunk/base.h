@@ -43,7 +43,7 @@ typedef struct
  * Makes the image identifier into an actual file name.
  * Basically it adds the '.' into it.
  * 
- * @params The name identifier string.
+ * @param s The name identifier string.
  *
  * @retval Pointer to the correct string. One must free this pointer later on.
  *
@@ -55,7 +55,7 @@ char* baseGetValidImagePath(const char* s);
  * This time we use strtol to get past the digits and also
  * check the file extension.
  *
- * @params name The image identifier string.
+ * @param name The image identifier string.
  * 
  * @retval Returns 1 on error and 0 for OK.
  */
@@ -65,8 +65,8 @@ int baseIsValidIdentifier(const char* name);
  * Reads one record from the database file /base/ and
  * stores it in /info/.
  *
- * @params base File pointer to the database.
- * @params info Pointer to artwork_info structure with info about the register.
+ * @param base File pointer to the database.
+ * @param info Pointer to artwork_info structure with info about the register.
  *
  * @retval Returns 0 on succes and 1 on error.
  */
@@ -77,8 +77,8 @@ int baseReadArtworkRecord(FILE* base, artwork_info* info);
  * to the file pointed at by *file.
  * Writes it according to the requested parameters.
  *
- * @params base File pointer to the database.
- * @params info Pointer to artwork_info structure with info about the register.
+ * @param file File pointer to the database.
+ * @param info Pointer to artwork_info structure with info about the register.
  *
  * @retval Returns 0 on succes and 1 on error.
  */
