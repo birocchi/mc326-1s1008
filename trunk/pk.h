@@ -82,39 +82,45 @@ void pkListFree(PrimaryKeyList* index);
 int pkListInsert(PrimaryKeyList* index, const char* name);
 
 /**
- * pkListIsEmpty
- *
  * Checks if the PK table is empty.
  *
- * Returns 1 if the list is empty or 'index' is NULL, 0 otherwise.
+ * @param index Pointer to the PrimaryKeyList struct.
+ *
+ * @return Returns 1 if the list is empty or 'index' is NULL, 0 otherwise.
  */
 int pkListIsEmpty(PrimaryKeyList* index);
 
 /**
- * pkListLoadFromBase
- *
  * Loads the primary keys from the registers at 'base'
  * to 'index'. Leaves it sorted.
  *
- * Returns 1 if any problems ocurred, 0 otherwise.
+ * @param index Pointer to the PrimaryKeyList struct.
+ *
+ * @param base File pointer to the database file.
+ *
+ * @return Returns 1 if any problems ocurred, 0 otherwise.
  */
 int pkListLoadFromBase(PrimaryKeyList* index, FILE* base);
 
 /**
- * pkListLoadFromPK
- *
  * Loads the primary keys from the primary key index
  * file 'pkfile' into 'index'.
  *
- * Returns 1 if any problems ocurres, 0 otherwise.
+ * @param index Pointer to the PrimaryKeyList struct.
+ *
+ * @param pkfile File pointer to the primary keys file.
+ *
+ * @return Returns 1 if any problems ocurres, 0 otherwise.
  */
 int pkListLoadFromPK(PrimaryKeyList* index, FILE* pkfile);
 
 /**
- * pkListWriteToFile
- *
  * Takes the primary key index 'index' and writes it properly
  * to the file 'pkfile'.
+ *
+ * @param index Pointer to the PrimaryKeyList struct.
+ *
+ * @param pkfile File pointer to the primary keys file.
  */
 void pkListWriteToFile(PrimaryKeyList* index, FILE* pkfile);
 
