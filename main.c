@@ -115,10 +115,12 @@ int main(int argc, char* argv[]) {
       readString("\n    Por favor, digite o titulo da obra (Max: 200 caracteres): ",
                  name, TITLE_LENGTH);
       if(pkListRemove(pkindex, name)){
-	printf("\n   Erro na remocao.\n");
+	printf("\n    Obra \"%s\" nao encontrada.\n", name);
       }
       else
-	printf("\n   Obra \"%s\" removida com sucesso.\n", name);
+	printf("\n    Obra \"%s\" removida com sucesso.\n", name);
+      
+      break;
       
     case 'c':
       readString("\n    Por favor, digite o titulo da obra (Max: 200 caracteres): ",

@@ -125,10 +125,10 @@ int pkListInsert(PrimaryKeyList* index, const char* name) {
 
 int pkListRemove(PrimaryKeyList* index, const char* name){
   PrimaryKeyRecord* match;
-  int i = 0;
+  int i = 0, j;
 
   /* This will use bsearch to find the key. */
-  match = bsearch(key, index->pklist, index->regnum,
+  match = bsearch(name, index->pklist, index->regnum,
                   sizeof(PrimaryKeyRecord),
                   __bsearch_compare);
 
@@ -137,16 +137,14 @@ int pkListRemove(PrimaryKeyList* index, const char* name){
     return 1;
 
   /* Find the register in index->pklist. */
-  while(index->pklist[i] != match && i < index->regnum){
+  while (index->pklist[i].rrn != match->rrn){
     i++;
   }
   /* Move all the subsequent register back one place. */
-  if (index->pklist[i] == match) {
     for(j = i; j < index->regnum - 1; j++){
       index->pklist[j] = index->pklist[j+1];
     }
-  }
-  
+
   index->regnum--;
 
   /* Must keep it sorted. */
