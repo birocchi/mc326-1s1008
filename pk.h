@@ -82,6 +82,11 @@ void pkListFree(PrimaryKeyList* index);
 int pkListInsert(PrimaryKeyList* index, const char* name);
 
 /**
+ * Removes an entry from the Primary Key Index.
+ */
+int pkListRemove(PrimaryKeyList* index, const char* name){
+
+/**
  * Checks if the PK table is empty.
  *
  * @param index Pointer to the PrimaryKeyList struct.
