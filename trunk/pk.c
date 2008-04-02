@@ -8,7 +8,7 @@
 #include "mem.h"
 #include "pk.h"
 
-/*
+/**
  * __bsearch_compare
  *
  * Comparison function used when we call bsearch to look for a key in our array.
@@ -20,7 +20,7 @@ static int __bsearch_compare(const void* a, const void* b)
   return strcmp( (char*)a, ((PrimaryKeyRecord*)b)->name );
 }
 
-/*
+/**
  * __qsort_compare
  *
  * Comparison function used when we call qsort in our primary keys array.
@@ -31,7 +31,7 @@ static int __qsort_compare(const void* a, const void* b)
   return strncmp( ((PrimaryKeyRecord*)a)->name, ((PrimaryKeyRecord*)b)->name, TITLE_LENGTH );
 }
 
-/*
+/**
  * pkListInflateSize
  *
  * Function used internally. It allocates more memory for our primary keys
