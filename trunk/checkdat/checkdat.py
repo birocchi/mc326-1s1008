@@ -88,7 +88,7 @@ class DatFile(object):
 
   def next(self):
     if self.__file.tell() < self.getSize():
-      return ArtworkInfo(StringIO(self.__file.read(420)))
+      return ArtworkInfo(StringIO(self.__file.read(450)))
 
     raise StopIteration
 
@@ -166,7 +166,7 @@ class CheckDat(object):
         else:
           imageNameList.append(imageName)
 
-      print ">> Entries in the databasee: %d" % len(imageNameList)
+      print ">> Entries in the database: %d" % len(imageNameList)
       print ">> Total: %d errors." % len(errors)
       errors.coreDump()
       
