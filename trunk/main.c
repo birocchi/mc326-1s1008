@@ -7,16 +7,19 @@
 #include "io.h"
 #include "menu.h"
 #include "pk.h"
+#include "avail.h"
 
 #define DBFILE   "base01.dat"   /* The database file name. */
 #define HTMLFILE "lista.html"   /* The HTML output. */
 #define PKFILE   "pkfile.pk"    /* The primary key file name. */
+#define AVAIL_HEAD "availhead.al" /* The avail list head file name. */
 
 int main(int argc, char* argv[]) {
   FILE *base;                 /* base01.dat basically */
   FILE *htmlfile;             /* Every single report will be printed here */
   FILE *pkfile;               /* File with the primary key table. */
-
+  FILE *availfile;            /* Open the avail list head. */
+  
   artwork_info info;          /* Holds the artwork data. */
   PrimaryKeyList* pkindex;
 
@@ -25,6 +28,22 @@ int main(int argc, char* argv[]) {
   char name[TITLE_LENGTH+1];  /* Holds the name for which to search. */
   int i;                      /* Number of entries in our database. */
   int match_pos;              /* Will hold the rrn of the found register. */
+  int avail;                  /* Holds the RRN of the first available spot */
+  int rrn;                    /* Hold the removed field RRN. */
+
+  availfile = fopen(AVAIL_HEAD, "r");
+  if (!availfile){
+    printf("Avail list nao existe, inicializando com -1.\n");
+    availfile = fopen(AVAIL_HEAD, "w");
+    fprintf(availfile, "-1");
+    fclose(availfile);
+    avail = -1;
+  }
+  else{
+    printf("Carregando primeira posicao disponivel. ");
+    fscanf(availfile, "%d", &avail);
+    fclose(availfile);
+  }
 
   /* Try to open it for reading. */
   base = fopen(DBFILE, "r");
@@ -114,12 +133,15 @@ int main(int argc, char* argv[]) {
     case 'r':
       readString("\n    Por favor, digite o titulo da obra (Max: 200 caracteres): ",
                  name, TITLE_LENGTH);
-      if(pkListRemove(pkindex, name)){
+      if(pkListRemove(pkindex, name, &rrn)){
 	printf("\n    Obra \"%s\" nao encontrada.\n", name);
       }
-      else
+      else{
+	removedField(base, rrn, &avail);
 	printf("\n    Obra \"%s\" removida com sucesso.\n", name);
-      
+	
+      }      
+
       break;
       
     case 'c':
@@ -182,6 +204,9 @@ int main(int argc, char* argv[]) {
 
     case 's':
       printf("Salvando tabela de chaves de busca...\n");
+
+      availfile = fopen(AVAIL_HEAD, "w");
+      fprintf(availfile, "%d", avail);
 
       /* We always rewrite the pkfile since it must be sorted. */
       pkfile = fopen(PKFILE, "w");
