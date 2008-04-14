@@ -88,11 +88,13 @@ int pkListInsert(PrimaryKeyList* index, const char* name);
  *
  * @param name The name (primary key) that will be removed.
  *
+ * @return rrn is gonna be the removed rrn. 
+ *
  * @retval 0 If removal went ok.
  *
  * @retval 1 If an error occurred.
  */
-int pkListRemove(PrimaryKeyList* index, const char* name);
+int pkListRemove(PrimaryKeyList* index, const char* name, int* rrn);
 
 /**
  * Checks if the PK table is empty.

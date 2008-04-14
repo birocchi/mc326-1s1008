@@ -123,7 +123,7 @@ int pkListInsert(PrimaryKeyList* index, const char* name) {
   return 0;
 }
 
-int pkListRemove(PrimaryKeyList* index, const char* name){
+int pkListRemove(PrimaryKeyList* index, const char* name, int * rrn){
   PrimaryKeyRecord* match;
   int i = 0, j;
 
@@ -135,6 +135,9 @@ int pkListRemove(PrimaryKeyList* index, const char* name){
   /* If the name isn't there, we can't remove it. */
   if (!match) 
     return 1;
+
+  /* Return via pointer the match's rrn. */
+  *rrn = match->rrn;
 
   /* Find the register in index->pklist. */
   while (index->pklist[i].rrn != match->rrn){
