@@ -23,7 +23,7 @@ int removedField(FILE * base, int rrn, int * avail){
   }
 
   fseek(base, REG_SIZE * rrn, SEEK_SET);
-  fprintf(base, "%d ", *avail);
+  fprintf(base, "%09d ", *avail);
   *avail = rrn;
   
   fclose(base);
