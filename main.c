@@ -206,7 +206,7 @@ int main(int argc, char* argv[]) {
       printf("Salvando tabela de chaves de busca...\n");
 
       availfile = fopen(AVAIL_HEAD, "w");
-      fprintf(availfile, "%d", avail);
+      fprintf(availfile, "%09d", avail);
 
       /* We always rewrite the pkfile since it must be sorted. */
       pkfile = fopen(PKFILE, "w");
