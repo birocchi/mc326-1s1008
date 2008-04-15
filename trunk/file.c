@@ -1,3 +1,6 @@
+/* Must be defined to have access to fileno() */
+#define _POSIX_C_SOURCE 1
+
 #include <stdio.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -18,24 +21,14 @@ int fileExists(const char* filename) {
   return 1;
 }
 
-int getFileSize(FILE * f){
-  int file_size;
-  int prev_pos;
-  
-  /* Don't try to get the size of a NULL pointer. */
-  if(!f)
+long getFileSize(FILE* f) {
+  int fd;
+  struct stat buf;
+
+  fd = fileno(f);
+
+  if (fstat(fd, &buf) != 0)
     return -1;
 
-  /* Save the current pointer position. */
-  prev_pos = ftell(f);
-
-  /* Go to the end of the file. */
-  fseek(f, 0, SEEK_END);
-  /* So the pointer position is the file size. */
-  file_size = ftell(f);
-  
-  /* Take the pointer back to it's original position. */
-  fseek(f, prev_pos, SEEK_SET);
-
-  return file_size;
+  return buf.st_size;
 }

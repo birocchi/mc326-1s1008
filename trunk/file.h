@@ -14,12 +14,12 @@
 int fileExists(const char* filename);
 
 /**
- * \brief Returns the size of a file.
+ * @brief Returns the size of a file.
  *
- * \param f The file whose size needs to be determined.
+ * @param f The file whose size will be given.
  *
- * \return The size in bytes of the file, -1 if f is an invalid file.
+ * @return The size in bytes of the file, -1 if f is an invalid file.
  */
-int getFileSize(FILE* f);
+long getFileSize(FILE* f);
 
 #endif
