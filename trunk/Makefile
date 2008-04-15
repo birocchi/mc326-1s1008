@@ -12,7 +12,7 @@ CFLAGS=-c -Wall -g -ansi -pedantic
 LDFLAGS=-lefence
 OFILES=base.o file.o io.o html.o main.o mem.o menu.o pk.o avail.o
 
-TP=tp2
+TP=tp3
 
 all: art
 
