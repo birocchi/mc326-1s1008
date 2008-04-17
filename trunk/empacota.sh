@@ -7,8 +7,8 @@
 # Creates a valid zip file with our work :)
 #
 
-TPNAME="tp2.zip"
-TPOUTPUT="tp02_grupo01"
+TPNAME="tp3.zip"
+TPOUTPUT="tp03_grupo01"
 
 if [ -f $TPNAME ]; then
   echo ">> Apagando zip anterior..."
