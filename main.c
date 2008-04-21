@@ -72,13 +72,12 @@ int main(int argc, char* argv[]) {
       while (insert_data) {
         readData(&info);
 
-        if (pkListFindByName(pkindex, info.title) != -1) {
+        if (pkListInsert(pkindex, info.title)) {
           printf("\nJa existe uma obra com titulo \"%s\".\n", info.title);
           continue;
         }
 
         baseWriteData(base, &info);
-        pkListInsert(pkindex, info.title);
 
         while (1) {
           printf("\nDeseja inserir mais uma entrada? (s)im, (n)ao? ");
