@@ -188,10 +188,8 @@ PrimaryKeyList* pkListLoadFromBase(const char* base_name) {
     /* Strip trailing whitespaces from the name */
     stripWhiteSpace(index->pklist[i].name);
 
-    /* Since we need to skip the rest of the register, and have already
-     * read TITLE_LENGTH, we must go REG_SIZE - TITLE_LENGTH positions ahead,
-     * and yet one more for we must read the next name. */
-    fseek(base, (REG_SIZE - TITLE_LENGTH)+1, SEEK_CUR);
+    /* Skip the rest of the entry and go to the next record */
+    fseek(base, REG_SIZE - TITLE_LENGTH, SEEK_CUR);
   }
 
   /* After everything is added, it has to be sorted. */
