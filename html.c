@@ -10,7 +10,7 @@ void htmlBegin(FILE* htmlfile) {
     fprintf(htmlfile, "<html>\n");
     fprintf(htmlfile, "<head>\n");
     fprintf(htmlfile, "  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n");
-    fprintf(htmlfile, "  <title>TP2 Grupo 1</title>\n");
+    fprintf(htmlfile, "  <title>TP3 Grupo 1</title>\n");
     fprintf(htmlfile, "</head>\n\n");
     fprintf(htmlfile, "<body>\n\n");
   }
