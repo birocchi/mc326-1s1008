@@ -24,8 +24,6 @@ int main(int argc, char* argv[]) {
   artwork_info info;          /* Holds the artwork data. */
   PrimaryKeyList* pkindex;
 
-  char c;                     /* Holds the user's choice from the menus. */
-  int insert_data;            /* Whether or not to insert more data into the dat file. */
   char name[TITLE_LENGTH+1];  /* Holds the name for which to search. */
   int i;                      /* Number of entries in our database. */
   int match_pos;              /* Will hold the rrn of the found register. */
@@ -56,64 +54,9 @@ int main(int argc, char* argv[]) {
   while (1) {
     printMenu();
 
-    if (readChar(&c)) {
-      printf("\nErro: Opcao invalida.\n");
-      continue;
-    }
-
-    switch (tolower(c)) {
-    default:
-      printf("\n(%c): Opcao invalida.\n", c);
+    switch (menuMultipleAnswers("   Opcao desejada: ", "cigrs")) {
+    default: /* This should not happen */
       break;
-
-    case 'i':
-      insert_data = 1;
-
-      while (insert_data) {
-        readData(&info);
-
-        if (pkListInsert(pkindex, info.title)) {
-          printf("\nJa existe uma obra com titulo \"%s\".\n", info.title);
-          continue;
-        }
-
-        baseWriteData(base, &info);
-
-        while (1) {
-          printf("\nDeseja inserir mais uma entrada? (s)im, (n)ao? ");
-
-          if (readChar(&c) == -1)
-            printf("\nOpcao invalida");
-
-          c = tolower(c);
-
-          if (c == 's')
-            break;
-          else if (c == 'n') {
-            insert_data = 0;
-            break;
-          }
-          else
-            printf("\nOpcao invalida");
-        }
-      }
-
-      break;
-
-    case 'r':
-      readString("\n    Por favor, digite o titulo da obra (Max: 200 caracteres): ",
-                 name, TITLE_LENGTH);
-      if(pkListRemove(pkindex, name, &rrn)){
-	printf("\n    Obra \"%s\" nao encontrada.\n", name);
-      }
-      else{
-	removedField(base, rrn, &avail);
-	printf("\n    Obra \"%s\" removida com sucesso.\n", name);
-
-      }
-
-      break;
-
     case 'c':
       readString("\n    Por favor, digite o titulo da obra (Max: 200 caracteres): ",
                  name, TITLE_LENGTH);
@@ -139,15 +82,12 @@ int main(int argc, char* argv[]) {
 
         printf("\n    As informacoes da obra \"%s\" foram salvas em \"%s\".\n", name, HTMLFILE);
       }
-
       break;
-
     case 'g':
       printf("   Gerando lista de obras...\n");
 
-      if (pkListIsEmpty(pkindex)) {
+      if (pkListIsEmpty(pkindex))
         printf("     O catalogo ainda nao possui obras.\n");
-      }
       else {
         htmlfile = fopen(HTMLFILE, "w");
         htmlBegin(htmlfile);
@@ -169,9 +109,28 @@ int main(int argc, char* argv[]) {
 
         printf("   Lista \"%s\" gerada com sucesso.\n", HTMLFILE);
       }
-
       break;
-
+    case 'i':
+      do {
+        readData(&info);
+        if (pkListInsert(pkindex, info.title)) {
+          printf("\nJa existe uma obra com titulo \"%s\".\n", info.title);
+          continue;
+        }
+        baseWriteData(base, &info);
+      } while (menuYesOrNo("\nDeseja inserir mais uma entrada? (s)im, (n)ao? "));
+      break;
+    case 'r':
+      readString("\n    Por favor, digite o titulo da obra (Max: 200 caracteres): ",
+                 name, TITLE_LENGTH);
+      if(pkListRemove(pkindex, name, &rrn)){
+        printf("\n    Obra \"%s\" nao encontrada.\n", name);
+      }
+      else{
+        removedField(base, rrn, &avail);
+        printf("\n    Obra \"%s\" removida com sucesso.\n", name);
+      }
+      break;
     case 's':
       printf("Salvando tabela de chaves de busca...\n");
 
