@@ -123,6 +123,7 @@ int main(int argc, char* argv[]) {
     case 'r':
       readString("\n    Por favor, digite o titulo da obra (Max: 200 caracteres): ",
                  name, TITLE_LENGTH);
+
       if(pkListRemove(pkindex, name, &rrn)){
         printf("\n    Obra \"%s\" nao encontrada.\n", name);
       }
