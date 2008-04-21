@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
@@ -19,7 +20,7 @@ int main(int argc, char* argv[]) {
   FILE *htmlfile;             /* Every single report will be printed here */
   FILE *pkfile;               /* File with the primary key table. */
   FILE *availfile;            /* Open the avail list head. */
-  
+
   artwork_info info;          /* Holds the artwork data. */
   PrimaryKeyList* pkindex;
 
@@ -45,40 +46,10 @@ int main(int argc, char* argv[]) {
     fclose(availfile);
   }
 
-  /* Try to open it for reading. */
-  base = fopen(DBFILE, "r");
-  if (!base) {
-    printf("Base de dados ainda nao existe.\n");
-  }
+  pkindex = pkListLoad(DBFILE, PKFILE);
 
-  pkindex = pkListInit();
-  if (pkindex == NULL) {
-    printf("Erro ao carregar chaves primarias. Saindo.\n");
-    exit(EXIT_FAILURE);
-  }
-
-  /* Loading the primary key tables. */
-  printf("Carregando tabela de chaves primarias...\n");
-  if (fileExists(PKFILE) && fileExists(DBFILE)) {
-    pkfile = fopen(PKFILE, "r");
-    pkListLoadFromPK(pkindex, pkfile);
-    fclose(pkfile);
-  }
-  else if (fileExists(DBFILE)){
-    printf("A tabela de chaves primarias esta sendo criada.\n");
-    pkListLoadFromBase(pkindex, base);
-  }
-
-  /* If there was a database, we now close it. */
-  if (base)
-    fclose(base);
-
-  /* And now we can open it for appending so we can insert new registers. */
   base = fopen(DBFILE, "a+");
-  if (!base) {
-    printf("Erro ao criar base de dados. Saindo...\n");
-    exit(EXIT_FAILURE);
-  }
+  assert(base != NULL);
 
   printWelcome();
 
@@ -139,11 +110,11 @@ int main(int argc, char* argv[]) {
       else{
 	removedField(base, rrn, &avail);
 	printf("\n    Obra \"%s\" removida com sucesso.\n", name);
-	
-      }      
+
+      }
 
       break;
-      
+
     case 'c':
       readString("\n    Por favor, digite o titulo da obra (Max: 200 caracteres): ",
                  name, TITLE_LENGTH);

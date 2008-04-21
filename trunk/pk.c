@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,47 +35,41 @@ static int __qsort_compare(const void* a, const void* b)
 /**
  * pkListInflateSize
  *
- * Function used internally. It allocates more memory for our primary keys
- * list, doubling the space used each time it is called.
+ * Allocate more memory for the primary keys index, doubling
+ * the space used each time it is called.
+ * Aborts on error.
  *
- * Returns 1 on error and 0 otherwise.
+ * \brief Allocate more memory for the primary keys index.
  */
-static int pkListInflateSize(PrimaryKeyList* index) {
+static void pkListInflateSize(PrimaryKeyList* index) {
   PrimaryKeyRecord* tmp;
 
   tmp = realloc(index->pklist, (index->maxregs*2)*sizeof(PrimaryKeyRecord));
 
-  if (tmp == NULL)
-    return 1;
-  else {
-    index->pklist = tmp; 
-    index->maxregs = index->maxregs*2;
-  }
+  assert(tmp != NULL);
 
-  return 0;
+  index->pklist = tmp;
+  index->maxregs = index->maxregs*2;
 }
 
-PrimaryKeyList* pkListInit(void) {
+PrimaryKeyList* pkListNew(size_t nelem) {
   PrimaryKeyList* ret;
 
-  ret = MEM_ALLOC(PrimaryKeyList); /* Alocating the PK list struct. */
-  ret->regnum = 0;
-  ret->maxregs = 20; /* Initial size of the base */
+  ret = MEM_ALLOC(PrimaryKeyList);
+  ret->regnum  = nelem;
 
-  /* Alocate the actual PK list, for the first time. */
-  ret->pklist = MEM_ALLOC_N(PrimaryKeyRecord, ret->maxregs); 
+  /* If nelem == 0, we create an empty list
+   * twice as big as the initial size of the base */
+  ret->maxregs = (nelem > 0 ? 2*nelem : 40);
 
-  if (ret->pklist == NULL) {
-    free(ret);
-    return NULL; 
-  }
+  ret->pklist  = MEM_ALLOC_N(PrimaryKeyRecord, ret->maxregs);
 
   return ret;
 }
 
 void pkListFree(PrimaryKeyList* index) {
   if (index) {
-    /* PrimaryKeyList* points to a struct, 
+    /* PrimaryKeyList* points to a struct,
      * so we must free the struct's pointers first.
      */
     free(index->pklist);
@@ -103,21 +98,19 @@ int pkListInsert(PrimaryKeyList* index, const char* name) {
     return 1;
 
   /* If we need more space on the list, inflate it */
-  if (index->regnum == index->maxregs) {
-    if (pkListInflateSize(index)) /* If we had problems inflating the index. */
-      return 1;
-  }
+  if (index->regnum == index->maxregs)
+    pkListInflateSize(index);
 
-  /* New register's rrn is the number of registers, 
+  /* New register's rrn is the number of registers,
    * since it's added to the end. */
-  index->pklist[index->regnum].rrn = index->regnum; 
+  index->pklist[index->regnum].rrn = index->regnum;
   /* Then we copy the key, in this case the name, to the PK index. */
   strncpy(index->pklist[index->regnum].name, name, TITLE_LENGTH+1);
 
   index->regnum++;
-  
+
   /* Must keep it sorted. */
-  qsort(index->pklist, index->regnum, 
+  qsort(index->pklist, index->regnum,
 	sizeof(PrimaryKeyRecord), __qsort_compare);
 
   return 0;
@@ -133,7 +126,7 @@ int pkListRemove(PrimaryKeyList* index, const char* name, int * rrn){
                   __bsearch_compare);
 
   /* If the name isn't there, we can't remove it. */
-  if (!match) 
+  if (!match)
     return 1;
 
   /* Return via pointer the match's rrn. */
@@ -151,7 +144,7 @@ int pkListRemove(PrimaryKeyList* index, const char* name, int * rrn){
   index->regnum--;
 
   /* Must keep it sorted. */
-  qsort(index->pklist, index->regnum, 
+  qsort(index->pklist, index->regnum,
 	sizeof(PrimaryKeyRecord), __qsort_compare);
 
   return 0;
@@ -164,23 +157,29 @@ int pkListIsEmpty(PrimaryKeyList* index) {
     return 1;
 }
 
-int pkListLoadFromBase(PrimaryKeyList* index, FILE* base) {
-  int basepos;
+PrimaryKeyList* pkListLoad(const char* base_name, const char* pkname) {
+  if (!fileExists(pkname))
+    return pkListLoadFromBase(base_name);
+  else {
+    if (fileExists(base_name))
+      return pkListLoadFromPK(pkname);
+    else
+      /* If neither the PK index nor the database exist,
+       * return a new, empty list */
+      return pkListNew(0);
+  }
+}
+
+PrimaryKeyList* pkListLoadFromBase(const char* base_name) {
+  PrimaryKeyList* index;
+  FILE* base;
   int i;
 
-  if ((base == NULL) || (index == NULL))
-    return 1;
+  base = fopen(base_name, "r");
+  assert(base != NULL);
 
-  basepos = ftell(base);
-  index->regnum = getFileSize(base) / REG_SIZE;
+  index = pkListNew(getFileSize(base) / REG_SIZE);
 
-  /* While we have more registers to store than available space,
-     we keep inflating our list.*/
-  while (index->regnum > index->maxregs) {
-    if (pkListInflateSize(index))
-      return 1;
-  }
-  
   /* Next we read the registers from our base. */
   for (i = 0; i < index->regnum; i++) {
     fgets(index->pklist[i].name, TITLE_LENGTH, base);
@@ -196,32 +195,25 @@ int pkListLoadFromBase(PrimaryKeyList* index, FILE* base) {
   }
 
   /* After everything is added, it has to be sorted. */
-  qsort(index->pklist, index->regnum, sizeof(PrimaryKeyRecord), __qsort_compare);
+  qsort(index->pklist, index->regnum, sizeof(PrimaryKeyRecord),
+        __qsort_compare);
 
-  fseek(base, basepos, SEEK_SET);
+  fclose(base);
 
-  return 0;
+  return index;
 }
 
-int pkListLoadFromPK(PrimaryKeyList* index, FILE* pkfile) {
+PrimaryKeyList* pkListLoadFromPK(const char* pkname) {
+  FILE* pkfile;
+  PrimaryKeyList* index;
   char tmpname[TITLE_LENGTH+1], tmprrn[RRN_LENGTH+1];
   int i, rrn;
-  int pkfilepos;
 
-  if (pkfile == NULL)
-    return 1;
+  pkfile = fopen(pkname, "r");
+  assert(pkfile != NULL);
 
-  pkfilepos = ftell(pkfile);
+  index = pkListNew(getFileSize(pkfile) / PK_REG_SIZE);
 
-  index->regnum = getFileSize(pkfile) / PK_REG_SIZE;
-
-  /* While we have more registers to store than available space,
-   * we keep inflating our list. */
-  while (index->regnum > index->maxregs) {
-    if (pkListInflateSize(index))
-      return 1;
-  }
-  
   for (i = 0; i < index->regnum; i++) {
     fgets(tmpname, TITLE_LENGTH+1, pkfile);
     strncpy(index->pklist[i].name, tmpname, TITLE_LENGTH);
@@ -234,16 +226,15 @@ int pkListLoadFromPK(PrimaryKeyList* index, FILE* pkfile) {
     index->pklist[i].rrn = rrn;
   }
 
-  /* Change the pointer to it's original position. */
-  fseek(pkfile, pkfilepos, SEEK_SET);
+  fclose(pkfile);
 
-  return 0;
+  return index;
 }
 
 void pkListWriteToFile(PrimaryKeyList* index, FILE* pkfile) {
   char write_str[20] = {'\0'};
   int i;
-  
+
   if (pkfile) {
     for (i = 0; i < index->regnum; i++) {
       /* We write the format string for fprintf at write_str.
