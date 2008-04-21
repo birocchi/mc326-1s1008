@@ -182,7 +182,7 @@ PrimaryKeyList* pkListLoadFromBase(const char* base_name) {
 
   /* Next we read the registers from our base. */
   for (i = 0; i < index->regnum; i++) {
-    fgets(index->pklist[i].name, TITLE_LENGTH, base);
+    fgets(index->pklist[i].name, TITLE_LENGTH+1, base);
     index->pklist[i].rrn = i;
 
     /* Strip trailing whitespaces from the name */
@@ -206,7 +206,7 @@ PrimaryKeyList* pkListLoadFromBase(const char* base_name) {
 PrimaryKeyList* pkListLoadFromPK(const char* pkname) {
   FILE* pkfile;
   PrimaryKeyList* index;
-  char tmpname[TITLE_LENGTH+1], tmprrn[RRN_LENGTH+1];
+  char tmprrn[RRN_LENGTH+1];
   int i, rrn;
 
   pkfile = fopen(pkname, "r");
@@ -215,8 +215,7 @@ PrimaryKeyList* pkListLoadFromPK(const char* pkname) {
   index = pkListNew(getFileSize(pkfile) / PK_REG_SIZE);
 
   for (i = 0; i < index->regnum; i++) {
-    fgets(tmpname, TITLE_LENGTH+1, pkfile);
-    strncpy(index->pklist[i].name, tmpname, TITLE_LENGTH);
+    fgets(index->pklist[i].name, TITLE_LENGTH+1, pkfile);
 
     /* Strip trailing whitespaces from the name */
     stripWhiteSpace(index->pklist[i].name);
