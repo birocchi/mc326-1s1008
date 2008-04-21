@@ -44,7 +44,7 @@ typedef struct {
  *
  * \param nelem Number of elements to allocate memory for.
  *
- * @retval Returns a pointer to the initialized list or NULL
+ * \retval Returns a pointer to the initialized list or NULL
  * if it could not be initialized.
  */
 PrimaryKeyList* pkListNew(size_t nelem);
@@ -52,10 +52,10 @@ PrimaryKeyList* pkListNew(size_t nelem);
 /**
  * Searches for the key 'key' in the 'index' list.
  *
- * @param index Pointer to a PrimaryKeyList struct.
- * @param key The string to be searched as primary key.
+ * \param index Pointer to a PrimaryKeyList struct.
+ * \param key The string to be searched as primary key.
  *
- * @return Returns the key's rrn if found or -1 case not.
+ * \return Returns the key's rrn if found or -1 case not.
  */
 int pkListFindByName(PrimaryKeyList* index, const char* key);
 
@@ -64,7 +64,7 @@ int pkListFindByName(PrimaryKeyList* index, const char* key);
  * Frees the pointer to the list,
  * and only then frees the struct itselft.
  *
- * @param index Pointer to a PrimaryKeyList struct.
+ * \param index Pointer to a PrimaryKeyList struct.
  */
 void pkListFree(PrimaryKeyList* index);
 
@@ -73,11 +73,11 @@ void pkListFree(PrimaryKeyList* index);
  * and a string, the pk. Adds the new key
  * to the PK index.
  *
- * @param index Pointer the PrimaryKeyList struct.
+ * \param index Pointer the PrimaryKeyList struct.
  *
- * @param name String with the primary key.
+ * \param name String with the primary key.
  *
- * @return Returns 0 if everything went ok \
+ * \return Returns 0 if everything went ok \
  * or 1 if the key was already in the list \
  * or if it had any problems inflating the table \
  * case it was already full.
@@ -87,24 +87,24 @@ int pkListInsert(PrimaryKeyList* index, const char* name);
 /**
  * Removes an entry from the Primary Key Index.
  *
- * @param index Pointer to the PrimaryKeyList struct.
+ * \param index Pointer to the PrimaryKeyList struct.
  *
- * @param name The name (primary key) that will be removed.
+ * \param name The name (primary key) that will be removed.
  *
- * @return rrn is gonna be the removed rrn. 
+ * \return rrn is gonna be the removed rrn. 
  *
- * @retval 0 If removal went ok.
+ * \retval 0 If removal went ok.
  *
- * @retval 1 If an error occurred.
+ * \retval 1 If an error occurred.
  */
 int pkListRemove(PrimaryKeyList* index, const char* name, int* rrn);
 
 /**
  * Checks if the PK table is empty.
  *
- * @param index Pointer to the PrimaryKeyList struct.
+ * \param index Pointer to the PrimaryKeyList struct.
  *
- * @return Returns 1 if the list is empty or 'index' is NULL, 0 otherwise.
+ * \return Returns 1 if the list is empty or 'index' is NULL, 0 otherwise.
  */
 int pkListIsEmpty(PrimaryKeyList* index);
 
@@ -121,16 +121,21 @@ int pkListIsEmpty(PrimaryKeyList* index);
 PrimaryKeyList* pkListLoad(const char* base_name, const char* pkname);
 
 /**
- * Loads the primary keys from the registers at 'base'
- * to 'index'. Leaves it sorted.
+ * \brief Load the primary keys from the database.
  *
+ * \param base_name The name of the database.
+ *
+ * \return New index structure with the loaded data.
  */
 PrimaryKeyList* pkListLoadFromBase(const char* base_name);
 
 /**
- * Loads the primary keys from the primary key index
- * file 'pkfile' into 'index'.
+ * \brief Load the primary keys from a previous
+ *        primary keys cache.
  *
+ * \param pkname The name of the cache file.
+ *
+ * \return New index structure with the loaded data.
  */
 PrimaryKeyList* pkListLoadFromPK(const char* pkname);
 
@@ -138,9 +143,9 @@ PrimaryKeyList* pkListLoadFromPK(const char* pkname);
  * Takes the primary key index 'index' and writes it properly
  * to the file 'pkfile'.
  *
- * @param index Pointer to the PrimaryKeyList struct.
+ * \param index Pointer to the PrimaryKeyList struct.
  *
- * @param pkfile File pointer to the primary keys file.
+ * \param pkfile File pointer to the primary keys file.
  */
 void pkListWriteToFile(PrimaryKeyList* index, FILE* pkfile);
 
