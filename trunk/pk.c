@@ -10,11 +10,10 @@
 #include "pk.h"
 
 /**
- * __bsearch_compare
- *
- * Comparison function used when we call bsearch to look for a key in our array.
- * It works like __qsort_compare, however /a/ is just a character here, but a
- * primary_key structure in __qsort_compare.
+ * \brief   Comparision function used when performing a binary search.
+ * \param   a The key being compared to the whole list.
+ * \param   b A PrimaryKeyRecord which is being compared to \a a.
+ * \return  Returns the value of \a strcmp on \a a and \a b.
  */
 static int __bsearch_compare(const void* a, const void* b)
 {
@@ -22,10 +21,10 @@ static int __bsearch_compare(const void* a, const void* b)
 }
 
 /**
- * __qsort_compare
- *
- * Comparison function used when we call qsort in our primary keys array.
- * It just calls strncmp on primary_key's name member.
+ * \brief   Comparison function used when performing a quicksort.
+ * \param   a A PrimaryKeyRecord.
+ * \param   b Another PrimaryKeyRecord.
+ * \return  Returns the value of \a strncmp on \a and \a b.
  */
 static int __qsort_compare(const void* a, const void* b)
 {
@@ -33,13 +32,11 @@ static int __qsort_compare(const void* a, const void* b)
 }
 
 /**
- * pkListInflateSize
+ * \brief Allocate more memory for the primary keys index.
+ * \param index The primary index list which we want to expand.
  *
  * Allocate more memory for the primary keys index, doubling
- * the space used each time it is called.
- * Aborts on error.
- *
- * \brief Allocate more memory for the primary keys index.
+ * the space used each time it is called. Aborts on error.
  */
 static void pkListInflateSize(PrimaryKeyList* index) {
   PrimaryKeyRecord* tmp;
@@ -54,9 +51,6 @@ static void pkListInflateSize(PrimaryKeyList* index) {
 
 void pkListFree(PrimaryKeyList* index) {
   if (index) {
-    /* PrimaryKeyList* points to a struct,
-     * so we must free the struct's pointers first.
-     */
     free(index->pklist);
     free(index);
     index = NULL;
@@ -116,7 +110,7 @@ PrimaryKeyList* pkListLoad(const char* base_name, const char* pkname) {
       return pkListLoadFromPK(pkname);
     else
       /* If neither the PK index nor the database exist,
-      * return a new, empty list */
+       * return a new, empty list */
       return pkListNew(0);
   }
 }
