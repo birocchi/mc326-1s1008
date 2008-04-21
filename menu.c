@@ -1,7 +1,28 @@
+#include <stdio.h>
+#include <string.h>
+#include "io.h"
 #include "menu.h"
 
-void printMenu(void)
-{
+char menuMultipleAnswers(const char* msg, const char* optstring) {
+  char c;
+
+  while (1) {
+    printf(msg);
+
+    if ((readChar(&c)) || (!strchr(optstring, c))) {
+      printf("\n   Opcao invalida.\n");
+      continue;
+    }
+
+    return c;
+  }
+}
+
+int menuYesOrNo(const char* msg) {
+  return menuMultipleAnswers(msg, "sn") == 's';
+}
+
+void printMenu(void) {
 	printf("\n");
 	printf("    _____________________________________\n");
 	printf("   |                                     |\n");
@@ -11,11 +32,9 @@ void printMenu(void)
 	printf("   |  (g)erar lista de obras de arte     |\n");
 	printf("   |  (s)air                             |\n");
 	printf("   |_____________________________________|\n\n");
-	printf("   Opcao desejada: ");
 }
 
-void printWelcome(void)
-{
+void printWelcome(void) {
 	printf("\n");
 	printf("   ########################################\n");
 	printf("   ##                                    ##\n");

@@ -62,10 +62,9 @@ int pkListFindByName(PrimaryKeyList* index, const char* key) {
 
   /* This will use bsearch to find the key. */
   match = bsearch(key, index->pklist, index->regnum,
-                  sizeof(PrimaryKeyRecord),
-                  __bsearch_compare);
+                  sizeof(PrimaryKeyRecord), __bsearch_compare);
 
-  if (match == NULL)
+  if (!match)
     return -1;
   else
     return match->rrn;
