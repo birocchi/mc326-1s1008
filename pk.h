@@ -3,45 +3,45 @@
 
 #include "base.h"
 
-/** Relative record number. 32-bit integer (4 bytes) */
+/** Relative record number: 32-bit integer (4 bytes) */
 #define RRN_LENGTH  4
 /** 4 bytes for a 32-bit integer */
 #define PK_REG_SIZE (TITLE_LENGTH + RRN_LENGTH)
 
 /**
- * This is the internal structure used
- * by the primary keys list to store
- * each entry: it consists of a RRN and
- * one name.
+ * \brief Internal structure used to store the primary keys list.
+ *
+ * This structure actually stores the information about each
+ * record: its name and RRN.
  */
 typedef struct {
-  /** The Register Relative Number. */
+  /** The Relative Register Number. */
   int rrn;
-  /** The primary key itself, the name, plus a '\\0' */
+  /** The primary key itself (the name) */
   char name[TITLE_LENGTH+1]; 
 } PrimaryKeyRecord;
 
 /**
- * This is the structure used everywhere
- * to handle primary keys.
- * There's the current number of entries,
- * the maximum number of entries for which
- * there is memory allocated, and the list
- * itself.
+ * \brief Structure used to handle primary keys.
+ *
+ * This is a wrapper around the real structure,
+ * \a PrimaryKeyRecord, and should be used instead
+ * of it.
  */
 typedef struct {
+  /** Current number of records. */
   int regnum;
+  /** Maximum possible number of records */
   int maxregs;
+  /** The primary key list */
   PrimaryKeyRecord* pklist;
 } PrimaryKeyList;
 
 /**
- * Searches for the key 'key' in the 'index' list.
- *
- * \param index Pointer to a PrimaryKeyList struct.
- * \param key The string to be searched as primary key.
- *
- * \return Returns the key's rrn if found or -1 case not.
+ * \brief   Searches for the key 'key' in the 'index' list.
+ * \param   index Pointer to a PrimaryKeyList struct.
+ * \param   key The string to be searched as primary key.
+ * \return  Returns the key's rrn if found or -1 case not.
  */
 int pkListFindByName(PrimaryKeyList* index, const char* key);
 
