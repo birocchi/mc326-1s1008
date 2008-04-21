@@ -72,7 +72,6 @@ int pkListFindByName(PrimaryKeyList* index, const char* key) {
 }
 
 int pkListInsert(PrimaryKeyList* index, const char* name) {
-  /* If the name is already on the list, do not add it again */
   if (pkListFindByName(index, name) != -1)
     return 1;
 
@@ -83,14 +82,12 @@ int pkListInsert(PrimaryKeyList* index, const char* name) {
   /* New register's rrn is the number of registers,
    * since it's added to the end. */
   index->pklist[index->regnum].rrn = index->regnum;
-  /* Then we copy the key, in this case the name, to the PK index. */
-  strncpy(index->pklist[index->regnum].name, name, TITLE_LENGTH+1);
-
   index->regnum++;
 
-  /* Must keep it sorted. */
-  qsort(index->pklist, index->regnum,
-	sizeof(PrimaryKeyRecord), __qsort_compare);
+  strncpy(index->pklist[index->regnum].name, name, TITLE_LENGTH+1);
+
+  qsort(index->pklist, index->regnum, sizeof(PrimaryKeyRecord),
+        __qsort_compare);
 
   return 0;
 }
@@ -98,8 +95,8 @@ int pkListInsert(PrimaryKeyList* index, const char* name) {
 int pkListIsEmpty(PrimaryKeyList* index) {
   if (index)
     return index->regnum == 0;
-  else
-    return 1;
+
+  return 1;
 }
 
 PrimaryKeyList* pkListLoad(const char* base_name, const char* pkname) {
@@ -137,7 +134,6 @@ PrimaryKeyList* pkListLoadFromBase(const char* base_name) {
     fseek(base, REG_SIZE - TITLE_LENGTH, SEEK_CUR);
   }
 
-  /* After everything is added, it has to be sorted. */
   qsort(index->pklist, index->regnum, sizeof(PrimaryKeyRecord),
         __qsort_compare);
 
@@ -180,7 +176,7 @@ PrimaryKeyList* pkListNew(size_t nelem) {
   ret->regnum  = nelem;
 
   /* If nelem == 0, we create an empty list
-  * twice as big as the initial size of the base */
+   * twice as big as the initial size of the base */
   ret->maxregs = (nelem > 0 ? 2*nelem : 40);
 
   ret->pklist  = MEM_ALLOC_N(PrimaryKeyRecord, ret->maxregs);
