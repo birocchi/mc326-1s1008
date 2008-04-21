@@ -36,14 +36,18 @@ typedef struct {
 } PrimaryKeyList;
 
 /**
- * The list's "constructor": allocate memory for the
- * list's internal structure, starting with 20 positions.
+ * Allocate memory for a new primary key list and
+ * initialize it.
+ *
+ * It allocates space for \a nelem records, or
+ * 40 records if \a nelem is 0.
+ *
+ * \param nelem Number of elements to allocate memory for.
  *
  * @retval Returns a pointer to the initialized list or NULL
  * if it could not be initialized.
  */
-PrimaryKeyList* pkListInit(void);
-
+PrimaryKeyList* pkListNew(size_t nelem);
 
 /**
  * Searches for the key 'key' in the 'index' list.
@@ -54,7 +58,6 @@ PrimaryKeyList* pkListInit(void);
  * @return Returns the key's rrn if found or -1 case not.
  */
 int pkListFindByName(PrimaryKeyList* index, const char* key);
-
 
 /**
  * Entirely frees the struct pointed by 'index'. 
@@ -106,28 +109,30 @@ int pkListRemove(PrimaryKeyList* index, const char* name, int* rrn);
 int pkListIsEmpty(PrimaryKeyList* index);
 
 /**
+ * \brief Loads data for a primary key index.
+ *
+ * \param base_name Database name.
+ * \param pkname Primary keys index file name.
+ *
+ * \return Returns a new index with the loaded data,
+ *         or an empty index if neither \a base_name
+ *         nor \a pkname are valid files.
+ */
+PrimaryKeyList* pkListLoad(const char* base_name, const char* pkname);
+
+/**
  * Loads the primary keys from the registers at 'base'
  * to 'index'. Leaves it sorted.
  *
- * @param index Pointer to the PrimaryKeyList struct.
- *
- * @param base File pointer to the database file.
- *
- * @return Returns 1 if any problems ocurred, 0 otherwise.
  */
-int pkListLoadFromBase(PrimaryKeyList* index, FILE* base);
+PrimaryKeyList* pkListLoadFromBase(const char* base_name);
 
 /**
  * Loads the primary keys from the primary key index
  * file 'pkfile' into 'index'.
  *
- * @param index Pointer to the PrimaryKeyList struct.
- *
- * @param pkfile File pointer to the primary keys file.
- *
- * @return Returns 1 if any problems ocurres, 0 otherwise.
  */
-int pkListLoadFromPK(PrimaryKeyList* index, FILE* pkfile);
+PrimaryKeyList* pkListLoadFromPK(const char* pkname);
 
 /**
  * Takes the primary key index 'index' and writes it properly
