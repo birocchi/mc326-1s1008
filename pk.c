@@ -52,21 +52,6 @@ static void pkListInflateSize(PrimaryKeyList* index) {
   index->maxregs = index->maxregs*2;
 }
 
-PrimaryKeyList* pkListNew(size_t nelem) {
-  PrimaryKeyList* ret;
-
-  ret = MEM_ALLOC(PrimaryKeyList);
-  ret->regnum  = nelem;
-
-  /* If nelem == 0, we create an empty list
-   * twice as big as the initial size of the base */
-  ret->maxregs = (nelem > 0 ? 2*nelem : 40);
-
-  ret->pklist  = MEM_ALLOC_N(PrimaryKeyRecord, ret->maxregs);
-
-  return ret;
-}
-
 void pkListFree(PrimaryKeyList* index) {
   if (index) {
     /* PrimaryKeyList* points to a struct,
@@ -116,40 +101,6 @@ int pkListInsert(PrimaryKeyList* index, const char* name) {
   return 0;
 }
 
-int pkListRemove(PrimaryKeyList* index, const char* name, int * rrn){
-  PrimaryKeyRecord* match;
-  int i = 0, j;
-
-  /* This will use bsearch to find the key. */
-  match = bsearch(name, index->pklist, index->regnum,
-                  sizeof(PrimaryKeyRecord),
-                  __bsearch_compare);
-
-  /* If the name isn't there, we can't remove it. */
-  if (!match)
-    return 1;
-
-  /* Return via pointer the match's rrn. */
-  *rrn = match->rrn;
-
-  /* Find the register in index->pklist. */
-  while (index->pklist[i].rrn != match->rrn){
-    i++;
-  }
-  /* Move all the subsequent register back one place. */
-    for(j = i; j < index->regnum - 1; j++){
-      index->pklist[j] = index->pklist[j+1];
-    }
-
-  index->regnum--;
-
-  /* Must keep it sorted. */
-  qsort(index->pklist, index->regnum,
-	sizeof(PrimaryKeyRecord), __qsort_compare);
-
-  return 0;
-}
-
 int pkListIsEmpty(PrimaryKeyList* index) {
   if (index)
     return index->regnum == 0;
@@ -165,7 +116,7 @@ PrimaryKeyList* pkListLoad(const char* base_name, const char* pkname) {
       return pkListLoadFromPK(pkname);
     else
       /* If neither the PK index nor the database exist,
-       * return a new, empty list */
+      * return a new, empty list */
       return pkListNew(0);
   }
 }
@@ -226,6 +177,55 @@ PrimaryKeyList* pkListLoadFromPK(const char* pkname) {
   fclose(pkfile);
 
   return index;
+}
+
+PrimaryKeyList* pkListNew(size_t nelem) {
+  PrimaryKeyList* ret;
+
+  ret = MEM_ALLOC(PrimaryKeyList);
+  ret->regnum  = nelem;
+
+  /* If nelem == 0, we create an empty list
+  * twice as big as the initial size of the base */
+  ret->maxregs = (nelem > 0 ? 2*nelem : 40);
+
+  ret->pklist  = MEM_ALLOC_N(PrimaryKeyRecord, ret->maxregs);
+
+  return ret;
+}
+
+int pkListRemove(PrimaryKeyList* index, const char* name, int * rrn){
+  PrimaryKeyRecord* match;
+  int i = 0, j;
+
+  /* This will use bsearch to find the key. */
+  match = bsearch(name, index->pklist, index->regnum,
+                  sizeof(PrimaryKeyRecord),
+                  __bsearch_compare);
+
+  /* If the name isn't there, we can't remove it. */
+  if (!match)
+    return 1;
+
+  /* Return via pointer the match's rrn. */
+  *rrn = match->rrn;
+
+  /* Find the register in index->pklist. */
+  while (index->pklist[i].rrn != match->rrn){
+    i++;
+  }
+  /* Move all the subsequent register back one place. */
+    for(j = i; j < index->regnum - 1; j++){
+      index->pklist[j] = index->pklist[j+1];
+    }
+
+  index->regnum--;
+
+  /* Must keep it sorted. */
+  qsort(index->pklist, index->regnum,
+	sizeof(PrimaryKeyRecord), __qsort_compare);
+
+  return 0;
 }
 
 void pkListWriteToFile(PrimaryKeyList* index, FILE* pkfile) {

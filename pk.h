@@ -36,20 +36,6 @@ typedef struct {
 } PrimaryKeyList;
 
 /**
- * Allocate memory for a new primary key list and
- * initialize it.
- *
- * It allocates space for \a nelem records, or
- * 40 records if \a nelem is 0.
- *
- * \param nelem Number of elements to allocate memory for.
- *
- * \retval Returns a pointer to the initialized list or NULL
- * if it could not be initialized.
- */
-PrimaryKeyList* pkListNew(size_t nelem);
-
-/**
  * Searches for the key 'key' in the 'index' list.
  *
  * \param index Pointer to a PrimaryKeyList struct.
@@ -83,21 +69,6 @@ void pkListFree(PrimaryKeyList* index);
  * case it was already full.
  */
 int pkListInsert(PrimaryKeyList* index, const char* name);
-
-/**
- * Removes an entry from the Primary Key Index.
- *
- * \param index Pointer to the PrimaryKeyList struct.
- *
- * \param name The name (primary key) that will be removed.
- *
- * \return rrn is gonna be the removed rrn. 
- *
- * \retval 0 If removal went ok.
- *
- * \retval 1 If an error occurred.
- */
-int pkListRemove(PrimaryKeyList* index, const char* name, int* rrn);
 
 /**
  * Checks if the PK table is empty.
@@ -138,6 +109,35 @@ PrimaryKeyList* pkListLoadFromBase(const char* base_name);
  * \return New index structure with the loaded data.
  */
 PrimaryKeyList* pkListLoadFromPK(const char* pkname);
+
+/**
+ * Allocate memory for a new primary key list and
+ * initialize it.
+ *
+ * It allocates space for \a nelem records, or
+ * 40 records if \a nelem is 0.
+ *
+ * @param nelem Number of elements to allocate memory for.
+ *
+ * \retval Returns a pointer to the initialized list or NULL
+ * if it could not be initialized.
+ */
+PrimaryKeyList* pkListNew(size_t nelem);
+
+/**
+ * Removes an entry from the Primary Key Index.
+ *
+ * \param index Pointer to the PrimaryKeyList struct.
+ *
+ * \param name The name (primary key) that will be removed.
+ *
+ * \return rrn is gonna be the removed rrn. 
+ *
+ * \retval 0 If removal went ok.
+ *
+ * \retval 1 If an error occurred.
+ */
+int pkListRemove(PrimaryKeyList* index, const char* name, int* rrn);
 
 /**
  * Takes the primary key index 'index' and writes it properly
