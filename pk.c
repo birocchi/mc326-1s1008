@@ -99,15 +99,13 @@ int pkListIsEmpty(PrimaryKeyList* index) {
 }
 
 PrimaryKeyList* pkListLoad(const char* base_name, const char* pkname) {
-  if (!fileExists(pkname))
-    return pkListLoadFromBase(base_name);
+  if (!fileExists(base_name))
+    return pkListNew(0);
   else {
-    if (fileExists(base_name))
-      return pkListLoadFromPK(pkname);
+    if (!fileExists(pkname))
+      return pkListLoadFromBase(base_name);
     else
-      /* If neither the PK index nor the database exist,
-       * return a new, empty list */
-      return pkListNew(0);
+      return pkListLoadFromPK(pkname);
   }
 }
 
@@ -187,13 +185,7 @@ int pkListRemove(PrimaryKeyList* index, const char* name, int * rrn){
   PrimaryKeyRecord* match;
   int i = 0, j;
 
-  /* This will use bsearch to find the key. */
-  match = bsearch(name, index->pklist, index->regnum,
-                  sizeof(PrimaryKeyRecord),
-                  __bsearch_compare);
-
-  /* If the name isn't there, we can't remove it. */
-  if (!match)
+  if (pkListFindByName(index, name) == -1)
     return 1;
 
   /* Return via pointer the match's rrn. */
