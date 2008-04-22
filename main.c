@@ -52,7 +52,7 @@ int main(int argc, char* argv[]) {
   printWelcome();
 
   while (1) {
-    printMenu();
+    printMainMenu();
 
     switch (menuMultipleAnswers("   Opcao desejada: ", "cigrs")) {
     default: /* This should not happen */
