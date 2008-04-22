@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include "base.h"
 #include "file.h"
 #include "io.h"
@@ -17,7 +18,7 @@
  */
 static int __bsearch_compare(const void* a, const void* b)
 {
-  return strcmp( (char*)a, ((PrimaryKeyRecord*)b)->name );
+  return strcasecmp( (char*)a, ((PrimaryKeyRecord*)b)->name );
 }
 
 /**
