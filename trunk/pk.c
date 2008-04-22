@@ -100,7 +100,7 @@ int pkListIsEmpty(PrimaryKeyList* index) {
 }
 
 PrimaryKeyList* pkListLoad(const char* base_name, const char* pkname) {
-  if (!fileExists(base_name))
+  if ((!fileExists(base_name)) || (getFileSizeFromName(base_name) < 1))
     return pkListNew(0);
   else {
     if (!fileExists(pkname))
