@@ -29,7 +29,7 @@ int menuYesOrNo(const char* msg);
 /**
  * \brief Print the options for the main menu.
  */
-void printMenu(void);
+void printMainMenu(void);
 
 /**
  * \brief Print a nifty welcome message.
