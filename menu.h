@@ -26,6 +26,9 @@ char menuMultipleAnswers(const char* msg, const char* optstring);
  */
 int menuYesOrNo(const char* msg);
 
+/**
+ * \brief Prin the options for a search in the database.
+ */
 void printConsultMenu(void);
 
 /**
