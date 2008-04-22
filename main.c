@@ -2,18 +2,14 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
+#include "avail.h"
 #include "base.h"
 #include "file.h"
+#include "filelist.h"
 #include "html.h"
 #include "io.h"
 #include "menu.h"
 #include "pk.h"
-#include "avail.h"
-
-#define DBFILE   "base01.dat"   /* The database file name. */
-#define HTMLFILE "lista.html"   /* The HTML output. */
-#define PKFILE   "pkfile.pk"    /* The primary key file name. */
-#define AVAIL_HEAD "availhead.al" /* The avail list head file name. */
 
 int main(int argc, char* argv[]) {
   FILE *base;                 /* base01.dat basically */
