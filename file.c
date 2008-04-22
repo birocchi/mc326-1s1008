@@ -10,12 +10,8 @@
 int fileExists(const char* filename) {
   struct stat buf;
 
-  /* Get all sorts of info about the file. */
-  if (stat(filename, &buf) != 0)
-    return 0;
-
-  /* Check if it's a regular file. */
-  if (!S_ISREG(buf.st_mode))
+  /* Check if stat return OK and the file is a regular file */
+  if ((stat(filename, &buf) != 0) || (!S_ISREG(buf.st_mode)))
     return 0;
 
   return 1;
@@ -28,6 +24,16 @@ long getFileSize(FILE* f) {
   fd = fileno(f);
 
   if (fstat(fd, &buf) != 0)
+    return -1;
+
+  return buf.st_size;
+}
+
+long getFileSizeFromName(const char* filename) {
+  struct stat buf;
+
+  /* Check if stat return OK and the file is a regular file */
+  if ((stat(filename, &buf) != 0) || (!S_ISREG(buf.st_mode)))
     return -1;
 
   return buf.st_size;
