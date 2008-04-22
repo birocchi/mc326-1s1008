@@ -26,6 +26,8 @@ char menuMultipleAnswers(const char* msg, const char* optstring);
  */
 int menuYesOrNo(const char* msg);
 
+void printConsultMenu(void);
+
 /**
  * \brief Print the options for the main menu.
  */
