@@ -22,6 +22,18 @@ int menuYesOrNo(const char* msg) {
   return menuMultipleAnswers(msg, "sn") == 's';
 }
 
+void printConsultMenu(void) {
+  printf("\n");
+  printf("   ---------------------\n");
+  printf("   Efetuar consulta por:\n");
+  printf("     (a)no da obra\n");
+  printf("     (a)utor da obra\n");
+  printf("     t(i)po da obra\n");
+  printf("     (t)titulo da obra\n");
+  printf("   ---------------------\n");
+  printf("\n");
+}
+
 void printMainMenu(void) {
 	printf("\n");
 	printf("    _____________________________________\n");
