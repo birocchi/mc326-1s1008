@@ -23,7 +23,7 @@ base_avail_list_update(Base* base)
  * TODO: There's room for optimization here
  */
 void
-base_insert(FILE* base, artwork_info info)
+base_insert(FILE* base, artwork_info* info)
 {
   int prevtail;
 

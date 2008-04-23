@@ -13,7 +13,7 @@ insert
   base_read_input(&artwork);
 
   if (pk_find_rrn(artwork.title) != -1) {
-    base_insert(db->base, artwork);
+    base_insert(db->base, &artwork);
 
     pk_insert(db->pk_index, base);
 
