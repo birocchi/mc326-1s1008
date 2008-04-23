@@ -27,49 +27,6 @@ int readChar(char* c) {
   }
 }
 
-int readData(artwork_info *info)
-{
-  /* We use IMG_LENGTH-2 here because we exclude the first
-   * two characters in the identifier (the group number)
-   * since it's constant.
-   */
-  char img[ (IMG_LENGTH-2)+1 ];
-
-  /* Returns an error if the pointer is NULL. */
-  if (!info)
-    return 1;
-
-  readString("\n   Por favor, digite o titulo da obra (Max: 200 caracteres): ",
-             info->title, TITLE_LENGTH);
-  readString("   Por favor, digite o tipo da obra (Max: 100 caracteres): ",
-             info->type, TYPE_LENGTH);
-  readString("   Por favor, digite o autor da obra (Max: 125 caracteres): ",
-             info->author, AUTHOR_LENGTH);
-
-  readInt("   Por favor, digite o ano da obra (Max: 4 caracteres): ",
-          info->year, YEAR_LENGTH);
-  readInt("   Por favor, digite o valor da obra (Max: 12 caracteres): ",
-          info->value, VALUE_LENGTH);
-
-  while (1) {
-    readString("   Por favor, digite o identificador da obra (Max: 7 caracteres): ",
-               img, IMG_LENGTH-2);
-
-    /* Validate the image identifier */
-    if (!baseIsValidIdentifier(img)) {
-      strncpy(info->img, GROUP_NUMBER, 2);
-      strncpy(info->img+2, img, (IMG_LENGTH-2)+1);
-      break;
-    }
-    else {
-      printf("   Entrada invalida.");
-      continue;
-    }
-  }
-
-  return 0;
-}
-
 /* This is basically a wrapper around readString
  * which checks if there are only digits in the
  * string read and loops back if not.

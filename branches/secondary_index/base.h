@@ -13,7 +13,7 @@
 /**
  * Total size of the register.
  */
-#define REG_SIZE (TITLE_LENGTH + TYPE_LENGTH + AUTHOR_LENGTH + \
+#define BASE_REG_SIZE (TITLE_LENGTH + TYPE_LENGTH + AUTHOR_LENGTH + \
                   YEAR_LENGTH + VALUE_LENGTH + IMG_LENGTH)
 
 /**
@@ -37,6 +37,8 @@ typedef struct
   /** The register's identifier */
   char img[IMG_LENGTH+1];  
 } artwork_info;
+
+void base_read_input(artwork_info* info);
 
 /**
  * Makes the image identifier into an actual file name.

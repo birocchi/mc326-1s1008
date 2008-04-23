@@ -15,7 +15,7 @@ typedef struct {
   FILE* fp_list;
   size_t max_records;
   size_t total_records;
-  SIRecord* record_list;
+  SecondaryIndexRecord* record_list;
 } SecondaryIndex;
 
 #endif

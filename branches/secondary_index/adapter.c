@@ -1,5 +1,5 @@
 typedef struct {
-  artwork_info      base;
+  FILE*             base;
   PrimaryKeyIndex*  pk_index;
   SecondaryIndex*   author_index;
   SecondaryIndex*   type_index;
@@ -8,14 +8,18 @@ typedef struct {
 
 insert
 {
-  /*
-   * 1. base_input_data
-   * 2. pk_find_data(base.title) == false
-   * 3. pk_insert(base.all)
-   * 4. author_index.insert
-   * 5. type_index.insert
-   * 6. year_index.insert
-   *
-   * Isso inclui mover readData pra base.c e transformar em base_input_data
-   */
+  artwork_info artwork;
+
+  base_read_input(&artwork);
+
+  if (pk_find_rrn(artwork.title) != -1) {
+    base_insert(db->base, artwork);
+
+    pk_insert(db->pk_index, base);
+
+    secondary_index_insert(db->author_index, artwork.author, artwork.title);
+    secondary_index_insert(db->type_index, artwork.type, artwork.title);
+    secondary_index_insert(db->year_index, artwork.year, artwork.title);
+  } else
+    return ERR_REPEATED_PK;
 }

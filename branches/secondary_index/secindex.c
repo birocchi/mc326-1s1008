@@ -36,7 +36,7 @@ secondary_index_insert_record(SecondaryIndex* index, const char* si_value)
 }
 
 void
-secondary_index_insert(SecondaryIndex* si_index, const char* si_value, const PrimaryKeyList* pk_index, const char* pk_value)
+secondary_index_insert(SecondaryIndex* si_index, const char* si_value, const char* pk_value)
 {
   SecondaryIndexRecord* s;
 

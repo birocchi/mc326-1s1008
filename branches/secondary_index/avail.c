@@ -22,7 +22,7 @@ int removedField(FILE * base, int rrn, int * avail){
     base = fopen(DBFILE, "r+");
   }
 
-  fseek(base, REG_SIZE * rrn, SEEK_SET);
+  fseek(base, BASE_REG_SIZE * rrn, SEEK_SET);
   fprintf(base, "%09d ", *avail);
   *avail = rrn;
   

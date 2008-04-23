@@ -118,7 +118,7 @@ PrimaryKeyList* pkListLoadFromBase(const char* base_name) {
   base = fopen(base_name, "r");
   assert(base != NULL);
 
-  index = pkListNew(getFileSize(base) / REG_SIZE);
+  index = pkListNew(getFileSize(base) / BASE_REG_SIZE);
 
   /* Next we read the registers from our base. */
   for (i = 0; i < index->regnum; i++) {
@@ -129,7 +129,7 @@ PrimaryKeyList* pkListLoadFromBase(const char* base_name) {
     stripWhiteSpace(index->pklist[i].name);
 
     /* Skip the rest of the entry and go to the next record */
-    fseek(base, REG_SIZE - TITLE_LENGTH, SEEK_CUR);
+    fseek(base, BASE_REG_SIZE - TITLE_LENGTH, SEEK_CUR);
   }
 
   qsort(index->pklist, index->regnum, sizeof(PrimaryKeyRecord),

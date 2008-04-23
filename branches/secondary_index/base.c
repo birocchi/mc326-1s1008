@@ -5,6 +5,67 @@
 #include "io.h"
 #include "mem.h"
 
+void
+base_insert(FILE* base, artwork_info info)
+{
+  int prevtail, newtail;
+
+  if (base->tail > -1) {
+    prevtail = base->tail;
+    fseek(base->fp, base->tail * (BASE_REG_SIZE), SEEK_SET);
+    fscanf(base->fp, "%d", &newtail);
+    base->tail = newtail;
+    fseek(base->fp, prevtail * (BASE_REG_SIZE), SEEK_SET);
+  } else {
+    fseek(base->fp, 0, SEEK_END);
+    newtail = ftell(base->fp);
+    base->tail = newtail;
+  }
+
+  base_write_data(base, info);
+  base_avail_list_update(base->tail);
+}
+
+void
+base_read_input(artwork_info *info)
+{
+  /* We use IMG_LENGTH-2 here because we exclude the first
+   * two characters in the identifier (the group number)
+   * since it's constant.
+   */
+  char img[ (IMG_LENGTH-2)+1 ];
+
+  assert(info != NULL);
+
+  readString("\n   Por favor, digite o titulo da obra (Max: 200 caracteres): ",
+             info->title, TITLE_LENGTH);
+  readString("   Por favor, digite o tipo da obra (Max: 100 caracteres): ",
+             info->type, TYPE_LENGTH);
+  readString("   Por favor, digite o autor da obra (Max: 125 caracteres): ",
+             info->author, AUTHOR_LENGTH);
+
+  readInt("   Por favor, digite o ano da obra (Max: 4 caracteres): ",
+          info->year, YEAR_LENGTH);
+  readInt("   Por favor, digite o valor da obra (Max: 12 caracteres): ",
+          info->value, VALUE_LENGTH);
+
+  while (1) {
+    readString("   Por favor, digite o identificador da obra (Max: 7 caracteres): ",
+               img, IMG_LENGTH-2);
+
+    /* Validate the image identifier */
+    if (!baseIsValidIdentifier(img)) {
+      strncpy(info->img, GROUP_NUMBER, 2);
+      strncpy(info->img+2, img, (IMG_LENGTH-2)+1);
+      break;
+    }
+    else {
+      printf("   Entrada invalida.");
+      continue;
+    }
+  }
+}
+
 char* baseGetValidImagePath(const char* s) {
   char* file;
 

@@ -29,17 +29,6 @@ void flushBuffer(void);
 int readChar(char* c);
 
 /**
- * \brief Reads the input from the user with information about
- *        one artwork entry.
- *
- * \param info Pointer to the place we want to store the data read.
- *
- * \retval 0 Success.
- * \retval 1 Error.
- */
-int readData(artwork_info *info);
-
-/**
  * \brief Reads input and checks if it's a valid integer. If not,
  *        read it until a valid integer is entered.
  *

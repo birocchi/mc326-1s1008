@@ -96,7 +96,7 @@ int main(int argc, char* argv[]) {
         /* For each pk in the index, start from the beggining since it's sorted. */
         for (i = 0; i < pkindex->regnum; i++) {
           /* Seek it into the database. */
-          fseek(base, (pkindex->pklist[i].rrn) * REG_SIZE, SEEK_SET);
+          fseek(base, (pkindex->pklist[i].rrn) * BASE_REG_SIZE, SEEK_SET);
           /* Read it's contents. */
           baseReadArtworkRecord(base, &info);
           /* And write it to the html file. */
