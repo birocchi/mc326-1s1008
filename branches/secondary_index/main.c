@@ -42,8 +42,11 @@ int main(int argc, char* argv[]) {
 
   pkindex = pkListLoad(DBFILE, PKFILE);
 
+  /* Open the files */
   base = fopen(DBFILE, "a+");
   assert(base != NULL);
+
+  open_si_files(&si_files);
 
   printWelcome();
 

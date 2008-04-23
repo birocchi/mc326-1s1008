@@ -3,7 +3,6 @@
 
 #include <stdio.h>
 
-
 #define TITLE_LENGTH   200 
 #define TYPE_LENGTH    100 
 #define AUTHOR_LENGTH  125 
