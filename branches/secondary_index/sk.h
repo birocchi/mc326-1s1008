@@ -1,5 +1,5 @@
-#ifndef __SK_H
-#define __SK_H
+#ifndef __SECINDEX_H
+#define __SECINDEX_H
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "base.h"
-#include "sk.h"
+#include "secindex.h"
   
 static void
 secondary_index_inflate_list(SecondaryIndex* index)
