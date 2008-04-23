@@ -6,21 +6,23 @@
 #include "io.h"
 #include "mem.h"
 
+/*
+ * TODO: There's room for optimization here
+ */
 void
 base_insert(FILE* base, artwork_info info)
 {
-  int prevtail, newtail;
+  int prevtail;
 
   if (base->tail > -1) {
     prevtail = base->tail;
+
     fseek(base->fp, base->tail * (BASE_REG_SIZE), SEEK_SET);
-    fscanf(base->fp, "%d", &newtail);
-    base->tail = newtail;
+    fscanf(base->fp, "%d", &(base->tail));
     fseek(base->fp, prevtail * (BASE_REG_SIZE), SEEK_SET);
   } else {
     fseek(base->fp, 0, SEEK_END);
-    newtail = ftell(base->fp);
-    base->tail = newtail;
+    base->tail = ftell(base->fp);
   }
 
   base_write_data(base, info);
