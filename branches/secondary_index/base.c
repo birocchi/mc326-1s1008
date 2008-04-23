@@ -6,6 +6,19 @@
 #include "io.h"
 #include "mem.h"
 
+void
+base_avail_list_update(Base* base)
+{
+  FILE* avlist;
+
+  avlist = fopen(base->avail_list_name, "w");
+  assert(avlist != NULL);
+
+  fprintf(avlist, "%d", base->tail);
+
+  fclose(avlist);
+}
+
 /*
  * TODO: There's room for optimization here
  */
@@ -26,7 +39,7 @@ base_insert(FILE* base, artwork_info info)
   }
 
   base_write_data(base, info);
-  base_avail_list_update(base->tail);
+  base_avail_list_update(base);
 }
 
 void

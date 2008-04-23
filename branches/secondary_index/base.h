@@ -14,7 +14,7 @@
  * Total size of the register.
  */
 #define BASE_REG_SIZE (TITLE_LENGTH + TYPE_LENGTH + AUTHOR_LENGTH + \
-                  YEAR_LENGTH + VALUE_LENGTH + IMG_LENGTH)
+                       YEAR_LENGTH + VALUE_LENGTH + IMG_LENGTH)
 
 /**
  * The main structure which holds data about
@@ -37,6 +37,13 @@ typedef struct
   /** The register's identifier */
   char img[IMG_LENGTH+1];  
 } artwork_info;
+
+typedef struct {
+  FILE*           fp;
+  int             tail;
+  unsigned char*  fp_name;
+  unsigned char*  avail_list_name;
+} Base;
 
 void base_read_input(artwork_info* info);
 
