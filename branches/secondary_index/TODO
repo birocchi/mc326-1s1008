@@ -9,6 +9,7 @@
 * Avail lists:
 + Terminar de implementar avail lists e integrar à inserção
 + 1 para o dat, 4 para os indices
++ Podem ser a mesma estrutura pra base e pros indices secundarios (avail.{c,h})
 
 * Secondary indexes:
 + Autor, tipo e ano
