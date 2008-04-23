@@ -15,7 +15,7 @@ insert
   if (pk_find_rrn(artwork.title) != -1) {
     base_insert(db->base, &artwork);
 
-    pk_insert(db->pk_index, base);
+    pk_insert(db->pk_index, artwork.title);
 
     secondary_index_insert(db->author_index, artwork.author, artwork.title);
     secondary_index_insert(db->type_index, artwork.type, artwork.title);

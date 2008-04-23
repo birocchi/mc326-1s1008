@@ -72,9 +72,6 @@ int pkListFindByName(PrimaryKeyList* index, const char* key) {
 }
 
 int pkListInsert(PrimaryKeyList* index, const char* name) {
-  if (pkListFindByName(index, name) != -1)
-    return 1;
-
   /* If we need more space on the list, inflate it */
   if (index->regnum == index->maxregs)
     pkListInflateSize(index);
