@@ -1,0 +1,15 @@
+== Idéias gerais ==
++ Refatorar artwork_info nos moldes de PrimaryKeyList?
+
++ Implementar um pkListForeach, mas dá preguiça e não tem muita utilidade por enquanto
+
++ Talvez htmlWriteRecordInfo não devesse existir como é, mas ser usado com um wrapper e pkListForeach
+
+== Para o TP3 ==
+* Avail lists:
++ Terminar de implementar avail lists e integrar à inserção
++ 1 para o dat, 4 para os indices
+
+* Secondary indexes:
++ Autor, tipo e ano
++ Integrar a insercao, consulta e remocao
