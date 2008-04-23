@@ -80,9 +80,7 @@ int baseReadArtworkRecord(FILE* base, artwork_info* info);
  *
  * @param file File pointer to the database.
  * @param info Pointer to artwork_info structure with info about the register.
- *
- * @return Returns 0 on succes and 1 on error.
  */
-int baseWriteData(FILE *file, artwork_info *info);
+void base_write_data(FILE *file, artwork_info *info);
 
 #endif

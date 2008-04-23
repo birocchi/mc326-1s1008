@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -113,14 +114,10 @@ int baseReadArtworkRecord(FILE *base, artwork_info *info)
   return 0;
 }
 
-int baseWriteData(FILE *file, artwork_info *info)
+void
+base_write_data(FILE *file, artwork_info *info)
 {
-  /* Return error if the file or struct pointers are NULL. */
-  if (!file || !info) {
-    return 1;
-  }
-
-  fseek(file, 0, SEEK_END);
+  assert(file != NULL and info != NULL);
 
   fprintf(file, "%-200s",   info->title);
   fprintf(file, "%-100s",   info->type);
@@ -130,6 +127,4 @@ int baseWriteData(FILE *file, artwork_info *info)
   fprintf(file, "%-9s",     info->img);
 
   fflush(file);
-
-  return 0;
 }
