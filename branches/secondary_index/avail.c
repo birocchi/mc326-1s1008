@@ -60,6 +60,22 @@ avail_list_new (const char *filename)
   avlist->tail = -1;
 }
 
+int
+avail_list_pop (AvaiList *avlist, size_t page_size, FILE *fp)
+{
+  int prevpos;
+
+  assert (avlist != NULL && fp != NULL);
+  assert (page_size > 0);
+
+  prevpos = avlist->tail * page_size;
+
+  fseek  (fp, prevpos, SEEK_SET);
+  fscanf (fp, "%d", &(avlist->tail));
+
+  return prevpos;
+}
+
 int removedField(FILE * base, int rrn, int * avail){
   int opened;
 

@@ -38,23 +38,19 @@ base_free (Base *b)
 void
 base_insert (FILE* base, artwork_info* info)
 {
-  int prevtail;
-
   assert (base != NULL && info != NULL);
 
-  if (avail_list_is_empty (base->avlist)) {
-    fseek (base->fp, 0, SEEK_END);
-    base->tail = ftell (base->fp);
-  } else {
-    prevtail = base->tail;
-
-    fseek (base->fp, base->tail * (BASE_REG_SIZE), SEEK_SET);
-    fscanf (base->fp, "%d", &(base->tail));
-    fseek (base->fp, prevtail * (BASE_REG_SIZE), SEEK_SET);
-  }
-
-  base_write_data (base, info);
-  base_avail_list_update (base);
+  if (avail_list_is_empty (base->avlist))
+    {
+      fseek (base->fp, 0, SEEK_END);
+      base_write_data (base, info);
+    }
+  else
+    {
+      writepos = avail_list_pop (base->avlist, BASE_REG_SIZE, base->fp);
+      fseek (base->fp, writepos, SEEK_SET);
+      base_write_data (base, info);
+    }
 }
 
 void
