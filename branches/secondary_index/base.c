@@ -6,19 +6,6 @@
 #include "io.h"
 #include "mem.h"
 
-void
-base_avail_list_update(Base* base)
-{
-  FILE* avlist;
-
-  avlist = fopen(base->avail_list_name, "w");
-  assert(avlist != NULL);
-
-  fprintf(avlist, "%d", base->tail);
-
-  fclose(avlist);
-}
-
 /*
  * TODO: There's room for optimization here
  */
