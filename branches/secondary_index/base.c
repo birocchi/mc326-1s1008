@@ -6,27 +6,55 @@
 #include "io.h"
 #include "mem.h"
 
+Base *
+base_new (const char *basename, const char *availname)
+{
+  Base *b = MEM_ALLOC (Base);
+
+  b->fp = fopen (basename, "r+");
+  assert (b->fp != NULL);
+
+  b->fp_name = strdup (basename);
+  b->avlist  = avail_list_new (availname);
+
+  return b;
+}
+
+void
+base_free (Base *b)
+{
+  if (b)
+    {
+      free (b->fp_name);
+      avail_list_free (b->avlist);
+      fclose (b->fp);
+      free (b);
+    }
+}
+
 /*
  * TODO: There's room for optimization here
  */
 void
-base_insert(FILE* base, artwork_info* info)
+base_insert (FILE* base, artwork_info* info)
 {
   int prevtail;
 
-  if (base->tail > -1) {
+  assert (base != NULL && info != NULL);
+
+  if (avail_list_is_empty (base->avlist)) {
+    fseek (base->fp, 0, SEEK_END);
+    base->tail = ftell (base->fp);
+  } else {
     prevtail = base->tail;
 
-    fseek(base->fp, base->tail * (BASE_REG_SIZE), SEEK_SET);
-    fscanf(base->fp, "%d", &(base->tail));
-    fseek(base->fp, prevtail * (BASE_REG_SIZE), SEEK_SET);
-  } else {
-    fseek(base->fp, 0, SEEK_END);
-    base->tail = ftell(base->fp);
+    fseek (base->fp, base->tail * (BASE_REG_SIZE), SEEK_SET);
+    fscanf (base->fp, "%d", &(base->tail));
+    fseek (base->fp, prevtail * (BASE_REG_SIZE), SEEK_SET);
   }
 
-  base_write_data(base, info);
-  base_avail_list_update(base);
+  base_write_data (base, info);
+  base_avail_list_update (base);
 }
 
 void

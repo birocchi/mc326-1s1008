@@ -39,10 +39,9 @@ typedef struct
 } artwork_info;
 
 typedef struct {
-  FILE*           fp;
-  int             tail;
-  unsigned char*  fp_name;
-  unsigned char*  avail_list_name;
+  AvailList       *avlist;
+  FILE            *fp;
+  unsigned char   *fp_name;
 } Base;
 
 void base_read_input(artwork_info* info);
