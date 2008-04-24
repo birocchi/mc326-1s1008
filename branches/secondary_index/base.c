@@ -11,7 +11,6 @@ base_free (Base *b)
 {
   if (b)
     {
-      free (b->fp_name);
       avail_list_free (b->avlist);
       fclose (b->fp);
       free (b);
@@ -47,7 +46,6 @@ base_new (const char *basename, const char *availname)
   b->fp = fopen (basename, "r+");
   assert (b->fp != NULL);
 
-  b->fp_name = strdup (basename);
   b->avlist  = avail_list_new (availname);
 
   return b;

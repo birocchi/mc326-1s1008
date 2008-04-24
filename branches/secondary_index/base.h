@@ -41,7 +41,6 @@ typedef struct
 typedef struct {
   AvailList       *avlist;
   FILE            *fp;
-  unsigned char   *fp_name;
 } Base;
 
 void base_free (Base *b);
