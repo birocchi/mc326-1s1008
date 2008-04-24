@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "avail.h"
 #include "base.h"
 
 typedef struct {
@@ -11,6 +12,7 @@ typedef struct {
 } SecondaryIndexRecord;
 
 typedef struct {
+  AvailList *avlist;
   FILE* fp_index;
   FILE* fp_list;
   size_t max_records;
