@@ -64,6 +64,9 @@ base_remove (Base *base, int rrn)
   avail_list_push (base->avlist, rrn);
 }
 
+/*
+ * TODO: Break this into smaller functions
+ */
 void
 base_read_input(artwork_info *info)
 {
