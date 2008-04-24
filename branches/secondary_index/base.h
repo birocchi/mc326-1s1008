@@ -44,6 +44,10 @@ typedef struct {
   unsigned char   *fp_name;
 } Base;
 
+void base_free (Base *b);
+void base_insert (Base *base, artwork_info *info);
+Base* base_new (const char *basename, const char *availname);
+void base_remove (Base *base, int rrn);
 void base_read_input(artwork_info* info);
 
 /**

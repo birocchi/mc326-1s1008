@@ -6,6 +6,39 @@
 #include "io.h"
 #include "mem.h"
 
+void
+base_free (Base *b)
+{
+  if (b)
+    {
+      free (b->fp_name);
+      avail_list_free (b->avlist);
+      fclose (b->fp);
+      free (b);
+    }
+}
+
+/*
+ * TODO: There's room for optimization here (too many disk seeks)
+ */
+void
+base_insert (Base *base, artwork_info *info)
+{
+  assert (base != NULL && info != NULL);
+
+  if (avail_list_is_empty (base->avlist))
+    {
+      fseek (base->fp, 0, SEEK_END);
+      base_write_data (base, info);
+    }
+  else
+    {
+      writepos = avail_list_pop (base->avlist, BASE_REG_SIZE, base->fp);
+      fseek (base->fp, writepos, SEEK_SET);
+      base_write_data (base, info);
+    }
+}
+
 Base *
 base_new (const char *basename, const char *availname)
 {
@@ -21,36 +54,14 @@ base_new (const char *basename, const char *availname)
 }
 
 void
-base_free (Base *b)
+base_remove (Base *base, int rrn)
 {
-  if (b)
-    {
-      free (b->fp_name);
-      avail_list_free (b->avlist);
-      fclose (b->fp);
-      free (b);
-    }
-}
+  assert (base != NULL);
 
-/*
- * TODO: There's room for optimization here
- */
-void
-base_insert (FILE* base, artwork_info* info)
-{
-  assert (base != NULL && info != NULL);
+  fseek (base->fp, rrn * BASE_REG_SIZE, SEEK_SET);
+  fprintf (base->fp, "%s", atoi (avail_list_get_tail (base->avlist)));
 
-  if (avail_list_is_empty (base->avlist))
-    {
-      fseek (base->fp, 0, SEEK_END);
-      base_write_data (base, info);
-    }
-  else
-    {
-      writepos = avail_list_pop (base->avlist, BASE_REG_SIZE, base->fp);
-      fseek (base->fp, writepos, SEEK_SET);
-      base_write_data (base, info);
-    }
+  avail_list_push (base->avlist, rrn);
 }
 
 void
