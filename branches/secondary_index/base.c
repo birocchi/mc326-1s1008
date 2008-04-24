@@ -74,8 +74,7 @@ base_read_input(artwork_info *info)
       strncpy(info->img, GROUP_NUMBER, 2);
       strncpy(info->img+2, img, (IMG_LENGTH-2)+1);
       break;
-    }
-    else {
+    } else {
       printf("   Entrada invalida.");
       continue;
     }
@@ -101,7 +100,7 @@ int baseIsValidIdentifier(const char* name) {
 
   i = strtol(name, &endptr, 10);
   if ((endptr == name) || (endptr == '\0') || strlen(endptr) != 3 || ((strncmp(endptr, "jpg", 3)) &&
-        strncmp(endptr, "gif", 3) && (strncmp(endptr, "png", 3))))
+      strncmp(endptr, "gif", 3) && (strncmp(endptr, "png", 3))))
     return 1;
   else
     return 0;
@@ -109,9 +108,7 @@ int baseIsValidIdentifier(const char* name) {
 
 int baseReadArtworkRecord(FILE *base, artwork_info *info)
 {
-  if (!base || !info) {
-    return 1;
-  }
+  assert((base != NULL) && (info != NULL));
 
   fgets(info->title, TITLE_LENGTH+1, base);
   stripWhiteSpace(info->title);
