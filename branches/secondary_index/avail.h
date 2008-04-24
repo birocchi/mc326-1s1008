@@ -11,10 +11,11 @@ typedef struct {
 
 int removedField(FILE * base, int rrn, int * avail);
 
-void        avail_list_add (AvailList *avlist, int pos);
 void        avail_list_free (AvailList *avlist);
 int         avail_list_get_tail (AvailList *avlist);
 int         avail_list_is_empty (AvailList *avlist);
 AvailList*  avail_list_new (const char *filename);
+void        avail_list_push (AvailList *avlist, int pos);
+void        avail_list_write (AvailList *avlist);
 
 #endif

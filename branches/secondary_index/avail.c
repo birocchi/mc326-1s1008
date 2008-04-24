@@ -10,21 +10,6 @@
 #include "avail.h"
 
 void
-avail_list_add (AvailList *avlist, int pos)
-{
-  FILE *fp;
-
-  assert (avlist != NULL);
-
-  fp = fopen (avlist->filename, "w");
-  assert (fp != NULL);
-  fprintf (fp, "%d", avlist->tail);
-  fclose (fp);
-
-  avlist->tail = pos;
-}
-
-void
 avail_list_free (AvailList *avlist)
 {
   if (avlist) {
@@ -68,12 +53,39 @@ avail_list_pop (AvaiList *avlist, size_t page_size, FILE *fp)
   assert (avlist != NULL && fp != NULL);
   assert (page_size > 0);
 
-  prevpos = avlist->tail * page_size;
+  if (avlist->tail != -1)
+    {
+      prevpos = avlist->tail * page_size;
 
-  fseek  (fp, prevpos, SEEK_SET);
-  fscanf (fp, "%d", &(avlist->tail));
+      fseek  (fp, prevpos, SEEK_SET);
+      fscanf (fp, "%d", &(avlist->tail));
 
-  return prevpos;
+      avail_list_write (avlist);
+
+      return prevpos;
+    }
+  else
+    return -1;
+}
+
+void
+avail_list_push (AvailList *avlist, int pos)
+{
+  avlist->tail = pos;
+  avail_list_write (avlist);
+}
+
+void
+avail_list_write (AvailList *avlist)
+{
+  FILE *fp;
+
+  assert (avlist != NULL);
+
+  fp = fopen (avlist->filename, "w");
+  assert (fp != NULL);
+  fprintf (fp, "%d", avlist->tail);
+  fclose (fp);
 }
 
 int removedField(FILE * base, int rrn, int * avail){
