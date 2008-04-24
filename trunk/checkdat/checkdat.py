@@ -52,8 +52,8 @@ class ArtworkInfo(object):
     self.__title = data.read(200)
     self.__type = data.read(100)
     self.__author = data.read(125)
-    self.__year = data.read(4)
-    self.__value = data.read(12)
+    self.__year = data.read(4).strip()
+    self.__value = data.read(12).strip()
     self.__imageName = data.read(9)
 
   # Getters
@@ -166,7 +166,7 @@ class CheckDat(object):
         else:
           imageNameList.append(imageName)
 
-      print ">> Entries in the database: %d" % len(imageNameList)
+      print ">> Entries in the databasee: %d" % len(imageNameList)
       print ">> Total: %d errors." % len(errors)
       errors.coreDump()
       
