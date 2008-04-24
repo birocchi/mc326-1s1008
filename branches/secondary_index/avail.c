@@ -9,6 +9,57 @@
 #include "pk.h"
 #include "avail.h"
 
+void
+avail_list_add (AvailList *avlist, int pos)
+{
+  FILE *fp;
+
+  assert (avlist != NULL);
+
+  fp = fopen (avlist->filename, "w");
+  assert (fp != NULL);
+  fprintf (fp, "%d", avlist->tail);
+  fclose (fp);
+
+  avlist->tail = pos;
+}
+
+void
+avail_list_free (AvailList *avlist)
+{
+  if (avlist) {
+    free (avlist->filename);
+    free (avlist);
+  }
+}
+
+int
+avail_list_get_tail (AvailList *avlist)
+{
+  assert(avlist != NULL);
+
+  return avlist->tail;
+}
+
+int
+avail_list_is_empty (AvailList *avlist)
+{
+  assert(avlist != NULL);
+
+  return avlist->tail == -1;
+}
+
+AvailList *
+avail_list_new (const char *filename)
+{
+  AvailList *avlist;
+
+  avlist = MEM_ALLOC(AvailList);
+  avlist->filename = strdup(filename);
+  avlist->fp = NULL;
+  avlist->tail = -1;
+}
+
 int removedField(FILE * base, int rrn, int * avail){
   int opened;
 
