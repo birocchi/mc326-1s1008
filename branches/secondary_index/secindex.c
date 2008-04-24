@@ -39,11 +39,22 @@ secondary_index_insert_record (SecondaryIndex *index, const char *si_value)
 void
 secondary_index_insert (SecondaryIndex *si_index, const char *si_value, const char *pk_value)
 {
+  int writepos;
   SecondaryIndexRecord *s;
 
-  s = secondary_index_find_record(si_index, si_value);
+  s = secondary_index_find_record (si_index, si_value);
   if (!s)
-    s = secondary_index_insert_record(si_index->record_list, si_value);
+    s = secondary_index_insert_record (si_index->record_list, si_value);
+
+  if (avail_list_is_empty (si_index->avlist))
+    {
+      fseek (si_index->fp_list, 0, SEEK_END);
+    }
+  else
+    {
+      writepos = avail_list_pop (si_index->avlist, (PK_REG_SIZE), si_index->fp_list);
+      fseek (base->fp, writepos, SEEK_SET);
+    }
 
   fprintf(si_index->fp_list, "%-200s", pk_value);
   fprintf(si_index->fp_list, "%04d", s->tail);
