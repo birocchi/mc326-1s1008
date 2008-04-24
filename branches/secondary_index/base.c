@@ -23,6 +23,8 @@ base_free (Base *b)
 void
 base_insert (Base *base, artwork_info *info)
 {
+  int writepos;
+
   assert (base != NULL && info != NULL);
 
   if (avail_list_is_empty (base->avlist))
