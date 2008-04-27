@@ -2,7 +2,7 @@
 #define __MEMINDEX_H
 
 typedef struct {
-  int id;
+  int  rrn;
   char name[TITLE_LENGTH+1];
 } MemoryIndexRecord;
 
@@ -16,7 +16,7 @@ typedef struct {
 int           memory_index_compare_by_name (const void *a, const void *b)
 int           memory_index_find_id (MemoryIndex *index, const char *name);
 void          memory_index_free (MemoryIndex *index);
-void          memory_index_insert (MemoryIndex *index, const char *name);
+int           memory_index_insert (MemoryIndex *index, const char *name);
 int           memory_index_is_empty (MemoryIndex *index);
 void          memory_index_load_from_file (MemoryIndex *index, const char *filename);
 MemoryIndex*  memory_index_new (const char *fp_name, size_t nelem);

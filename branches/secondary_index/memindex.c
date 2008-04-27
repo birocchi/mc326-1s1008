@@ -18,7 +18,7 @@ flush_to_disk (MemoryIndex *index)
   for (i = 0; i < index->regnum; i++)
     {
       fprintf (fp, "%-200s%04d", index->reclist[i].name,
-                                 index->reclist[i].id);
+                                 index->reclist[i].rrn);
     }
 
   fclose (fp);
@@ -64,7 +64,7 @@ memory_index_find_id (MemoryIndex *index, const char *name)
   match = bsearch (name, index->reclist, index->regnum,
                    sizeof (MemoryIndexRecord), bsearch_find_by_name);
   if (match)
-    return match->id;
+    return match->rrn;
   else
     return -1;
 }
@@ -80,7 +80,7 @@ memory_index_free (MemoryIndex *index)
     }
 }
 
-void
+int
 memory_index_insert (MemoryIndex *index, const char *name)
 {
   assert (index != NULL);
@@ -88,13 +88,16 @@ memory_index_insert (MemoryIndex *index, const char *name)
   if (index->regnum == index->maxregs)
     inflate_list (index, index->maxregs * 2);
 
-  index->reclist[index->regnum].id = index->regnum;
+  index->reclist[index->regnum].rrn = index->regnum;
   index->regnum++;
 
   strncpy (index->reclist[index->regnum].name, name, TITLE_LENGTH+1);
 
   qsort (index->reclist, index->regnum,
          sizeof (MemoryIndexRecord), memory_index_compare_by_names);
+
+  /* Return the inserted entry's RRN */
+  return index->regnum - 1;
 }
 
 int
@@ -107,8 +110,8 @@ void
 memory_index_load_from_file (MemoryIndex *index, const char *filename)
 {
   FILE *fp = NULL;
-  char strid[RRN_LENGTH+1];
-  int i, id;
+  char strrrn[RRN_LENGTH+1];
+  int i, rrn;
   size_t regnum;
 
   assert (index != NULL);
@@ -128,8 +131,8 @@ memory_index_load_from_file (MemoryIndex *index, const char *filename)
       stripWhiteSpace(index->reclist[i].name);
 
       fgets(strid, RRN_LENGTH+1, fp);
-      id = atoi(strid);
-      index->reclist[i].id = id;
+      rrn = atoi(strrrn);
+      index->reclist[i].rrn = rrn;
     }
 
   fclose (fp);
@@ -153,7 +156,7 @@ memory_index_remove (MemoryIndex *index, int id)
 {
   int i = 0, j;
 
-  while ((i < index->regnum) && (index->reclist[i].id != id))
+  while ((i < index->regnum) && (index->reclist[i].rrn != id))
     i++;
 
   if (i == index->regnum) /* Match not found, leave function */
