@@ -75,14 +75,14 @@ memory_index_free (MemoryIndex *index)
 }
 
 MemoryIndexRecord *
-memory_index_insert (MemoryIndex *index, const char *name)
+memory_index_insert (MemoryIndex *index, const char *name, int rrn)
 {
   assert (index != NULL);
 
   if (index->regnum == index->maxregs)
     inflate_list (index, index->maxregs * 2);
 
-  index->reclist[index->regnum].rrn = index->regnum;
+  index->reclist[index->regnum].rrn = (rrn > -1 ? rrn : index->regnum);
   index->regnum++;
 
   strncpy (index->reclist[index->regnum].name, name, TITLE_LENGTH+1);
@@ -146,11 +146,11 @@ memory_index_new (const char *fp_name, size_t nelem)
 }
 
 void
-memory_index_remove (MemoryIndex *index, int id)
+memory_index_remove (MemoryIndex *index, MemoryIndexRecord *key)
 {
   int i = 0, j;
 
-  while ((i < index->regnum) && (index->reclist[i].rrn != id))
+  while ((i < index->regnum) && (index->reclist[i] != key))
     i++;
 
   if (i == index->regnum) /* Match not found, leave function */
@@ -162,5 +162,5 @@ memory_index_remove (MemoryIndex *index, int id)
   index->regnum--;
 
   qsort (index->reclist, index->regnum,
-         sizeof (MemoryIndexRecord), qsort_compare_names);
+         sizeof (MemoryIndexRecord), memory_index_compare_by_name);
 }
