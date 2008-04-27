@@ -3,7 +3,7 @@
 #include "base.h"
 #include "mem.h"
 #include "secindex.h"
-  
+
 static void
 secondary_index_inflate_list (SecondaryIndex* index)
 {
@@ -34,6 +34,15 @@ secondary_index_insert_record (SecondaryIndex *index, const char *si_value)
   index->total_records++;
 
   return s;
+}
+
+void
+secondary_index_free (SecondaryIndex *index)
+{
+  if (index)
+    {
+      
+    }
 }
 
 void

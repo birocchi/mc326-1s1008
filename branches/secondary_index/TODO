@@ -5,6 +5,8 @@
 
 + Talvez htmlWriteRecordInfo não devesse existir como é, mas ser usado com um wrapper e pkListForeach
 
++ Unificar a estrutura id+titulo usada em SecondaryIndex e PK, com funcoes de inflate etc
+
 == Para o TP3 ==
 * Avail lists:
 + Terminar de implementar avail lists e integrar à inserção

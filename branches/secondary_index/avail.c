@@ -12,16 +12,17 @@
 void
 avail_list_free (AvailList *avlist)
 {
-  if (avlist) {
-    free (avlist->filename);
-    free (avlist);
-  }
+  if (avlist)
+    {
+      free (avlist->filename);
+      free (avlist);
+    }
 }
 
 int
 avail_list_get_tail (AvailList *avlist)
 {
-  assert(avlist != NULL);
+  assert (avlist != NULL);
 
   return avlist->tail;
 }
@@ -29,7 +30,7 @@ avail_list_get_tail (AvailList *avlist)
 int
 avail_list_is_empty (AvailList *avlist)
 {
-  assert(avlist != NULL);
+  assert (avlist != NULL);
 
   return avlist->tail == -1;
 }
@@ -39,8 +40,8 @@ avail_list_new (const char *filename)
 {
   AvailList *avlist;
 
-  avlist = MEM_ALLOC(AvailList);
-  avlist->filename = strdup(filename);
+  avlist = MEM_ALLOC (AvailList);
+  avlist->filename = strdup (filename);
   avlist->fp = NULL;
   avlist->tail = -1;
 }
@@ -57,7 +58,7 @@ avail_list_pop (AvaiList *avlist, size_t page_size, FILE *fp)
     {
       prevpos = avlist->tail * page_size;
 
-      fseek  (fp, prevpos, SEEK_SET);
+      fseek (fp, prevpos, SEEK_SET);
       fscanf (fp, "%d", &(avlist->tail));
 
       avail_list_write (avlist);
@@ -88,29 +89,38 @@ avail_list_write (AvailList *avlist)
   fclose (fp);
 }
 
-int removedField(FILE * base, int rrn, int * avail){
+int
+removedField (FILE * base, int rrn, int *avail)
+{
   int opened;
 
-  if(base){
-    opened = 1;
-    fclose(base);
-    base = fopen(DBFILE, "r+");
-  }
-  else{
-    opened = 0;
-    base = fopen(DBFILE, "r+");
-  }
+  if (base)
+    {
+      opened = 1;
+      fclose (base);
+      base = fopen (DBFILE, "r+");
+    }
+  else
+    {
+      opened = 0;
+      base = fopen (DBFILE, "r+");
+    }
 
-  fseek(base, BASE_REG_SIZE * rrn, SEEK_SET);
-  fprintf(base, "%09d ", *avail);
+  fseek (base, BASE_REG_SIZE * rrn, SEEK_SET);
+  fprintf (base, "%09d ", *avail);
   *avail = rrn;
-  
-  fclose(base);
 
-  if(opened){
-    base = fopen(DBFILE, "r+");
-  }
+  fclose (base);
+
+  if (opened)
+    {
+      base = fopen (DBFILE, "r+");
+    }
 
   return 0;
 
 }
+
+/*
+ * vim: cino={s
+ */
