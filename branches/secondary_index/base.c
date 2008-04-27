@@ -131,24 +131,23 @@ int baseIsValidIdentifier(const char* name) {
     return 0;
 }
 
-int baseReadArtworkRecord(FILE *base, ArtworkInfo *info)
+void
+base_read_artwork_record (FILE *base, ArtworkInfo *info)
 {
-  assert((base != NULL) && (info != NULL));
+  assert ((base != NULL) && (info != NULL));
 
-  fgets(info->title, TITLE_LENGTH+1, base);
-  stripWhiteSpace(info->title);
-  fgets(info->type, TYPE_LENGTH+1, base);
-  stripWhiteSpace(info->type);
-  fgets(info->author, AUTHOR_LENGTH+1, base);
-  stripWhiteSpace(info->author);
-  fgets(info->year, YEAR_LENGTH+1, base);
-  stripWhiteSpace(info->year);
-  fgets(info->value, VALUE_LENGTH+1, base);
-  stripWhiteSpace(info->value);
-  fgets(info->img, IMG_LENGTH+1, base);
-  stripWhiteSpace(info->img);
-
-  return 0;
+  fgets (info->title, TITLE_LENGTH+1, base);
+  stripWhiteSpace (info->title);
+  fgets (info->type, TYPE_LENGTH+1, base);
+  stripWhiteSpace (info->type);
+  fgets (info->author, AUTHOR_LENGTH+1, base);
+  stripWhiteSpace (info->author);
+  fgets (info->year, YEAR_LENGTH+1, base);
+  stripWhiteSpace (info->year);
+  fgets (info->value, VALUE_LENGTH+1, base);
+  stripWhiteSpace (info->value);
+  fgets (info->img, IMG_LENGTH+1, base);
+  stripWhiteSpace (info->img);
 }
 
 void

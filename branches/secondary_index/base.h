@@ -72,15 +72,13 @@ char* baseGetValidImagePath(const char* s);
 int baseIsValidIdentifier(const char* name);
 
 /**
- * Reads one record from the database file /base/ and
- * stores it in /info/.
+ * \brief Reads one record from the database file \a base and
+ *        stores it in \a info.
  *
- * @param base File pointer to the database.
- * @param info Pointer to ArtworkInfo structure with info about the register.
- *
- * @return Returns 0 on succes and 1 on error.
+ * \param base File pointer to the database.
+ * \param info Pointer to ArtworkInfo structure with info about the register.
  */
-int baseReadArtworkRecord(FILE* base, ArtworkInfo* info);
+void base_read_artwork_record(FILE *base, ArtworkInfo *info);
 
 /**
  * Writes the data from the struct pointed at by *info
