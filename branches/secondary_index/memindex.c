@@ -54,19 +54,13 @@ memory_index_compare_by_name (const void *a, const void *b)
                   ((MemoryIndexRecord*)b)->name, TITLE_LENGTH);
 }
 
-int
-memory_index_find_id (MemoryIndex *index, const char *name)
+MemoryIndexRecord *
+memory_index_find (MemoryIndex *index, const char *name)
 {
-  MemoryIndexRecord *match;
-
   assert (index != NULL);
 
-  match = bsearch (name, index->reclist, index->regnum,
-                   sizeof (MemoryIndexRecord), bsearch_find_by_name);
-  if (match)
-    return match->rrn;
-  else
-    return -1;
+  return bsearch (name, index->reclist, index->regnum,
+                  sizeof (MemoryIndexRecord), bsearch_find_by_name);
 }
 
 void
