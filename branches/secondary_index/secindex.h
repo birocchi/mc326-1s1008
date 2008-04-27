@@ -4,20 +4,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "avail.h"
-#include "base.h"
+#include "memindex.h"
 
 typedef struct {
-  int tail;
-  char title[TITLE_LENGTH+1];
-} SecondaryIndexRecord;
-
-typedef struct {
-  AvailList *avlist;
-  FILE* fp_index;
-  FILE* fp_list;
-  size_t max_records;
-  size_t total_records;
-  SecondaryIndexRecord* record_list;
+  AvailList       *avlist;
+  const char      *fp_index_name;
+  FILE            *fp_list;
+  MemoryIndex     *record_list;
 } SecondaryIndex;
 
+void            secondary_index_free (SecondaryIndex *index);
+void            secondary_index_insert (SecondaryIndex *si_index, const char *si_value, const char *pk_value);
+SecondaryIndex* secondary_index_new (const char *indexname, const char *listname, const char *avname);
 #endif
