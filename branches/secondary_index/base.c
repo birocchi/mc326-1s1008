@@ -21,7 +21,7 @@ base_free (Base *b)
  * TODO: There's room for optimization here (too many disk seeks)
  */
 void
-base_insert (Base *base, artwork_info *info)
+base_insert (Base *base, ArtworkInfo *info)
 {
   int writepos;
 
@@ -34,7 +34,7 @@ base_insert (Base *base, artwork_info *info)
     }
   else
     {
-      writepos = avail_list_pop (base->avlist, BASE_REG_SIZE, base->fp);
+      writepos = avail_list_pop (base->avlist, base->fp);
       fseek (base->fp, writepos, SEEK_SET);
       base_write_data (base, info);
     }
@@ -48,7 +48,7 @@ base_new (const char *basename, const char *availname)
   b->fp = fopen (basename, "r+");
   assert (b->fp != NULL);
 
-  b->avlist  = avail_list_new (availname);
+  b->avlist  = avail_list_new (availname, BASE_REG_SIZE);
 
   return b;
 }
@@ -68,7 +68,7 @@ base_remove (Base *base, int rrn)
  * TODO: Break this into smaller functions
  */
 void
-base_read_input(artwork_info *info)
+base_read_input(ArtworkInfo *info)
 {
   /* We use IMG_LENGTH-2 here because we exclude the first
    * two characters in the identifier (the group number)
@@ -131,7 +131,7 @@ int baseIsValidIdentifier(const char* name) {
     return 0;
 }
 
-int baseReadArtworkRecord(FILE *base, artwork_info *info)
+int baseReadArtworkRecord(FILE *base, ArtworkInfo *info)
 {
   assert((base != NULL) && (info != NULL));
 
@@ -152,7 +152,7 @@ int baseReadArtworkRecord(FILE *base, artwork_info *info)
 }
 
 void
-base_write_data(FILE *file, artwork_info *info)
+base_write_data(FILE *file, ArtworkInfo *info)
 {
   assert(file != NULL and info != NULL);
 

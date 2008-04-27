@@ -6,9 +6,33 @@ typedef struct {
   SecondaryIndex*   year_index;
 } Adapter;
 
+static void
+print_record (ArtworkInfo *artwork, FILE *fp_html)
+{
+  html_write_record_info (artwork, fp_html);
+}
+
+find()
+{
+  FILE *fp_html = fopen (HTMLFILE, "w");
+  assert (fp_html);
+
+  html_begin (fp_html);
+
+  switch (find_field)
+    {
+      case FIELD_AUTHOR:
+        mrec = secondary_index_find (db->author_index, key);
+        secondary_index_foreach (db->author_index, mrec, print_record, fp_html);
+        break;
+    }
+
+  fclose (fp_html);
+}
+
 insert
 {
-  artwork_info artwork;
+  ArtworkInfo artwork;
 
   base_read_input(&artwork);
 

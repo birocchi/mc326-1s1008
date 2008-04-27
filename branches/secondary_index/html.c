@@ -23,7 +23,7 @@ void htmlEnd(FILE* htmlfile) {
   }
 }
 
-void htmlWriteRecordInfo(FILE* htmlfile, artwork_info* info) {
+void htmlWriteRecordInfo(FILE* htmlfile, ArtworkInfo* info) {
   char* path = baseGetValidImagePath(info->img);
 
   if (htmlfile && info) {
@@ -36,6 +36,5 @@ void htmlWriteRecordInfo(FILE* htmlfile, artwork_info* info) {
     fprintf(htmlfile, "<p><b>Identificador:</b> %s</p>\n\n", info->img);
   }
 
-  free(path);
-
+  free (path);
 }

@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
   FILE *pkfile;               /* File with the primary key table. */
   FILE *availfile;            /* Open the avail list head. */
 
-  artwork_info info;          /* Holds the artwork data. */
+  ArtworkInfo info;          /* Holds the artwork data. */
   PrimaryKeyList* pkindex;
 
   char name[TITLE_LENGTH+1];  /* Holds the name for which to search. */

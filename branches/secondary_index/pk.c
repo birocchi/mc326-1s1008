@@ -8,6 +8,7 @@
 #include "file.h"
 #include "io.h"
 #include "mem.h"
+#include "memindex.h"
 #include "pk.h"
 
 /**
@@ -96,41 +97,52 @@ int pkListIsEmpty(PrimaryKeyList* index) {
   return 1;
 }
 
-PrimaryKeyList* pkListLoad(const char* base_name, const char* pkname) {
+MemoryIndex *
+pk_load (const char *base_name, const char *pkname)
+{
+  MemoryIndex *list;
+
   if ((!fileExists(base_name)) || (getFileSizeFromName(base_name) < 1))
-    return pkListNew(0);
-  else {
-    if (!fileExists(pkname))
-      return pkListLoadFromBase(base_name);
-    else
-      return pkListLoadFromPK(pkname);
-  }
+    list = memory_index_new (pkname, 0);
+  else
+    {
+      if (!fileExists(pkname))
+        list = pk_load_from_base (base_name, pkname);
+      else
+        {
+          list = memory_index_new (pkname, 0);
+          memory_index_load_from_file (list, pkname);
+        }
+    }
+
+  return list;
 }
 
-PrimaryKeyList* pkListLoadFromBase(const char* base_name) {
-  PrimaryKeyList* index;
-  FILE* base;
+static MemoryIndex *
+pk_load_from_base (const char *base_name, const char *pkname)
+{
+  MemoryIndex *index;
+  FILE *base;
   int i;
 
-  base = fopen(base_name, "r");
-  assert(base != NULL);
+  base = fopen (base_name, "r");
+  assert (base != NULL);
 
-  index = pkListNew(getFileSize(base) / BASE_REG_SIZE);
+  index = memory_index_new (pkname, getFileSize (base) / BASE_REG_SIZE);
 
-  /* Next we read the registers from our base. */
   for (i = 0; i < index->regnum; i++) {
-    fgets(index->pklist[i].name, TITLE_LENGTH+1, base);
-    index->pklist[i].rrn = i;
+    fgets(index->reclist[i].name, TITLE_LENGTH+1, base);
+    index->reclist[i].rrn = i;
 
     /* Strip trailing whitespaces from the name */
-    stripWhiteSpace(index->pklist[i].name);
+    stripWhiteSpace(index->reclist[i].name);
 
     /* Skip the rest of the entry and go to the next record */
     fseek(base, BASE_REG_SIZE - TITLE_LENGTH, SEEK_CUR);
   }
 
-  qsort(index->pklist, index->regnum, sizeof(PrimaryKeyRecord),
-        __qsort_compare);
+  qsort (index->reclist, index->regnum, sizeof (MemoryIndexRecord),
+         memory_index_compare_by_name);
 
   fclose(base);
 
@@ -205,18 +217,4 @@ int pkListRemove(PrimaryKeyList* index, const char* name, int * rrn){
 	sizeof(PrimaryKeyRecord), __qsort_compare);
 
   return 0;
-}
-
-void pkListWriteToFile(PrimaryKeyList* index, FILE* pkfile) {
-  char write_str[20] = {'\0'};
-  int i;
-
-  if (pkfile) {
-    for (i = 0; i < index->regnum; i++) {
-      /* We write the format string for fprintf at write_str.
-	     * This takes the sizes for the fields. */
-      sprintf(write_str, "%%-%ds%%0%dd", TITLE_LENGTH, RRN_LENGTH);
-      fprintf(pkfile, write_str, index->pklist[i].name, index->pklist[i].rrn);
-    }
-  }
 }

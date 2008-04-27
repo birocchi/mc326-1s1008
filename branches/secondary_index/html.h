@@ -30,6 +30,6 @@ void htmlEnd(FILE* htmlfile);
  *
  * @retval Returns nothing.
  */
-void htmlWriteRecordInfo(FILE* htmlfile, artwork_info* info);
+void htmlWriteRecordInfo(FILE* htmlfile, ArtworkInfo* info);
 
 #endif

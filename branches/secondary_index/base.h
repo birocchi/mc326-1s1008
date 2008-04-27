@@ -36,7 +36,7 @@ typedef struct
   char value[VALUE_LENGTH+1];      
   /** The register's identifier */
   char img[IMG_LENGTH+1];  
-} artwork_info;
+} ArtworkInfo;
 
 typedef struct {
   AvailList       *avlist;
@@ -44,10 +44,10 @@ typedef struct {
 } Base;
 
 void base_free (Base *b);
-void base_insert (Base *base, artwork_info *info);
+void base_insert (Base *base, ArtworkInfo *info);
 Base* base_new (const char *basename, const char *availname);
 void base_remove (Base *base, int rrn);
-void base_read_input(artwork_info* info);
+void base_read_input(ArtworkInfo* info);
 
 /**
  * Makes the image identifier into an actual file name.
@@ -76,11 +76,11 @@ int baseIsValidIdentifier(const char* name);
  * stores it in /info/.
  *
  * @param base File pointer to the database.
- * @param info Pointer to artwork_info structure with info about the register.
+ * @param info Pointer to ArtworkInfo structure with info about the register.
  *
  * @return Returns 0 on succes and 1 on error.
  */
-int baseReadArtworkRecord(FILE* base, artwork_info* info);
+int baseReadArtworkRecord(FILE* base, ArtworkInfo* info);
 
 /**
  * Writes the data from the struct pointed at by *info
@@ -88,8 +88,8 @@ int baseReadArtworkRecord(FILE* base, artwork_info* info);
  * Writes it according to the requested parameters.
  *
  * @param file File pointer to the database.
- * @param info Pointer to artwork_info structure with info about the register.
+ * @param info Pointer to ArtworkInfo structure with info about the register.
  */
-void base_write_data(FILE *file, artwork_info *info);
+void base_write_data(FILE *file, ArtworkInfo *info);
 
 #endif
