@@ -4,7 +4,6 @@
 #include "base.h"
 
 typedef struct {
-  FILE        *fp;
   const char  *filename;
   size_t      page_size;
   int         tail;

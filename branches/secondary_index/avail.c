@@ -49,6 +49,22 @@ avail_list_is_empty (AvailList *avlist)
   return avlist->tail == -1;
 }
 
+void
+avail_list_load (AvailList *avlist)
+{
+  FILE *fp;
+
+  assert (avlist);
+
+  if (!fileExists(avlist->filename))
+    return;
+  
+  fp = fopen (avlist->filename, "r");
+  assert (fp);
+  fscanf (fp, "%04d", avlist->tail);
+  fclose (fp);
+}
+
 AvailList *
 avail_list_new (const char *filename, size_t page_size)
 {
@@ -56,7 +72,6 @@ avail_list_new (const char *filename, size_t page_size)
 
   avlist = MEM_ALLOC (AvailList);
   avlist->filename = strdup (filename);
-  avlist->fp = NULL;
   avlist->page_size = page_size;
   avlist->tail = -1;
 }
