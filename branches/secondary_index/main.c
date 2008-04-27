@@ -29,28 +29,6 @@ main (int argc, char *argv[])
   int avail;                  /* Holds the RRN of the first available spot */
   int rrn;                    /* Hold the removed field RRN. */
 
-  availfile = fopen(AVAIL_HEAD, "r");
-  if (!availfile){
-    printf("Avail list nao existe, inicializando com -1.\n");
-    availfile = fopen(AVAIL_HEAD, "w");
-    fprintf(availfile, "-1");
-    fclose(availfile);
-    avail = -1;
-  }
-  else{
-    printf("Carregando primeira posicao disponivel. ");
-    fscanf(availfile, "%d", &avail);
-    fclose(availfile);
-  }
-
-  pkindex = pkListLoad(DBFILE, PKFILE);
-
-  /* Open the files */
-  base = fopen(DBFILE, "a+");
-  assert(base != NULL);
-
-  open_si_files(&si_files);
-
   db = adapter_new ();
   adapter_load_files (db);
 
@@ -63,6 +41,7 @@ main (int argc, char *argv[])
     default: /* This should not happen */
       break;
     case 'c':
+      printConsultMenu();
       readString("\n    Por favor, digite o titulo da obra (Max: 200 caracteres): ",
                  name, TITLE_LENGTH);
 
