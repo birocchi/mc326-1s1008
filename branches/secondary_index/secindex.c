@@ -39,7 +39,7 @@ secondary_index_insert (SecondaryIndex *si_index, const char *si_value, const ch
     fseek (si_index->fp_list, 0, SEEK_END);
   else
     {
-      writepos = avail_list_pop (si_index->avlist, (PK_REG_SIZE), si_index->fp_list);
+      writepos = avail_list_pop (si_index->avlist, si_index->fp_list);
       fseek (base->fp, writepos, SEEK_SET);
     }
 
@@ -54,11 +54,57 @@ secondary_index_new (const char *indexname, const char *listname, const char *av
 {
   SecondaryIndex *s = MEM_ALLOC (SecondaryIndex);
 
-  s->avlist = avail_list_new (avname);
+  s->avlist = avail_list_new (avname, PK_REG_SIZE);
   s->record_list = memory_index_new (indexname, 0);
 
   s->fp_list = fopen (listname, "r+");
   assert (s->fp_list != NULL);
 
   return s;
+}
+
+void
+secondary_index_remove (SecondaryIndex *index, const char *sec_value, const char *pk_value)
+{
+  MemoryIndexRecord *rec;
+  int prevnode = -1, curnode, nextnode;
+
+  assert (index != NULL);
+
+  rec = memory_index_find (index, sec_value);
+  if (rec)
+    {
+      curnode = rec->rrn;
+
+      while (curnode != -1)
+        {
+          fseek (index->fp_list, curnode * PK_REG_SIZE, SEEK_SET);
+          fgets (tmpname, TITLE_LENGTH+1, index->fp_list);
+          fgets (tmprrn, RRN_LENGTH+1, index->fp_list);
+
+          stripWhiteSpace (tmpname);
+          nextnode = atoi (tmprrn);
+
+          if (!strcasecmp (tmpname, pk_value))
+            {
+              if (prevnode == -1)
+                rec->rrn = nextnode;
+              else  /* Not the head node, no need to update the index */
+                {
+                  fseek (index->fp_list, (prevnode * PK_REG_SIZE) + TITLE_LENGTH, SEEK_SET);
+                  fprintf (index->fp_list, "%04d", nextnode);
+                }
+
+                avail_list_push (index->avlist, curnode);
+
+              break;
+            }
+
+          prevnode = curnode;
+          curnode  = nextnode;
+
+          if (rec->rrn == -1)
+           memory_index_remove (index->record_list, rec);
+        }
+    }
 }
