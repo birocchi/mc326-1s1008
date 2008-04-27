@@ -11,7 +11,9 @@
 #include "menu.h"
 #include "pk.h"
 
-int main(int argc, char* argv[]) {
+int
+main (int argc, char *argv[])
+{
   FILE *base;                 /* base01.dat basically */
   FILE *htmlfile;             /* Every single report will be printed here */
   FILE *pkfile;               /* File with the primary key table. */
@@ -19,6 +21,7 @@ int main(int argc, char* argv[]) {
 
   ArtworkInfo info;          /* Holds the artwork data. */
   PrimaryKeyList* pkindex;
+  Adapter *db;
 
   char name[TITLE_LENGTH+1];  /* Holds the name for which to search. */
   int i;                      /* Number of entries in our database. */
@@ -47,6 +50,9 @@ int main(int argc, char* argv[]) {
   assert(base != NULL);
 
   open_si_files(&si_files);
+
+  db = adapter_new ();
+  adapter_load_files (db);
 
   printWelcome();
 

@@ -2,7 +2,7 @@
 #include "base.h"
 
 typedef struct {
-  FILE*             base;
+  Base              *base;
   PrimaryKeyIndex*  pk_index;
   SecondaryIndex*   author_index;
   SecondaryIndex*   type_index;
@@ -23,9 +23,35 @@ print_record (const char *name, int rrn, va_list ap)
   rec = memory_index_find (db->pk_index, name);
   if (rec)
     {
-      fseek (db->base, rec->rrn * BASE_REG_SIZE, SEEK_SET);
-      base_read_artwork_record (db->base, &artwork);
+      fseek (db->base->fp, rec->rrn * BASE_REG_SIZE, SEEK_SET);
+      base_read_artwork_record (db->base->fp, &artwork);
       html_write_record_info (&artwork, fp_html);
+    }
+}
+
+Adapter *
+adapter_new (void)
+{
+  Adapter *db = MEM_ALLOC (Adapter);
+
+  return db;
+}
+
+void
+adapter_load_files (Adapter *db)
+{
+  assert (db);
+
+  if ((!fileExists (DBFILE)) || (getFileSizeWithName (DBFILE) < 1))
+    {
+      db->base = base_new (DBFILE, DBFILE_AVAIL);
+      db->pk_index = memory_index_new (PKFILE, 0);
+      db->author_index = secondary_index_new (SI_AUTHOR_INDEX, SI_AUTHOR_LIST, SI_AUTHOR_AVAIL);
+      db->type_index = secondary_index_new (SI_TYPE_INDEX, SI_TYPE_LIST, SI_TYPE_AVAIL);
+      db->year_index = secondary_index_new (SI_YEAR, SI_YEAR_LIST, SI_YEAR_AVAIL);
+    }
+  else
+    {
     }
 }
 
