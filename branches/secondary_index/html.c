@@ -6,7 +6,7 @@
 #include "io.h"
 
 void
-htmlBegin(FILE *htmlfile)
+html_begin(FILE *htmlfile)
 {
   if (htmlfile)
     {
@@ -22,7 +22,7 @@ htmlBegin(FILE *htmlfile)
 }
 
 void
-htmlEnd(FILE *htmlfile)
+html_end(FILE *htmlfile)
 {
   if (htmlfile)
     {
@@ -33,7 +33,7 @@ htmlEnd(FILE *htmlfile)
 }
 
 void
-htmlWriteRecordInfo (FILE *htmlfile, ArtworkInfo *info)
+html_write_record_info (FILE *htmlfile, ArtworkInfo *info)
 {
   char *path = baseGetValidImagePath (info->img);
 
