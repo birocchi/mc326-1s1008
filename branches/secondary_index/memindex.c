@@ -47,8 +47,8 @@ bsearch_find_by_name (const void* a, const void* b)
   return strcasecmp ((char*)a, ((MemoryIndexRecord*)b)->name);
 }
 
-static int
-qsort_compare_names (const void *a, const void *b)
+int
+memory_index_compare_by_name (const void *a, const void *b)
 {
   return strncmp (((MemoryIndexRecord*)a)->name,
                   ((MemoryIndexRecord*)b)->name, TITLE_LENGTH);

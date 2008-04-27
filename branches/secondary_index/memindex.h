@@ -13,6 +13,7 @@ typedef struct {
   MemoryIndexRecord *reclist;
 } MemoryIndex;
 
+int           memory_index_compare_by_name (const void *a, const void *b)
 int           memory_index_find_id (MemoryIndex *index, const char *name);
 void          memory_index_free (MemoryIndex *index);
 void          memory_index_insert (MemoryIndex *index, const char *name);
