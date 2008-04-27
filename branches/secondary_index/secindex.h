@@ -15,7 +15,7 @@ typedef struct {
 
 void            secondary_index_free (SecondaryIndex *index);
 void            secondary_index_insert (SecondaryIndex *si_index, const char *si_value, const char *pk_value);
-SecondaryIndex* secondary_index_new (const char *indexname, const char *listname, const char *avname);
+SecondaryIndex* secondary_index_new (const char *indexname, const char *listname, const char *avname, int writeonly);
 void            secondary_index_remove (SecondaryIndex *index, const char *sec_value, const char *pk_value);
 
 #endif

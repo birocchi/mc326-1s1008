@@ -44,14 +44,25 @@ adapter_load_files (Adapter *db)
 
   if ((!fileExists (DBFILE)) || (getFileSizeWithName (DBFILE) < 1))
     {
-      db->base = base_new (DBFILE, DBFILE_AVAIL);
+      db->base = base_new (DBFILE, DBFILE_AVAIL, 1);
       db->pk_index = memory_index_new (PKFILE, 0);
-      db->author_index = secondary_index_new (SI_AUTHOR_INDEX, SI_AUTHOR_LIST, SI_AUTHOR_AVAIL);
-      db->type_index = secondary_index_new (SI_TYPE_INDEX, SI_TYPE_LIST, SI_TYPE_AVAIL);
-      db->year_index = secondary_index_new (SI_YEAR, SI_YEAR_LIST, SI_YEAR_AVAIL);
+      db->author_index = secondary_index_new (SI_AUTHOR_INDEX, SI_AUTHOR_LIST, SI_AUTHOR_AVAIL. 1);
+      db->type_index = secondary_index_new (SI_TYPE_INDEX, SI_TYPE_LIST, SI_TYPE_AVAIL, 1);
+      db->year_index = secondary_index_new (SI_YEAR, SI_YEAR_LIST, SI_YEAR_AVAIL, 1);
     }
   else
     {
+      if (!fileExists (PKFILE))
+        db->pk_index = pk_load_from_base (DBFILE, PKFILE);
+      else
+        {
+          db->pk_index = memory_index_new (PKFILE, 0);
+          memory_index_load_from_file (db->pk_index, PKFILE);
+        }
+
+      db->author_index = secondary_index_new (SI_AUTHOR_INDEX, SI_AUTHOR_LIST, SI_AUTHOR_AVAIL. 0);
+      db->type_index = secondary_index_new (SI_TYPE_INDEX, SI_TYPE_LIST, SI_TYPE_AVAIL, 0);
+      db->year_index = secondary_index_new (SI_YEAR, SI_YEAR_LIST, SI_YEAR_AVAIL, 0);
     }
 }
 

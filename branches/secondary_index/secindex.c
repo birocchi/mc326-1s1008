@@ -81,15 +81,21 @@ secondary_index_insert (SecondaryIndex *si_index, const char *si_value, const ch
 }
 
 SecondaryIndex *
-secondary_index_new (const char *indexname, const char *listname, const char *avname)
+secondary_index_new (const char *indexname, const char *listname, const char *avname, int writeonly)
 {
   SecondaryIndex *s = MEM_ALLOC (SecondaryIndex);
 
   s->avlist = avail_list_new (avname, PK_REG_SIZE);
   s->record_list = memory_index_new (indexname, 0);
 
-  s->fp_list = fopen (listname, "r+");
-  assert (s->fp_list != NULL);
+  if (!writeonly)
+    {
+      memory_index_load_from_file (s->record_list, indexname);
+      avail_list_load (s->avlist);
+    }
+
+  s->fp_list = fopen (listname, (!writeonly && fileExists(listname) ? "r+" : "w"));
+  assert (s->fp_list);
 
   return s;
 }

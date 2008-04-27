@@ -41,14 +41,20 @@ base_insert (Base *base, ArtworkInfo *info)
 }
 
 Base *
-base_new (const char *basename, const char *availname)
+base_new (const char *basename, const char *availname, int writeonly)
 {
   Base *b = MEM_ALLOC (Base);
 
-  b->fp = fopen (basename, "r+");
-  assert (b->fp != NULL);
+  b->avlist = avail_list_new (availname, BASE_REG_SIZE);
 
-  b->avlist  = avail_list_new (availname, BASE_REG_SIZE);
+  if ((fileExists (basename) && (getFileSizeWithName (basename) > 0)))
+    {
+      b->fp = fopen (basename, "r+");
+      avail_list_load (b->avlist);
+    }
+  else
+    b->fp = fopen (basename, "w");
+  assert (b->fp);
 
   return b;
 }

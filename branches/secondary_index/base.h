@@ -45,7 +45,7 @@ typedef struct {
 
 void base_free (Base *b);
 void base_insert (Base *base, ArtworkInfo *info);
-Base* base_new (const char *basename, const char *availname);
+Base* base_new (const char *basename, const char *availname, int writeonly);
 void base_remove (Base *base, int rrn);
 void base_read_input(ArtworkInfo* info);
 
