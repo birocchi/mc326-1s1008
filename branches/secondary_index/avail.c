@@ -76,8 +76,6 @@ avail_list_pop (AvaiList *avlist, FILE *fp)
       fseek (fp, prevpos, SEEK_SET);
       fscanf (fp, "%d", &(avlist->tail));
 
-      avail_list_write (avlist);
-
       return prevpos;
     }
   else
@@ -88,5 +86,4 @@ void
 avail_list_push (AvailList *avlist, int pos)
 {
   avlist->tail = pos;
-  avail_list_write (avlist);
 }
