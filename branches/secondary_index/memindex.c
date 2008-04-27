@@ -74,7 +74,7 @@ memory_index_free (MemoryIndex *index)
     }
 }
 
-int
+MemoryIndexRecord *
 memory_index_insert (MemoryIndex *index, const char *name)
 {
   assert (index != NULL);
@@ -91,7 +91,7 @@ memory_index_insert (MemoryIndex *index, const char *name)
          sizeof (MemoryIndexRecord), memory_index_compare_by_names);
 
   /* Return the inserted entry's RRN */
-  return index->regnum - 1;
+  return index->reclist[index->regnum-1];
 }
 
 int
