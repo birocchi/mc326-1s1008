@@ -16,7 +16,8 @@ typedef struct {
 int           memory_index_find_id (MemoryIndex *index, const char *name);
 void          memory_index_free (MemoryIndex *index);
 void          memory_index_insert (MemoryIndex *index, const char *name);
-MemoryIndex*  memory_index_new (size_t nelem);
+int           memory_index_is_empty (MemoryIndex *index);
+MemoryIndex*  memory_index_new (const char *fp_name, size_t nelem);
 void          memory_index_remove (MemoryIndex *index, int id);
 
 #endif

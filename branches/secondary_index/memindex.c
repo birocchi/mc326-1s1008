@@ -95,14 +95,21 @@ memory_index_insert (MemoryIndex *index, const char *name)
          sizeof (MemoryIndexRecord), qsort_compare_names);
 }
 
+int
+memory_index_is_empty (MemoryIndex *index)
+{
+  return (index ? index->regnum == 0 : 1);
+}
+
 MemoryIndex *
-memory_index_new (size_t nelem)
+memory_index_new (const char *fp_name, size_t nelem)
 {
   MemoryIndex *index = MEM_ALLOC (MemoryIndex);
 
   index->regnum = nelem;
   index->maxregs = (nelem == 0 ? 40 : 2*nelem);
   index->reclist = MEM_ALLOC_N (MemoryIndexRecord, index->maxregs);
+  index->fp_name = strdup (fp_name);
 
   return index;
 }
