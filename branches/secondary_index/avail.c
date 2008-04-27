@@ -9,11 +9,25 @@
 #include "pk.h"
 #include "avail.h"
 
+static void
+avail_list_write (AvailList *avlist)
+{
+  FILE *fp;
+
+  assert (avlist != NULL);
+
+  fp = fopen (avlist->filename, "w");
+  assert (fp != NULL);
+  fprintf (fp, "%d", avlist->tail);
+  fclose (fp);
+}
+
 void
 avail_list_free (AvailList *avlist)
 {
   if (avlist)
     {
+      avail_list_write (avlist);
       free (avlist->filename);
       free (avlist);
     }
@@ -36,18 +50,19 @@ avail_list_is_empty (AvailList *avlist)
 }
 
 AvailList *
-avail_list_new (const char *filename)
+avail_list_new (const char *filename, size_t page_size)
 {
   AvailList *avlist;
 
   avlist = MEM_ALLOC (AvailList);
   avlist->filename = strdup (filename);
   avlist->fp = NULL;
+  avlist->page_size = page_size;
   avlist->tail = -1;
 }
 
 int
-avail_list_pop (AvaiList *avlist, size_t page_size, FILE *fp)
+avail_list_pop (AvaiList *avlist, FILE *fp)
 {
   int prevpos;
 
@@ -56,7 +71,7 @@ avail_list_pop (AvaiList *avlist, size_t page_size, FILE *fp)
 
   if (avlist->tail != -1)
     {
-      prevpos = avlist->tail * page_size;
+      prevpos = avlist->tail * avlist->page_size;
 
       fseek (fp, prevpos, SEEK_SET);
       fscanf (fp, "%d", &(avlist->tail));
@@ -75,52 +90,3 @@ avail_list_push (AvailList *avlist, int pos)
   avlist->tail = pos;
   avail_list_write (avlist);
 }
-
-void
-avail_list_write (AvailList *avlist)
-{
-  FILE *fp;
-
-  assert (avlist != NULL);
-
-  fp = fopen (avlist->filename, "w");
-  assert (fp != NULL);
-  fprintf (fp, "%d", avlist->tail);
-  fclose (fp);
-}
-
-int
-removedField (FILE * base, int rrn, int *avail)
-{
-  int opened;
-
-  if (base)
-    {
-      opened = 1;
-      fclose (base);
-      base = fopen (DBFILE, "r+");
-    }
-  else
-    {
-      opened = 0;
-      base = fopen (DBFILE, "r+");
-    }
-
-  fseek (base, BASE_REG_SIZE * rrn, SEEK_SET);
-  fprintf (base, "%09d ", *avail);
-  *avail = rrn;
-
-  fclose (base);
-
-  if (opened)
-    {
-      base = fopen (DBFILE, "r+");
-    }
-
-  return 0;
-
-}
-
-/*
- * vim: cino={s
- */
