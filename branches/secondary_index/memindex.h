@@ -8,8 +8,8 @@ typedef struct {
 
 typedef struct {
   const char *fp_name;
-  int regnum;
-  int maxregs;
+  size_t regnum;
+  size_t maxregs;
   MemoryIndexRecord *reclist;
 } MemoryIndex;
 
