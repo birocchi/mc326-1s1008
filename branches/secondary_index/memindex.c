@@ -94,7 +94,7 @@ memory_index_insert (MemoryIndex *index, const char *name)
   strncpy (index->reclist[index->regnum].name, name, TITLE_LENGTH+1);
 
   qsort (index->reclist, index->regnum,
-         sizeof (MemoryIndexRecord), qsort_compare_names);
+         sizeof (MemoryIndexRecord), memory_index_compare_by_names);
 }
 
 int
