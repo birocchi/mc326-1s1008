@@ -1,9 +1,40 @@
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "base.h"
+#include "io.h"
 #include "mem.h"
 #include "memindex.h"
 #include "secindex.h"
+
+void
+secondary_index_foreach (SecondaryIndex *index, MemoryIndexRecord *record,
+                         void (*callback)(const char*, int, va_list), ...)
+{
+  char tmpname[TITLE_LENGTH+1], tmprrn[RRN_LENGTH+1];
+  int node, nextnode;
+  va_list ap;
+
+  va_start (ap, callback);
+
+  node = record->rrn;
+  while (node != -1)
+    {
+      fseek (index->fp_list, node * PK_REG_SIZE, SEEK_SET);
+      fgets (tmpname, TITLE_LENGTH+1, index->fp_list);
+      fgets (tmprrn, RRN_LENGTH+1, index->fp_list);
+
+      stripWhiteSpace(tmpname);
+      nextnode = atoi(tmprrn);
+
+      callback (tmpname, nextnode, ap);
+
+      node = nextnode;
+    }
+
+  va_end (ap);
+}
 
 void
 secondary_index_free (SecondaryIndex *index)
