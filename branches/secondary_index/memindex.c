@@ -109,7 +109,9 @@ memory_index_load_from_file (MemoryIndex *index, const char *filename)
   size_t regnum;
 
   assert (index != NULL);
-  assert (fileExists (filename));
+
+  if (!fileExists (filename))
+    return;
 
   fp = fopen (filename, "r");
   assert (fp != NULL);
