@@ -17,6 +17,7 @@ int           memory_index_find_id (MemoryIndex *index, const char *name);
 void          memory_index_free (MemoryIndex *index);
 void          memory_index_insert (MemoryIndex *index, const char *name);
 int           memory_index_is_empty (MemoryIndex *index);
+void          memory_index_load_from_file (MemoryIndex *index, const char *filename);
 MemoryIndex*  memory_index_new (const char *fp_name, size_t nelem);
 void          memory_index_remove (MemoryIndex *index, int id);
 

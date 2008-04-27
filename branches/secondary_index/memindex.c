@@ -25,18 +25,20 @@ flush_to_disk (MemoryIndex *index)
 }
 
 static void
-inflate_list (MemoryIndex *index)
+inflate_list (MemoryIndex *index, size_t size)
 {
   MemoryIndexRecord *tmp;
 
   assert (index != NULL);
 
-  tmp = realloc(index->reclist, (index->maxregs*2) *
-                                sizeof (MemoryIndexRecord));
-  assert(tmp != NULL);
+  if (size > index->maxregs)
+    {
+      tmp = realloc(index->reclist, size * sizeof (MemoryIndexRecord));
+      assert(tmp != NULL);
 
-  index->reclist = tmp;
-  index->maxregs *= 2;
+      index->reclist = tmp;
+      index->maxregs = size;
+    }
 }
 
 static int
@@ -84,7 +86,7 @@ memory_index_insert (MemoryIndex *index, const char *name)
   assert (index != NULL);
 
   if (index->regnum == index->maxregs)
-    inflate_list (index);
+    inflate_list (index, index->maxregs * 2);
 
   index->reclist[index->regnum].id = index->regnum;
   index->regnum++;
@@ -99,6 +101,38 @@ int
 memory_index_is_empty (MemoryIndex *index)
 {
   return (index ? index->regnum == 0 : 1);
+}
+
+void
+memory_index_load_from_file (MemoryIndex *index, const char *filename)
+{
+  FILE *fp = NULL;
+  char strid[RRN_LENGTH+1];
+  int i, id;
+  size_t regnum;
+
+  assert (index != NULL);
+  assert (fileExists (filename));
+
+  fp = fopen (filename, "r");
+  assert (fp != NULL);
+
+  regnum = getFileSize (fp) / MEM_REG_SIZE;
+  inflate_list (index, regnum);
+
+  for (i = 0; i < regnum; i++ )
+    {  
+      fgets (index->reclist[i].name, TITLE_LENGTH+1, fp);
+
+      /* Strip trailing whitespaces from the name */
+      stripWhiteSpace(index->reclist[i].name);
+
+      fgets(strid, RRN_LENGTH+1, fp);
+      id = atoi(strid);
+      index->reclist[i].id = id;
+    }
+
+  fclose (fp);
 }
 
 MemoryIndex *
