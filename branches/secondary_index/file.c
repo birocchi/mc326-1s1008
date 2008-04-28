@@ -39,6 +39,8 @@ long getFileSizeFromName(const char* filename) {
   return buf.st_size;
 }
 
-int isValidFile(const char* filename) {
-  return (fileExists(filename) && (getFileSizeFromName(filename) > 0));
+int
+isValidFile (const char *filename)
+{
+  return (fileExists (filename) && (getFileSizeFromName (filename) > 0));
 }

@@ -28,4 +28,6 @@ long getFileSize(FILE* f);
  */
 long getFileSizeFromName(const char* filename);
 
+int isValidFile (const char *filename);
+
 #endif
