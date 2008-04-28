@@ -49,7 +49,6 @@ secondary_index_free (SecondaryIndex *index)
       memory_index_free (index->record_list);
       fclose (index->fp_list);
       free (index->fp_index_name);
-      free (index->record_list);
       free (index);
     }
 }
