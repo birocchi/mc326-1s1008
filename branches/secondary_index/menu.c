@@ -29,7 +29,7 @@ void printConsultMenu(void) {
   printf("     (a)no da obra\n");
   printf("     a(u)tor da obra\n");
   printf("     t(i)po da obra\n");
-  printf("     (t)titulo da obra\n");
+  printf("     (t)itulo da obra\n");
   printf("   ---------------------\n");
   printf("\n");
 }
