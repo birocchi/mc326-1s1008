@@ -21,7 +21,7 @@ secondary_index_foreach (SecondaryIndex *index, MemoryIndexRecord *record,
   node = record->rrn;
   while (node != -1)
     {
-      fseek (index->fp_list, node * PK_REG_SIZE, SEEK_SET);
+      fseek (index->fp_list, node * MEM_REG_SIZE, SEEK_SET);
       fgets (tmpname, TITLE_LENGTH+1, index->fp_list);
       fgets (tmprrn, RRN_LENGTH+1, index->fp_list);
 
@@ -41,8 +41,8 @@ secondary_index_free (SecondaryIndex *index)
 {
   if (index)
     {
-      avail_list_free (s->avlist);
-      memory_index_free (s->record_list);
+      avail_list_free (index->avlist);
+      memory_index_free (index->record_list);
       fclose (index->fp_list);
       free (index->fp_index_name);
       free (index->record_list);
@@ -85,7 +85,7 @@ secondary_index_new (const char *indexname, const char *listname, const char *av
 {
   SecondaryIndex *s = MEM_ALLOC (SecondaryIndex);
 
-  s->avlist = avail_list_new (avname, PK_REG_SIZE);
+  s->avlist = avail_list_new (avname, MEM_REG_SIZE);
   s->record_list = memory_index_new (indexname, 0);
 
   if (!writeonly)
@@ -115,7 +115,7 @@ secondary_index_remove (SecondaryIndex *index, const char *sec_value, const char
 
       while (curnode != -1)
         {
-          fseek (index->fp_list, curnode * PK_REG_SIZE, SEEK_SET);
+          fseek (index->fp_list, curnode * MEM_REG_SIZE, SEEK_SET);
           fgets (tmpname, TITLE_LENGTH+1, index->fp_list);
           fgets (tmprrn, RRN_LENGTH+1, index->fp_list);
 
@@ -128,7 +128,7 @@ secondary_index_remove (SecondaryIndex *index, const char *sec_value, const char
                 rec->rrn = nextnode;
               else  /* Not the head node, no need to update the index */
                 {
-                  fseek (index->fp_list, (prevnode * PK_REG_SIZE) + TITLE_LENGTH, SEEK_SET);
+                  fseek (index->fp_list, (prevnode * MEM_REG_SIZE) + TITLE_LENGTH, SEEK_SET);
                   fprintf (index->fp_list, "%04d", nextnode);
                 }
 

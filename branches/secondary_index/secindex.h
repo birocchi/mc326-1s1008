@@ -9,7 +9,7 @@
 
 typedef struct {
   AvailList       *avlist;
-  const char      *fp_index_name;
+  char            *fp_index_name;
   FILE            *fp_list;
   MemoryIndex     *record_list;
 } SecondaryIndex;
