@@ -83,15 +83,15 @@ memory_index_free (MemoryIndex *index)
 MemoryIndexRecord *
 memory_index_insert (MemoryIndex *index, const char *name)
 {
-  assert (index != NULL);
+  assert (index && name);
 
   if (index->regnum == index->maxregs)
     inflate_list (index, index->maxregs * 2);
 
+  strncpy (index->reclist[index->regnum].name, name, TITLE_LENGTH+1);
+
   index->reclist[index->regnum].rrn = index->regnum;
   index->regnum++;
-
-  strncpy (index->reclist[index->regnum].name, name, TITLE_LENGTH+1);
 
   qsort (index->reclist, index->regnum,
          sizeof (MemoryIndexRecord), memory_index_compare_by_name);
