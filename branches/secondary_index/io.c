@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -77,13 +78,10 @@ void readValue(char s[], size_t length)
 char *
 str_dup (const char *s)
 {
-  int len;
-  char *dup;
+  char *dup = malloc (strlen (s) + 1);
+  assert (dup);
 
-  len = strlen (s);
-  dup = MEM_ALLOC_N (char, len);
-  strncpy (dup, s, len);
-
+  strcpy (dup, s);
   return dup;
 }
 
