@@ -15,25 +15,27 @@
 #include "pk.h"
 #include "secindex.h"
 
-typedef enum {
+enum {
   LOAD_BASE_PK      = 1 << 0,
   LOAD_BASE_AUTHOR  = 1 << 1,
   LOAD_BASE_TYPE    = 1 << 2,
   LOAD_BASE_YEAR    = 1 << 3
-} LoadFromBase;
+};
 
 static void
-load_files_from_base (Adapter *db, LoadFromBase flags)
+load_files_from_base (Adapter *db, int flags)
 {
   ArtworkInfo artwork;
   FILE *base = db->base->fp;
-  int i;
+  int i, baselen;
 
-  if (!base)
+  if ((!base) || (!flags))
     return;
 
+  baselen = getFileSize (base) / BASE_REG_SIZE;
+
   if (flags & LOAD_BASE_PK)
-    db->pk_index = memory_index_new (PKFILE, getFileSize (base) / BASE_REG_SIZE);
+    db->pk_index = memory_index_new (PKFILE, 0);
   if (flags & LOAD_BASE_AUTHOR)
     db->author_index = secondary_index_new (SI_AUTHOR_INDEX, SI_AUTHOR_LIST, SI_AUTHOR_AVAIL, 1);
   if (flags & LOAD_BASE_TYPE)
@@ -43,7 +45,7 @@ load_files_from_base (Adapter *db, LoadFromBase flags)
 
   fseek (base, 0, SEEK_SET);
 
-  for (i = 0; i < db->pk_index->regnum; i++)
+  for (i = 0; i < baselen; i++)
     {
       base_read_artwork_record (base, &artwork);
 
@@ -220,7 +222,7 @@ adapter_list (Adapter *db)
 void
 adapter_load_files (Adapter *db)
 {
-  LoadFromBase loadbase;
+  int loadbase = 0;
   assert (db);
 
   if (!isValidFile (DBFILE))
@@ -258,8 +260,7 @@ adapter_load_files (Adapter *db)
       else
         db->year_index = secondary_index_new (SI_YEAR_INDEX, SI_YEAR_LIST, SI_YEAR_AVAIL, 0);
 
-      if (loadbase)
-        load_files_from_base (db, loadbase);
+      load_files_from_base (db, loadbase);
     }
 }
 
