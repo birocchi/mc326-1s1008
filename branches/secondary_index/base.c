@@ -49,7 +49,7 @@ base_new (const char *basename, const char *availname, int writeonly)
 
   b->avlist = avail_list_new (availname, BASE_REG_SIZE);
 
-  if ((fileExists (basename) && (getFileSizeWithName (basename) > 0)))
+  if ((fileExists (basename) && (getFileSizeFromName (basename) > 0)))
     {
       b->fp = fopen (basename, "r+");
       avail_list_load (b->avlist);
@@ -67,7 +67,7 @@ base_remove (Base *base, int rrn)
   assert (base != NULL);
 
   fseek (base->fp, rrn * BASE_REG_SIZE, SEEK_SET);
-  fprintf (base->fp, "%s", avail_list_get_tail (base->avlist));
+  fprintf (base->fp, "%04d", avail_list_get_tail (base->avlist));
 
   avail_list_push (base->avlist, rrn);
 }
