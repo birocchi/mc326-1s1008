@@ -2,6 +2,7 @@
 #define __BASE_H
 
 #include <stdio.h>
+#include "avail.h"
 
 #define TITLE_LENGTH   200 
 #define TYPE_LENGTH    100 
