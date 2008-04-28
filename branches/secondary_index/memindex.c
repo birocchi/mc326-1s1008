@@ -74,6 +74,7 @@ memory_index_free (MemoryIndex *index)
   if (index)
     {
       flush_to_disk (index);
+      free (index->fp_name);
       free (index->reclist);
       free (index);
     }
