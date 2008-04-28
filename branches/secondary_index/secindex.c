@@ -55,7 +55,7 @@ secondary_index_insert (SecondaryIndex *si_index, const char *si_value, const ch
 {
   int listpos;
   int writepos;
-  SecondaryIndexRecord *rec;
+  MemoryIndexRecord *rec;
 
   rec = memory_index_find (si_index, si_value);
   if (rec)
