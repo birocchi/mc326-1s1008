@@ -10,7 +10,7 @@ typedef struct {
 } MemoryIndexRecord;
 
 typedef struct {
-  const char *fp_name;
+  char *fp_name;
   size_t regnum;
   size_t maxregs;
   MemoryIndexRecord *reclist;

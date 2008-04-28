@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "avail.h"
 #include "base.h"
 #include "io.h"
 #include "mem.h"
@@ -30,13 +31,13 @@ base_insert (Base *base, ArtworkInfo *info)
   if (avail_list_is_empty (base->avlist))
     {
       fseek (base->fp, 0, SEEK_END);
-      base_write_data (base, info);
+      base_write_data (base->fp, info);
     }
   else
     {
       writepos = avail_list_pop (base->avlist, base->fp);
       fseek (base->fp, writepos, SEEK_SET);
-      base_write_data (base, info);
+      base_write_data (base->fp, info);
     }
 }
 
