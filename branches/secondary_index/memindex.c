@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "base.h"
 #include "mem.h"
 #include "memindex.h"
 
@@ -88,7 +89,7 @@ memory_index_insert (MemoryIndex *index, const char *name)
   strncpy (index->reclist[index->regnum].name, name, TITLE_LENGTH+1);
 
   qsort (index->reclist, index->regnum,
-         sizeof (MemoryIndexRecord), memory_index_compare_by_names);
+         sizeof (MemoryIndexRecord), memory_index_compare_by_name);
 
   /* Return the inserted entry's RRN */
   return index->reclist[index->regnum-1];
@@ -126,7 +127,7 @@ memory_index_load_from_file (MemoryIndex *index, const char *filename)
       /* Strip trailing whitespaces from the name */
       stripWhiteSpace(index->reclist[i].name);
 
-      fgets(strid, RRN_LENGTH+1, fp);
+      fgets(strrrn, RRN_LENGTH+1, fp);
       rrn = atoi(strrrn);
       index->reclist[i].rrn = rrn;
     }

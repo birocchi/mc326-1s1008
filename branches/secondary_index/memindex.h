@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include "base.h"
 
+#define MEM_REG_SIZE (TITLE_LENGTH + RRN_LENGTH)
+
 typedef struct {
   int  rrn;
   char name[TITLE_LENGTH+1];
@@ -16,7 +18,7 @@ typedef struct {
   MemoryIndexRecord *reclist;
 } MemoryIndex;
 
-int                 memory_index_compare_by_name (const void *a, const void *b)
+int                 memory_index_compare_by_name (const void *a, const void *b);
 MemoryIndexRecord*  memory_index_find (MemoryIndex *index, const char *name);
 void                memory_index_free (MemoryIndex *index);
 MemoryIndexRecord*  memory_index_insert (MemoryIndex *index, const char *name);
