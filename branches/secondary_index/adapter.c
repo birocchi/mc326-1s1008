@@ -15,6 +15,49 @@
 #include "pk.h"
 #include "secindex.h"
 
+typedef enum {
+  LOAD_BASE_PK      = 1 << 0,
+  LOAD_BASE_AUTHOR  = 1 << 1,
+  LOAD_BASE_TYPE    = 1 << 2,
+  LOAD_BASE_YEAR    = 1 << 3
+} LoadFromBase;
+
+static void
+load_files_from_base (Adapter *db, LoadFromBase flags)
+{
+  ArtworkInfo artwork;
+  FILE *base = db->base->fp;
+  int i;
+
+  if (!base)
+    return;
+
+  if (flags & LOAD_BASE_PK)
+    db->pk_index = memory_index_new (PKFILE, getFileSize (base) / BASE_REG_SIZE);
+  if (flags & LOAD_BASE_AUTHOR)
+    db->author_index = secondary_index_new (SI_AUTHOR_INDEX, SI_AUTHOR_LIST, SI_AUTHOR_AVAIL, 1);
+  if (flags & LOAD_BASE_TYPE)
+    db->type_index = secondary_index_new (SI_TYPE_INDEX, SI_TYPE_LIST, SI_TYPE_AVAIL, 1);
+  if (flags & LOAD_BASE_YEAR)
+    db->year_index = secondary_index_new (SI_YEAR_INDEX, SI_YEAR_LIST, SI_YEAR_AVAIL, 1);
+
+  fseek (base, 0, SEEK_SET);
+
+  for (i = 0; i < db->pk_index->regnum; i++)
+    {
+      base_read_artwork_record (base, &artwork);
+
+      if (flags & LOAD_BASE_PK)
+        memory_index_insert (db->pk_index, artwork.title);
+      if (flags & LOAD_BASE_AUTHOR)
+        secondary_index_insert (db->author_index, artwork.author, artwork.title);
+      if (flags & LOAD_BASE_TYPE)
+        secondary_index_insert (db->type_index, artwork.type, artwork.title);
+      if (flags & LOAD_BASE_YEAR)
+        secondary_index_insert (db->year_index, artwork.year, artwork.title);
+    }
+}
+
 static void
 print_record (const char *name, int rrn, va_list ap)
 {
@@ -177,9 +220,10 @@ adapter_list (Adapter *db)
 void
 adapter_load_files (Adapter *db)
 {
+  LoadFromBase loadbase;
   assert (db);
 
-  if ((!fileExists (DBFILE)) || (getFileSizeFromName (DBFILE) < 1))
+  if (!isValidFile (DBFILE))
     {
       db->base = base_new (DBFILE, DBFILE_AVAIL, 1);
       db->pk_index = memory_index_new (PKFILE, 0);
@@ -189,17 +233,33 @@ adapter_load_files (Adapter *db)
     }
   else
     {
-      if (!fileExists (PKFILE))
-        db->pk_index = pk_load_from_base (DBFILE, PKFILE);
+      db->base = base_new (DBFILE, DBFILE_AVAIL, 0);
+
+      if (!isValidFile (PKFILE))
+        loadbase |= LOAD_BASE_PK;
       else
         {
           db->pk_index = memory_index_new (PKFILE, 0);
           memory_index_load_from_file (db->pk_index, PKFILE);
         }
 
-      db->author_index = secondary_index_new (SI_AUTHOR_INDEX, SI_AUTHOR_LIST, SI_AUTHOR_AVAIL, 0);
-      db->type_index = secondary_index_new (SI_TYPE_INDEX, SI_TYPE_LIST, SI_TYPE_AVAIL, 0);
-      db->year_index = secondary_index_new (SI_YEAR_INDEX, SI_YEAR_LIST, SI_YEAR_AVAIL, 0);
+      if (!isValidFile (SI_AUTHOR_INDEX) || !isValidFile (SI_AUTHOR_LIST))
+        loadbase |= LOAD_BASE_AUTHOR;
+      else
+        db->author_index = secondary_index_new (SI_AUTHOR_INDEX, SI_AUTHOR_LIST, SI_AUTHOR_AVAIL, 0);
+
+      if (!isValidFile (SI_TYPE_INDEX) || !isValidFile (SI_TYPE_LIST))
+        loadbase |= LOAD_BASE_TYPE;
+      else
+        db->type_index = secondary_index_new (SI_TYPE_INDEX, SI_TYPE_LIST, SI_TYPE_AVAIL, 0);
+
+      if (!isValidFile (SI_YEAR_INDEX) || !isValidFile (SI_YEAR_LIST))
+        loadbase |= LOAD_BASE_YEAR;
+      else
+        db->year_index = secondary_index_new (SI_YEAR_INDEX, SI_YEAR_LIST, SI_YEAR_AVAIL, 0);
+
+      if (loadbase)
+        load_files_from_base (db, loadbase);
     }
 }
 
