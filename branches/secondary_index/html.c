@@ -17,7 +17,7 @@ html_begin(FILE *htmlfile)
       fprintf (htmlfile, "  <title>TP3 Grupo 1</title>\n");
       fprintf (htmlfile, "</head>\n\n");
       fprintf (htmlfile, "<body>\n");
-      fprintf (htmlfile, "<table width=\"100%\" border=\"1\">\n");
+      fprintf (htmlfile, "<table width=\"100%%\" border=\"1\">\n");
     }
 }
 
