@@ -62,7 +62,7 @@ avail_list_load (AvailList *avlist)
   
   fp = fopen (avlist->filename, "r");
   assert (fp);
-  fscanf (fp, "%04d", avlist->tail);
+  fscanf (fp, "%04d", &(avlist->tail));
   fclose (fp);
 }
 
@@ -72,9 +72,11 @@ avail_list_new (const char *filename, size_t page_size)
   AvailList *avlist;
 
   avlist = MEM_ALLOC (AvailList);
-  avlist->filename = strdup (filename);
+  avlist->filename = str_dup (filename);
   avlist->page_size = page_size;
   avlist->tail = -1;
+
+  return avlist;
 }
 
 int

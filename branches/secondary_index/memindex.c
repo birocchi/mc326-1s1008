@@ -147,7 +147,7 @@ memory_index_new (const char *fp_name, size_t nelem)
   index->regnum = nelem;
   index->maxregs = (nelem == 0 ? 40 : 2*nelem);
   index->reclist = MEM_ALLOC_N (MemoryIndexRecord, index->maxregs);
-  index->fp_name = strdup (fp_name);
+  index->fp_name = str_dup (fp_name);
 
   return index;
 }

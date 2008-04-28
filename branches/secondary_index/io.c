@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "io.h"
+#include "mem.h"
 
 void flushBuffer(void)
 {
