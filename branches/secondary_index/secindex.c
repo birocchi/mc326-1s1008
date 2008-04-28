@@ -1,8 +1,11 @@
+#include <assert.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "avail.h"
 #include "base.h"
+#include "file.h"
 #include "io.h"
 #include "mem.h"
 #include "memindex.h"
@@ -53,17 +56,16 @@ secondary_index_free (SecondaryIndex *index)
 void
 secondary_index_insert (SecondaryIndex *si_index, const char *si_value, const char *pk_value)
 {
-  int listpos;
-  int writepos;
+  int newrrn, writepos;
   MemoryIndexRecord *rec;
 
   rec = memory_index_find (si_index, si_value);
   if (rec)
-    newrrn = rec->regnum + 1;
+    newrrn = si_index->regnum + 1;
   else
     {
       rec = memory_index_insert (si_index, si_value);
-      newrrn = rec->regnum;
+      newrrn = si_index->regnum;
     }
 
   if (avail_list_is_empty (si_index->avlist))
@@ -71,7 +73,7 @@ secondary_index_insert (SecondaryIndex *si_index, const char *si_value, const ch
   else
     {
       writepos = avail_list_pop (si_index->avlist, si_index->fp_list);
-      fseek (base->fp, writepos, SEEK_SET);
+      fseek (si_index->fp_list, writepos, SEEK_SET);
     }
 
   fprintf (si_index->fp_list, "%-200s%04d", pk_value, rec->rrn);
@@ -104,6 +106,7 @@ void
 secondary_index_remove (SecondaryIndex *index, const char *sec_value, const char *pk_value)
 {
   MemoryIndexRecord *rec;
+  char tmpname[TITLE_LENGTH+1], tmprrn[RRN_LENGTH+1];
   int prevnode = -1, curnode, nextnode;
 
   assert (index != NULL);
