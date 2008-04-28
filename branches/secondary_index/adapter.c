@@ -6,14 +6,6 @@
 #include "base.h"
 #include "menu.h"
 
-typedef struct {
-  Base              *base;
-  PrimaryKeyIndex*  pk_index;
-  SecondaryIndex*   author_index;
-  SecondaryIndex*   type_index;
-  SecondaryIndex*   year_index;
-} Adapter;
-
 static void
 print_record (const char *name, int rrn, va_list ap)
 {
@@ -35,6 +27,77 @@ print_record (const char *name, int rrn, va_list ap)
 }
 
 void
+adapter_find (Adapter *db)
+{
+  ArtworkInfo artwork;
+  char field;
+  char key[TITLE_LENGTH+1]; /* TITLE_LENGTH is the largest of all lengths */
+  FILE *fp_html;
+  int nelem;
+  SecondaryIndex *secindex;
+ 
+  fp_html = fopen (HTMLFILE, "w");
+  assert (fp_html);
+  html_begin (fp_html);
+
+  printConsultMenu();
+
+  field = menuMultipleAnswers ("   Opcao desejada: ", "auit");
+  switch (field)
+    {
+      case 'a': /* Year */
+        secindex = db->year_index;
+        readString ("   Digite o ano para busca: ", key, YEAR_LENGTH);
+        break;
+      case 'i': /* Type */
+        secindex = db->type_index;
+        readString ("   Digite o tipo para busca: ", key, TYPE_LENGTH);
+        break;
+      case 't': /* Title */
+        readString ("   Digite o titulo para busca: ", key, TITLE_LENGTH);
+        break;
+      case 'u': /* Author */
+        secindex = db->author_index;
+        readString ("   Digite o autor para busca: ", key, AUTHOR_LENGTH);
+        break;
+      default:
+        break;
+    }
+
+  if (field != 't')
+    {
+      mrec = secondary_index_find (secindex, key);
+
+      if (mrec)
+        {
+          secondary_index_foreach (db->author_index, mrec, print_record, base, fp_html);
+          printf ("   O resultado da busca foi gravado em \"%s\".\n", HTMLFILE);
+        }
+      else
+        printf ("   Nao foi encontrada nenhuma obra.\n");
+    }
+  else
+    {
+      mrec = memory_index_find (index->pk_list, key);
+
+      if (mrec)
+        {
+          fseek (db->base->fp, mrec->rrn * BASE_REG_SIZE, SEEK_SET);
+          base_read_artwork_info (db->base->fp, &artwork);
+          html_write_record_info (fp_html, &artwork);
+          printf ("   O resultado da busca foi gravado em \"%s\".\n", HTMLFILE);
+        }
+      else
+        printf ("   Nao foi encontrada nenhuma obra.\n");
+    }
+
+  fclose (fp_html);
+
+  if (menuYesOrNo ("   Apagar algum resultado da busca? (s)im, (n)ao? "))
+    adapter_remove (db);
+}
+
+void
 adapter_free (Adapter *db)
 {
   if (db)
@@ -45,6 +108,59 @@ adapter_free (Adapter *db)
       secondary_index_free (db->type_index);
       secondary_index_free (db->year_index);
       free (db);
+    }
+}
+
+void
+adapter_insert (Adapter *db)
+{
+  ArtworkInfo artwork;
+
+  do
+    {
+      base_read_input(&artwork);
+
+      if (memory_index_find (db->pk_index, artwork.title) == NULL)
+        {
+          base_insert(db->base, &artwork);
+
+          memory_index_insert (db->pk_index, artwork.title);
+
+          secondary_index_insert(db->author_index, artwork.author, artwork.title);
+          secondary_index_insert(db->type_index, artwork.type, artwork.title);
+          secondary_index_insert(db->year_index, artwork.year, artwork.title);
+        }
+      else
+        printf ("   Ja existe uma obra com titulo \"%s\".\n", key);
+    } while (menuYesOrNo("\nDeseja inserir mais uma entrada? (s)im, (n)ao? "));
+}
+
+void
+adapter_list (Adapter *db)
+{
+  ArtworkInfo artwork;
+  FILE *fp_html;
+
+  if (memory_index_is_empty (db->pk_index))
+    printf("   O catalogo ainda nao possui obras.\n");
+  else
+    {
+      fp_html = fopen (HTMLFILE, "w");
+      assert (fp_html);
+
+      html_begin (fp_html);
+
+      fseek(base, 0, SEEK_SET);
+      for (i = 0; i < pkindex->regnum; i++) {
+        fseek (db->base->fp, (db->pk_index->reclist[i].rrn) * BASE_REG_SIZE, SEEK_SET);
+        base_read_artwork_record (base, &info);
+        html_write_record_info (fp_html, &info);
+      }
+
+      html_end (fp_html);
+      fclose (fp_html);
+
+      printf ("   Lista \"%s\" gerada com sucesso.\n", HTMLFILE);
     }
 }
 
@@ -84,86 +200,25 @@ adapter_new (void)
 }
 
 void
-adapter_find (Adapter *db)
+adapter_remove (Adapter *db)
 {
   ArtworkInfo artwork;
-  char field;
-  char key[TITLE_LENGTH+1]; /* TITLE_LENGTH is the largest of all lengths */
-  FILE *fp_html;
-  SecondaryIndex *secindex;
- 
-  fp_html = fopen (HTMLFILE, "w");
-  assert (fp_html);
-  html_begin (fp_html);
+  MemoryIndexRecord *mrec;
 
-  field = menuMultipleAnswers ("   Opcao desejada: ", "auit");
-  switch (field)
+  readString ("   Digite o titulo da obra: ", key, TITLE_LENGTH);
+
+  mrec = memory_index_find (db->pk_index, key);
+  if (mrec)
     {
-      case 'a': /* Year */
-        secindex = db->year_index;
-        readString ("   Digite o ano para busca: ", key, YEAR_LENGTH);
-        break;
-      case 'i': /* Type */
-        secindex = db->type_index;
-        readString ("   Digite o tipo para busca: ", key, TYPE_LENGTH);
-        break;
-      case 't': /* Title */
-        readString ("   Digite o titulo para busca: ", key, TITLE_LENGTH);
-        break;
-      case 'u': /* Author */
-        secindex = db->author_index;
-        readString ("   Digite o autor para busca: ", key, AUTHOR_LENGTH);
-        break;
-      default:
-        break;
-    }
+      fseek (db->base->fp, mrec->rrn * BASE_REG_SIZE, SEEK_SET);
+      base_read_artwork_info (db->base->fp, &artwork);
 
-  if (field != 't')
-    {
-      mrec = secondary_index_find (secindex, key);
-
-      if (mrec)
-        secondary_index_foreach (db->author_index, mrec, print_record, base, fp_html);
-      else
-        printf ("   Nao foi encontrada nenhuma obra.\n");
+      base_remove (db->base, mrec->rrn);
+      memory_index_remove (db->pk_index, mrec);
+      secondary_index_remove (db->author_index, artwork.author, key);
+      secondary_index_remove (db->type, artwork.author, key);
+      secondary_index_remove (db->year_index, artwork.author, key);
     }
   else
-    {
-      mrec = memory_index_find (index->pk_list, key);
-
-      if (mrec)
-        {
-          fseek (db->base->fp, mrec->rrn * BASE_REG_SIZE, SEEK_SET);
-          base_read_artwork_info (db->base->fp, &artwork);
-          html_write_record_info (fp_html, &artwork);
-        }
-      else
-        printf ("   Nao foi encontrada nenhuma obra.\n");
-    }
-
-  printf ("O resultado da busca foi gravado em \"%s\".\n", HTMLFILE);
-
-  if (menuYesOrNo ("Apagar algum resultado da busca? (s)im, (n)ao? "))
-    {
-    }
-
-  fclose (fp_html);
-}
-
-insert
-{
-  ArtworkInfo artwork;
-
-  base_read_input(&artwork);
-
-  if (pk_find_rrn(artwork.title) != -1) {
-    base_insert(db->base, &artwork);
-
-    pkListInsert(db->pk_index, artwork.title);
-
-    secondary_index_insert(db->author_index, artwork.author, artwork.title);
-    secondary_index_insert(db->type_index, artwork.type, artwork.title);
-    secondary_index_insert(db->year_index, artwork.year, artwork.title);
-  } else
-    return ERR_REPEATED_PK;
+    printf ("   Nao ha nenhuma obra com titulo \"%s\".\n", key);
 }
