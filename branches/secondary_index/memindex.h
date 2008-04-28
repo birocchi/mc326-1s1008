@@ -1,6 +1,9 @@
 #ifndef __MEMINDEX_H
 #define __MEMINDEX_H
 
+#include <stdlib.h>
+#include "base.h"
+
 typedef struct {
   int  rrn;
   char name[TITLE_LENGTH+1];
