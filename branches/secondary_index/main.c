@@ -1,15 +1,8 @@
-#include <assert.h>
-#include <ctype.h>
-#include <string.h>
+#include <stdio.h>
 #include <stdlib.h>
-#include "avail.h"
-#include "base.h"
-#include "file.h"
-#include "filelist.h"
-#include "html.h"
-#include "io.h"
+#include <string.h>
+#include "adapter.h"
 #include "menu.h"
-#include "pk.h"
 
 int
 main (int argc, char *argv[])

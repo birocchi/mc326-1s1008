@@ -4,6 +4,7 @@
 #include <string.h>
 #include "avail.h"
 #include "base.h"
+#include "file.h"
 #include "io.h"
 #include "mem.h"
 

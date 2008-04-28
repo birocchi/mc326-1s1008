@@ -5,7 +5,15 @@
 #include <string.h>
 #include "adapter.h"
 #include "base.h"
+#include "file.h"
+#include "filelist.h"
+#include "html.h"
+#include "io.h"
+#include "mem.h"
+#include "memindex.h"
 #include "menu.h"
+#include "pk.h"
+#include "secindex.h"
 
 static void
 print_record (const char *name, int rrn, va_list ap)
@@ -23,7 +31,7 @@ print_record (const char *name, int rrn, va_list ap)
     {
       fseek (db->base->fp, rec->rrn * BASE_REG_SIZE, SEEK_SET);
       base_read_artwork_record (db->base->fp, &artwork);
-      html_write_record_info (&artwork, fp_html);
+      html_write_record_info (html_fp, &artwork);
     }
 }
 
@@ -34,7 +42,7 @@ adapter_find (Adapter *db)
   char field;
   char key[TITLE_LENGTH+1]; /* TITLE_LENGTH is the largest of all lengths */
   FILE *fp_html;
-  int nelem;
+  MemoryIndexRecord *mrec;
   SecondaryIndex *secindex;
  
   fp_html = fopen (HTMLFILE, "w");
@@ -67,11 +75,11 @@ adapter_find (Adapter *db)
 
   if (field != 't')
     {
-      mrec = secondary_index_find (secindex, key);
+      mrec = memory_index_find (secindex->record_list, key);
 
       if (mrec)
         {
-          secondary_index_foreach (db->author_index, mrec, print_record, base, fp_html);
+          secondary_index_foreach (db->author_index, mrec, print_record, db->base->fp, fp_html);
           printf ("   O resultado da busca foi gravado em \"%s\".\n", HTMLFILE);
         }
       else
@@ -79,12 +87,12 @@ adapter_find (Adapter *db)
     }
   else
     {
-      mrec = memory_index_find (index->pk_list, key);
+      mrec = memory_index_find (db->pk_index, key);
 
       if (mrec)
         {
           fseek (db->base->fp, mrec->rrn * BASE_REG_SIZE, SEEK_SET);
-          base_read_artwork_info (db->base->fp, &artwork);
+          base_read_artwork_record (db->base->fp, &artwork);
           html_write_record_info (fp_html, &artwork);
           printf ("   O resultado da busca foi gravado em \"%s\".\n", HTMLFILE);
         }
@@ -132,7 +140,7 @@ adapter_insert (Adapter *db)
           secondary_index_insert(db->year_index, artwork.year, artwork.title);
         }
       else
-        printf ("   Ja existe uma obra com titulo \"%s\".\n", key);
+        printf ("   Ja existe uma obra com titulo \"%s\".\n", artwork.title);
     } while (menuYesOrNo("\nDeseja inserir mais uma entrada? (s)im, (n)ao? "));
 }
 
@@ -141,6 +149,7 @@ adapter_list (Adapter *db)
 {
   ArtworkInfo artwork;
   FILE *fp_html;
+  int i;
 
   if (memory_index_is_empty (db->pk_index))
     printf("   O catalogo ainda nao possui obras.\n");
@@ -151,11 +160,11 @@ adapter_list (Adapter *db)
 
       html_begin (fp_html);
 
-      fseek(base, 0, SEEK_SET);
-      for (i = 0; i < pkindex->regnum; i++) {
+      fseek(db->base->fp, 0, SEEK_SET);
+      for (i = 0; i < db->pk_index->regnum; i++) {
         fseek (db->base->fp, (db->pk_index->reclist[i].rrn) * BASE_REG_SIZE, SEEK_SET);
-        base_read_artwork_record (base, &info);
-        html_write_record_info (fp_html, &info);
+        base_read_artwork_record (db->base->fp, &artwork);
+        html_write_record_info (fp_html, &artwork);
       }
 
       html_end (fp_html);
@@ -170,13 +179,13 @@ adapter_load_files (Adapter *db)
 {
   assert (db);
 
-  if ((!fileExists (DBFILE)) || (getFileSizeWithName (DBFILE) < 1))
+  if ((!fileExists (DBFILE)) || (getFileSizeFromName (DBFILE) < 1))
     {
       db->base = base_new (DBFILE, DBFILE_AVAIL, 1);
       db->pk_index = memory_index_new (PKFILE, 0);
-      db->author_index = secondary_index_new (SI_AUTHOR_INDEX, SI_AUTHOR_LIST, SI_AUTHOR_AVAIL. 1);
+      db->author_index = secondary_index_new (SI_AUTHOR_INDEX, SI_AUTHOR_LIST, SI_AUTHOR_AVAIL, 1);
       db->type_index = secondary_index_new (SI_TYPE_INDEX, SI_TYPE_LIST, SI_TYPE_AVAIL, 1);
-      db->year_index = secondary_index_new (SI_YEAR, SI_YEAR_LIST, SI_YEAR_AVAIL, 1);
+      db->year_index = secondary_index_new (SI_YEAR_INDEX, SI_YEAR_LIST, SI_YEAR_AVAIL, 1);
     }
   else
     {
@@ -188,9 +197,9 @@ adapter_load_files (Adapter *db)
           memory_index_load_from_file (db->pk_index, PKFILE);
         }
 
-      db->author_index = secondary_index_new (SI_AUTHOR_INDEX, SI_AUTHOR_LIST, SI_AUTHOR_AVAIL. 0);
+      db->author_index = secondary_index_new (SI_AUTHOR_INDEX, SI_AUTHOR_LIST, SI_AUTHOR_AVAIL, 0);
       db->type_index = secondary_index_new (SI_TYPE_INDEX, SI_TYPE_LIST, SI_TYPE_AVAIL, 0);
-      db->year_index = secondary_index_new (SI_YEAR, SI_YEAR_LIST, SI_YEAR_AVAIL, 0);
+      db->year_index = secondary_index_new (SI_YEAR_INDEX, SI_YEAR_LIST, SI_YEAR_AVAIL, 0);
     }
 }
 
@@ -205,6 +214,7 @@ adapter_remove (Adapter *db)
 {
   ArtworkInfo artwork;
   MemoryIndexRecord *mrec;
+  char key[TITLE_LENGTH+1];
 
   readString ("   Digite o titulo da obra: ", key, TITLE_LENGTH);
 
@@ -212,12 +222,12 @@ adapter_remove (Adapter *db)
   if (mrec)
     {
       fseek (db->base->fp, mrec->rrn * BASE_REG_SIZE, SEEK_SET);
-      base_read_artwork_info (db->base->fp, &artwork);
+      base_read_artwork_record (db->base->fp, &artwork);
 
       base_remove (db->base, mrec->rrn);
       memory_index_remove (db->pk_index, mrec);
       secondary_index_remove (db->author_index, artwork.author, key);
-      secondary_index_remove (db->type, artwork.author, key);
+      secondary_index_remove (db->type_index, artwork.author, key);
       secondary_index_remove (db->year_index, artwork.author, key);
     }
   else

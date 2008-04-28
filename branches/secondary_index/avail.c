@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -77,12 +78,11 @@ avail_list_new (const char *filename, size_t page_size)
 }
 
 int
-avail_list_pop (AvaiList *avlist, FILE *fp)
+avail_list_pop (AvailList *avlist, FILE *fp)
 {
   int prevpos;
 
   assert (avlist != NULL && fp != NULL);
-  assert (page_size > 0);
 
   if (avlist->tail != -1)
     {

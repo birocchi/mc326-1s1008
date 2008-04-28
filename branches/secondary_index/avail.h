@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 typedef struct {
-  const char  *filename;
+  char        *filename;
   size_t      page_size;
   int         tail;
 } AvailList;

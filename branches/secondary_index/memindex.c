@@ -1,7 +1,13 @@
+#define __USE_XOPEN_EXTENDED
+
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include "base.h"
+#include "file.h"
+#include "io.h"
 #include "mem.h"
 #include "memindex.h"
 
@@ -92,7 +98,7 @@ memory_index_insert (MemoryIndex *index, const char *name)
          sizeof (MemoryIndexRecord), memory_index_compare_by_name);
 
   /* Return the inserted entry's RRN */
-  return index->reclist[index->regnum-1];
+  return &index->reclist[index->regnum-1];
 }
 
 int
@@ -153,7 +159,7 @@ memory_index_remove (MemoryIndex *index, MemoryIndexRecord *key)
 {
   int i = 0, j;
 
-  while ((i < index->regnum) && (index->reclist[i] != key))
+  while ((i < index->regnum) && (&index->reclist[i] != key))
     i++;
 
   if (i == index->regnum) /* Match not found, leave function */
