@@ -9,7 +9,6 @@
 
 typedef struct {
   AvailList       *avlist;
-  char            *fp_index_name;
   FILE            *fp_list;
   MemoryIndex     *record_list;
 } SecondaryIndex;

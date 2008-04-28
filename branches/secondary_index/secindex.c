@@ -48,7 +48,6 @@ secondary_index_free (SecondaryIndex *index)
       avail_list_free (index->avlist);
       memory_index_free (index->record_list);
       fclose (index->fp_list);
-      free (index->fp_index_name);
       free (index);
     }
 }
@@ -56,10 +55,36 @@ secondary_index_free (SecondaryIndex *index)
 void
 secondary_index_insert (SecondaryIndex *si_index, const char *si_value, const char *pk_value)
 {
-  int newrrn, writepos;
+  int nextnode, newrrn, writepos;
   MemoryIndexRecord *rec;
 
+  if (avail_list_is_empty (si_index->avlist))
+    {
+      fseek (si_index->fp_list, 0, SEEK_END);
+      newrrn = si_index->record_list->regnum;
+    }
+  else
+    {
+      writepos = avail_list_pop (si_index->avlist, si_index->fp_list);
+      fseek (si_index->fp_list, writepos, SEEK_SET);
+      newrrn = writepos / si_index->avlist->page_size;
+    }
+
   rec = memory_index_find (si_index->record_list, si_value);
+  if (!rec)
+    {
+      rec = memory_index_insert (si_index->record_list, si_value);
+      nextnode = -1;
+    }
+  else
+    nextnode = rec->rrn;
+
+  fprintf (si_index->fp_list, "%-200s%04d", pk_value, nextnode);
+  fflush (si_index->fp_list);
+
+  rec->rrn = newrrn;
+
+#if 0
   if (rec)
     newrrn = si_index->record_list->regnum + 1;
   else
@@ -76,10 +101,9 @@ secondary_index_insert (SecondaryIndex *si_index, const char *si_value, const ch
       fseek (si_index->fp_list, writepos, SEEK_SET);
     }
 
-  fprintf (si_index->fp_list, "%-200s%04d", pk_value, rec->rrn);
-  fflush (si_index->fp_list);
 
   rec->rrn = newrrn;
+#endif
 }
 
 SecondaryIndex *
@@ -96,7 +120,7 @@ secondary_index_new (const char *indexname, const char *listname, const char *av
       avail_list_load (s->avlist);
     }
 
-  s->fp_list = fopen (listname, (!writeonly && fileExists(listname) ? "r+" : "w"));
+  s->fp_list = fopen (listname, (!writeonly && fileExists(listname) ? "r+" : "w+"));
   assert (s->fp_list);
 
   return s;
