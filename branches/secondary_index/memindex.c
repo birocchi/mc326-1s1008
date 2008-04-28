@@ -1,5 +1,3 @@
-#define __USE_XOPEN_EXTENDED
-
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>

@@ -73,6 +73,19 @@ void readValue(char s[], size_t length)
   stripWhiteSpace(s);
 }
 
+char *
+strdup (const char *s)
+{
+  int len;
+  char *dup;
+
+  len = strlen (s);
+  dup = MEM_ALLOC_N (char, len);
+  strncpy (dup, s, len);
+
+  return dup;
+}
+
 void stripNewLine(char s[])
 {
   char* pos = strchr(s, '\n');
