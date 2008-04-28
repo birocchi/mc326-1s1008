@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include "avail.h"
 #include "base.h"
 #include "file.h"
@@ -59,13 +60,13 @@ secondary_index_insert (SecondaryIndex *si_index, const char *si_value, const ch
   int newrrn, writepos;
   MemoryIndexRecord *rec;
 
-  rec = memory_index_find (si_index, si_value);
+  rec = memory_index_find (si_index->record_list, si_value);
   if (rec)
-    newrrn = si_index->regnum + 1;
+    newrrn = si_index->record_list->regnum + 1;
   else
     {
-      rec = memory_index_insert (si_index, si_value);
-      newrrn = si_index->regnum;
+      rec = memory_index_insert (si_index->record_list, si_value);
+      newrrn = si_index->record_list->regnum;
     }
 
   if (avail_list_is_empty (si_index->avlist))
@@ -111,7 +112,7 @@ secondary_index_remove (SecondaryIndex *index, const char *sec_value, const char
 
   assert (index != NULL);
 
-  rec = memory_index_find (index, sec_value);
+  rec = memory_index_find (index->record_list, sec_value);
   if (rec)
     {
       curnode = rec->rrn;
