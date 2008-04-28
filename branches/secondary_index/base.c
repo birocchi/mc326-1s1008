@@ -66,7 +66,7 @@ base_remove (Base *base, int rrn)
   assert (base != NULL);
 
   fseek (base->fp, rrn * BASE_REG_SIZE, SEEK_SET);
-  fprintf (base->fp, "%s", atoi (avail_list_get_tail (base->avlist)));
+  fprintf (base->fp, "%s", avail_list_get_tail (base->avlist));
 
   avail_list_push (base->avlist, rrn);
 }
@@ -160,7 +160,7 @@ base_read_artwork_record (FILE *base, ArtworkInfo *info)
 void
 base_write_data(FILE *file, ArtworkInfo *info)
 {
-  assert(file != NULL and info != NULL);
+  assert(file != NULL && info != NULL);
 
   fprintf(file, "%-200s",   info->title);
   fprintf(file, "%-100s",   info->type);
