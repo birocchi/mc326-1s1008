@@ -74,7 +74,7 @@ void readValue(char s[], size_t length)
 }
 
 char *
-strdup (const char *s)
+str_dup (const char *s)
 {
   int len;
   char *dup;

@@ -62,7 +62,7 @@ void readString(const char* inputText, char* dest, size_t length);
  */
 void readValue(char s[], size_t length);
 
-char* strdup (const char *s);
+char* str_dup (const char *s);
 
 /**
  * \brief Replaces the trailing '\\n' character (if it exists) in a string
