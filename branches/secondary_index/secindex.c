@@ -83,27 +83,6 @@ secondary_index_insert (SecondaryIndex *si_index, const char *si_value, const ch
   fflush (si_index->fp_list);
 
   rec->rrn = newrrn;
-
-#if 0
-  if (rec)
-    newrrn = si_index->record_list->regnum + 1;
-  else
-    {
-      rec = memory_index_insert (si_index->record_list, si_value);
-      newrrn = si_index->record_list->regnum;
-    }
-
-  if (avail_list_is_empty (si_index->avlist))
-    fseek (si_index->fp_list, 0, SEEK_END);
-  else
-    {
-      writepos = avail_list_pop (si_index->avlist, si_index->fp_list);
-      fseek (si_index->fp_list, writepos, SEEK_SET);
-    }
-
-
-  rec->rrn = newrrn;
-#endif
 }
 
 SecondaryIndex *
