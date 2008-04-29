@@ -124,7 +124,7 @@ adapter_find (Adapter *db)
 
       if (mrec)
         {
-          secondary_index_foreach (db->author_index, mrec, print_record, db, fp_html);
+          secondary_index_foreach (secindex, mrec, print_record, db, fp_html);
           printf ("   O resultado da busca foi gravado em \"%s\".\n", HTMLFILE);
         }
       else
