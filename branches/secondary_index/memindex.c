@@ -130,6 +130,8 @@ memory_index_load_from_file (MemoryIndex *index, const char *filename)
       rrn = atoi (strrrn);
 
       index->reclist[i].rrn = rrn;
+
+      index->regnum++;
     }
 
   fclose (fp);
