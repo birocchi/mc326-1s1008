@@ -5,8 +5,8 @@
 #include "base.h"
 
 /** Relative record number: 32-bit integer (4 bytes) */
-#define RRN_LENGTH 4
-#define MEM_REG_SIZE (TITLE_LENGTH + RRN_LENGTH)
+#define RRN_LENGTH    4
+#define MEM_REG_SIZE  (TITLE_LENGTH + RRN_LENGTH)
 
 typedef struct {
   int  rrn;

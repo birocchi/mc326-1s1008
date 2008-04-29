@@ -23,24 +23,24 @@ enum {
 };
 
 static void
-load_files_from_base (Adapter *db, int flags)
+load_files_from_base (Adapter *db, int loadflags)
 {
   ArtworkInfo artwork;
   FILE *base = db->base->fp;
   int i, baselen;
 
-  if ((!base) || (!flags))
+  if ((!base) || (!loadflags))
     return;
 
   baselen = getFileSize (base) / BASE_REG_SIZE;
 
-  if (flags & LOAD_BASE_PK)
+  if (loadflags & LOAD_BASE_PK)
     db->pk_index = memory_index_new (PKFILE, 0);
-  if (flags & LOAD_BASE_AUTHOR)
+  if (loadflags & LOAD_BASE_AUTHOR)
     db->author_index = secondary_index_new (SI_AUTHOR_INDEX, SI_AUTHOR_LIST, SI_AUTHOR_AVAIL, 1);
-  if (flags & LOAD_BASE_TYPE)
+  if (loadflags & LOAD_BASE_TYPE)
     db->type_index = secondary_index_new (SI_TYPE_INDEX, SI_TYPE_LIST, SI_TYPE_AVAIL, 1);
-  if (flags & LOAD_BASE_YEAR)
+  if (loadflags & LOAD_BASE_YEAR)
     db->year_index = secondary_index_new (SI_YEAR_INDEX, SI_YEAR_LIST, SI_YEAR_AVAIL, 1);
 
   fseek (base, 0, SEEK_SET);
@@ -49,13 +49,13 @@ load_files_from_base (Adapter *db, int flags)
     {
       base_read_artwork_record (base, &artwork);
 
-      if (flags & LOAD_BASE_PK)
+      if (loadflags & LOAD_BASE_PK)
         memory_index_insert (db->pk_index, artwork.title, db->pk_index->regnum);
-      if (flags & LOAD_BASE_AUTHOR)
+      if (loadflags & LOAD_BASE_AUTHOR)
         secondary_index_insert (db->author_index, artwork.author, artwork.title);
-      if (flags & LOAD_BASE_TYPE)
+      if (loadflags & LOAD_BASE_TYPE)
         secondary_index_insert (db->type_index, artwork.type, artwork.title);
-      if (flags & LOAD_BASE_YEAR)
+      if (loadflags & LOAD_BASE_YEAR)
         secondary_index_insert (db->year_index, artwork.year, artwork.title);
     }
 }
@@ -86,13 +86,10 @@ adapter_find (Adapter *db)
   char field;
   char key[TITLE_LENGTH+1]; /* TITLE_LENGTH is the largest of all lengths */
   FILE *fp_html;
-  MemoryIndexRecord *mrec;
-  SecondaryIndex *secindex;
+  MemoryIndex *mindex      = NULL;
+  MemoryIndexRecord *mrec  = NULL;
+  SecondaryIndex *secindex = NULL;
  
-  fp_html = fopen (HTMLFILE, "w");
-  assert (fp_html);
-  html_begin (fp_html);
-
   printConsultMenu();
 
   field = menuMultipleAnswers ("   Opcao desejada: ", "auit");
@@ -100,55 +97,53 @@ adapter_find (Adapter *db)
     {
       case 'a': /* Year */
         secindex = db->year_index;
+        mindex   = secindex->record_list;
         readString ("   Digite o ano para busca: ", key, YEAR_LENGTH);
         break;
       case 'i': /* Type */
         secindex = db->type_index;
+        mindex   = secindex->record_list;
         readString ("   Digite o tipo para busca: ", key, TYPE_LENGTH);
         break;
       case 't': /* Title */
+        mindex   = db->pk_index;
         readString ("   Digite o titulo para busca: ", key, TITLE_LENGTH);
         break;
       case 'u': /* Author */
         secindex = db->author_index;
+        mindex   = secindex->record_list;
         readString ("   Digite o autor para busca: ", key, AUTHOR_LENGTH);
         break;
       default:
         break;
     }
 
-  if (field != 't')
+  mrec = memory_index_find (mindex, key);
+  if (mrec)
     {
-      mrec = memory_index_find (secindex->record_list, key);
+      fp_html = fopen (HTMLFILE, "w");
+      assert (fp_html);
+      html_begin (fp_html);
 
-      if (mrec)
-        {
-          secondary_index_foreach (secindex, mrec, print_record, db, fp_html);
-          printf ("   O resultado da busca foi gravado em \"%s\".\n", HTMLFILE);
-        }
+      if (secindex)
+        secondary_index_foreach (secindex, mrec, print_record, db, fp_html);
       else
-        printf ("   Nao foi encontrada nenhuma obra.\n");
-    }
-  else
-    {
-      mrec = memory_index_find (db->pk_index, key);
-
-      if (mrec)
         {
           fseek (db->base->fp, mrec->rrn * BASE_REG_SIZE, SEEK_SET);
           base_read_artwork_record (db->base->fp, &artwork);
           html_write_record_info (fp_html, &artwork);
-          printf ("   O resultado da busca foi gravado em \"%s\".\n", HTMLFILE);
         }
-      else
-        printf ("   Nao foi encontrada nenhuma obra.\n");
+
+      printf ("   O resultado da busca foi gravado em \"%s\".\n", HTMLFILE);
+
+      html_end (fp_html);
+      fclose (fp_html);
+
+      if (menuYesOrNo ("   Apagar algum resultado da busca? (s)im, (n)ao? "))
+        adapter_remove (db);
     }
-
-  html_end (fp_html);
-  fclose (fp_html);
-
-  if (menuYesOrNo ("   Apagar algum resultado da busca? (s)im, (n)ao? "))
-    adapter_remove (db);
+  else
+    printf ("Nao foi encontrada nenhuma obra.");
 }
 
 void
