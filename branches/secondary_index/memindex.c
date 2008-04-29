@@ -80,8 +80,8 @@ memory_index_free (MemoryIndex *index)
     }
 }
 
-MemoryIndexRecord *
-memory_index_insert (MemoryIndex *index, const char *name)
+void
+memory_index_insert (MemoryIndex *index, const char *name, int rrn)
 {
   assert (index && name);
 
@@ -89,15 +89,11 @@ memory_index_insert (MemoryIndex *index, const char *name)
     inflate_list (index, index->maxregs * 2);
 
   strncpy (index->reclist[index->regnum].name, name, TITLE_LENGTH+1);
-
-  index->reclist[index->regnum].rrn = index->regnum;
+  index->reclist[index->regnum].rrn = rrn;
   index->regnum++;
 
   qsort (index->reclist, index->regnum,
          sizeof (MemoryIndexRecord), memory_index_compare_by_name);
-
-  /* Return the inserted entry's RRN */
-  return &index->reclist[index->regnum-1];
 }
 
 int

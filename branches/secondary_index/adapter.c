@@ -50,7 +50,7 @@ load_files_from_base (Adapter *db, int flags)
       base_read_artwork_record (base, &artwork);
 
       if (flags & LOAD_BASE_PK)
-        memory_index_insert (db->pk_index, artwork.title);
+        memory_index_insert (db->pk_index, artwork.title, db->pk_index->regnum);
       if (flags & LOAD_BASE_AUTHOR)
         secondary_index_insert (db->author_index, artwork.author, artwork.title);
       if (flags & LOAD_BASE_TYPE)
@@ -178,7 +178,7 @@ adapter_insert (Adapter *db)
         {
           base_insert(db->base, &artwork);
 
-          memory_index_insert (db->pk_index, artwork.title);
+          memory_index_insert (db->pk_index, artwork.title, db->pk_index->regnum);
 
           secondary_index_insert(db->author_index, artwork.author, artwork.title);
           secondary_index_insert(db->type_index, artwork.type, artwork.title);

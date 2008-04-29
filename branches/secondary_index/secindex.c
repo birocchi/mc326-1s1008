@@ -61,7 +61,7 @@ secondary_index_insert (SecondaryIndex *si_index, const char *si_value, const ch
   if (avail_list_is_empty (si_index->avlist))
     {
       fseek (si_index->fp_list, 0, SEEK_END);
-      newrrn = si_index->record_list->regnum;
+      newrrn = getFileSize (si_index->fp_list) / si_index->avlist->page_size;
     }
   else
     {
@@ -73,16 +73,17 @@ secondary_index_insert (SecondaryIndex *si_index, const char *si_value, const ch
   rec = memory_index_find (si_index->record_list, si_value);
   if (!rec)
     {
-      rec = memory_index_insert (si_index->record_list, si_value);
+      memory_index_insert (si_index->record_list, si_value, newrrn);
       nextnode = -1;
     }
   else
-    nextnode = rec->rrn;
+    {
+      nextnode = rec->rrn;
+      rec->rrn = newrrn;
+    }
 
   fprintf (si_index->fp_list, "%-200s%04d", pk_value, nextnode);
   fflush (si_index->fp_list);
-
-  rec->rrn = newrrn;
 }
 
 SecondaryIndex *
