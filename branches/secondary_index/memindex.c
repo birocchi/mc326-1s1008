@@ -124,12 +124,11 @@ memory_index_load_from_file (MemoryIndex *index, const char *filename)
   for (i = 0; i < regnum; i++ )
     {  
       fgets (index->reclist[i].name, TITLE_LENGTH+1, fp);
+      fgets (strrrn, RRN_LENGTH+1, fp);
 
-      /* Strip trailing whitespaces from the name */
-      stripWhiteSpace(index->reclist[i].name);
+      stripWhiteSpace (index->reclist[i].name);
+      rrn = atoi (strrrn);
 
-      fgets(strrrn, RRN_LENGTH+1, fp);
-      rrn = atoi(strrrn);
       index->reclist[i].rrn = rrn;
     }
 
