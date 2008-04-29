@@ -55,8 +55,8 @@ bsearch_find_by_name (const void* a, const void* b)
 int
 memory_index_compare_by_name (const void *a, const void *b)
 {
-  return strncmp (((MemoryIndexRecord*)a)->name,
-                  ((MemoryIndexRecord*)b)->name, TITLE_LENGTH);
+  return strcasecmp (((MemoryIndexRecord*)a)->name,
+                     ((MemoryIndexRecord*)b)->name);
 }
 
 MemoryIndexRecord *
