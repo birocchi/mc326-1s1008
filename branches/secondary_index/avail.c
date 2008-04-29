@@ -62,7 +62,7 @@ avail_list_load (AvailList *avlist)
   
   fp = fopen (avlist->filename, "r");
   assert (fp);
-  fscanf (fp, "%04d", &(avlist->tail));
+  fscanf (fp, "%d", &(avlist->tail));
   fclose (fp);
 }
 
