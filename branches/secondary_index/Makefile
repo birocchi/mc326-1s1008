@@ -10,7 +10,7 @@
 CC=gcc
 CFLAGS=-c -Wall -g -ansi -pedantic
 LDFLAGS=#-lefence
-OFILES=adapter.o avail.o base.o file.o io.o html.o main.o mem.o memindex.o menu.o pk.o secindex.o
+OFILES=adapter.o avail.o base.o file.o io.o html.o main.o mem.o memindex.o menu.o secindex.o
 
 TP=tp3
 
@@ -47,9 +47,6 @@ memindex.o: memindex.c memindex.h
 	$(CC) $(CFLAGS) $<
 
 menu.o: menu.c menu.h
-	$(CC) $(CFLAGS) $<
-
-pk.o: pk.c pk.h
 	$(CC) $(CFLAGS) $<
 
 secindex.o: secindex.c secindex.h

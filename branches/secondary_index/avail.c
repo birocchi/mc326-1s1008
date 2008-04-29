@@ -7,7 +7,6 @@
 #include "file.h"
 #include "io.h"
 #include "mem.h"
-#include "pk.h"
 #include "avail.h"
 
 static void

@@ -15,10 +15,10 @@ flush_to_disk (MemoryIndex *index)
   int i;
   FILE *fp;
 
-  assert (index != NULL);
+  assert (index);
 
   fp = fopen (index->fp_name, "w");
-  assert (fp != NULL);
+  assert (fp);
 
   for (i = 0; i < index->regnum; i++)
     {
@@ -34,12 +34,13 @@ inflate_list (MemoryIndex *index, size_t size)
 {
   MemoryIndexRecord *tmp;
 
-  assert (index != NULL);
+  assert (index);
+  assert (size > index->maxregs);
 
   if (size > index->maxregs)
     {
       tmp = realloc(index->reclist, size * sizeof (MemoryIndexRecord));
-      assert(tmp != NULL);
+      assert(tmp);
 
       index->reclist = tmp;
       index->maxregs = size;
@@ -52,7 +53,7 @@ bsearch_find_by_name (const void* a, const void* b)
   return strcasecmp ((char*)a, ((MemoryIndexRecord*)b)->name);
 }
 
-int
+static int
 memory_index_compare_by_name (const void *a, const void *b)
 {
   return strcasecmp (((MemoryIndexRecord*)a)->name,
@@ -62,7 +63,7 @@ memory_index_compare_by_name (const void *a, const void *b)
 MemoryIndexRecord *
 memory_index_find (MemoryIndex *index, const char *name)
 {
-  assert (index != NULL);
+  assert (index);
 
   return bsearch (name, index->reclist, index->regnum,
                   sizeof (MemoryIndexRecord), bsearch_find_by_name);
@@ -110,19 +111,19 @@ memory_index_load_from_file (MemoryIndex *index, const char *filename)
   int i, rrn;
   size_t regnum;
 
-  assert (index != NULL);
+  assert (index);
 
   if (!fileExists (filename))
     return;
 
   fp = fopen (filename, "r");
-  assert (fp != NULL);
+  assert (fp);
 
   regnum = getFileSize (fp) / MEM_REG_SIZE;
   inflate_list (index, regnum);
 
   for (i = 0; i < regnum; i++ )
-    {  
+    {
       fgets (index->reclist[i].name, TITLE_LENGTH+1, fp);
       fgets (strrrn, RRN_LENGTH+1, fp);
 
@@ -130,7 +131,6 @@ memory_index_load_from_file (MemoryIndex *index, const char *filename)
       rrn = atoi (strrrn);
 
       index->reclist[i].rrn = rrn;
-
       index->regnum++;
     }
 

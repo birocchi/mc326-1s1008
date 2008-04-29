@@ -12,7 +12,6 @@
 #include "mem.h"
 #include "memindex.h"
 #include "menu.h"
-#include "pk.h"
 #include "secindex.h"
 
 enum {
