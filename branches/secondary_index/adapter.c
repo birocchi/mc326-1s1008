@@ -72,12 +72,11 @@ print_record (const char *name, int rrn, va_list ap)
   html_fp = va_arg(ap, FILE*);
 
   rec = memory_index_find (db->pk_index, name);
-  if (rec)
-    {
-      fseek (db->base->fp, rec->rrn * BASE_REG_SIZE, SEEK_SET);
-      base_read_artwork_record (db->base->fp, &artwork);
-      html_write_record_info (html_fp, &artwork);
-    }
+  assert (rec);
+
+  fseek (db->base->fp, rec->rrn * BASE_REG_SIZE, SEEK_SET);
+  base_read_artwork_record (db->base->fp, &artwork);
+  html_write_record_info (html_fp, &artwork);
 }
 
 void
@@ -145,6 +144,7 @@ adapter_find (Adapter *db)
         printf ("   Nao foi encontrada nenhuma obra.\n");
     }
 
+  html_end (fp_html);
   fclose (fp_html);
 
   if (menuYesOrNo ("   Apagar algum resultado da busca? (s)im, (n)ao? "))
