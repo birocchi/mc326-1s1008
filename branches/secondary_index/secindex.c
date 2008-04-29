@@ -13,10 +13,10 @@
 #include "secindex.h"
 
 void
-secondary_index_foreach (SecondaryIndex *index, MemoryIndexRecord *record,
-                         void (*callback)(const char*, int, va_list), ...)
+secondary_index_foreach (SecondaryIndex * index, MemoryIndexRecord * record,
+                         void (*callback) (const char *, int, va_list), ...)
 {
-  char tmpname[TITLE_LENGTH+1], tmprrn[RRN_LENGTH+1];
+  char tmpname[TITLE_LENGTH + 1], tmprrn[RRN_LENGTH + 1];
   int node, nextnode;
   va_list ap;
 
@@ -26,11 +26,11 @@ secondary_index_foreach (SecondaryIndex *index, MemoryIndexRecord *record,
   while (node != -1)
     {
       fseek (index->fp_list, node * MEM_REG_SIZE, SEEK_SET);
-      fgets (tmpname, TITLE_LENGTH+1, index->fp_list);
-      fgets (tmprrn, RRN_LENGTH+1, index->fp_list);
+      fgets (tmpname, TITLE_LENGTH + 1, index->fp_list);
+      fgets (tmprrn, RRN_LENGTH + 1, index->fp_list);
 
-      stripWhiteSpace(tmpname);
-      nextnode = atoi(tmprrn);
+      stripWhiteSpace (tmpname);
+      nextnode = atoi (tmprrn);
 
       callback (tmpname, nextnode, ap);
 
@@ -41,7 +41,7 @@ secondary_index_foreach (SecondaryIndex *index, MemoryIndexRecord *record,
 }
 
 void
-secondary_index_free (SecondaryIndex *index)
+secondary_index_free (SecondaryIndex * index)
 {
   if (index)
     {
@@ -53,7 +53,8 @@ secondary_index_free (SecondaryIndex *index)
 }
 
 void
-secondary_index_insert (SecondaryIndex *si_index, const char *si_value, const char *pk_value)
+secondary_index_insert (SecondaryIndex * si_index, const char *si_value,
+                        const char *pk_value)
 {
   int nextnode, newrrn, writepos;
   MemoryIndexRecord *rec;
@@ -87,7 +88,8 @@ secondary_index_insert (SecondaryIndex *si_index, const char *si_value, const ch
 }
 
 SecondaryIndex *
-secondary_index_new (const char *indexname, const char *listname, const char *avname, int writeonly)
+secondary_index_new (const char *indexname, const char *listname,
+                     const char *avname, int writeonly)
 {
   SecondaryIndex *s = MEM_ALLOC (SecondaryIndex);
 
@@ -100,17 +102,19 @@ secondary_index_new (const char *indexname, const char *listname, const char *av
       avail_list_load (s->avlist);
     }
 
-  s->fp_list = fopen (listname, (!writeonly && fileExists(listname) ? "r+" : "w+"));
+  s->fp_list =
+    fopen (listname, (!writeonly && fileExists (listname) ? "r+" : "w+"));
   assert (s->fp_list);
 
   return s;
 }
 
 void
-secondary_index_remove (SecondaryIndex *index, const char *sec_value, const char *pk_value)
+secondary_index_remove (SecondaryIndex * index, const char *sec_value,
+                        const char *pk_value)
 {
   MemoryIndexRecord *rec;
-  char tmpname[TITLE_LENGTH+1], tmprrn[RRN_LENGTH+1];
+  char tmpname[TITLE_LENGTH + 1], tmprrn[RRN_LENGTH + 1];
   int prevnode = -1, curnode, nextnode;
 
   assert (index != NULL);
@@ -123,8 +127,8 @@ secondary_index_remove (SecondaryIndex *index, const char *sec_value, const char
       while (curnode != -1)
         {
           fseek (index->fp_list, curnode * MEM_REG_SIZE, SEEK_SET);
-          fgets (tmpname, TITLE_LENGTH+1, index->fp_list);
-          fgets (tmprrn, RRN_LENGTH+1, index->fp_list);
+          fgets (tmpname, TITLE_LENGTH + 1, index->fp_list);
+          fgets (tmprrn, RRN_LENGTH + 1, index->fp_list);
 
           stripWhiteSpace (tmpname);
           nextnode = atoi (tmprrn);
@@ -133,22 +137,23 @@ secondary_index_remove (SecondaryIndex *index, const char *sec_value, const char
             {
               if (prevnode == -1)
                 rec->rrn = nextnode;
-              else  /* Not the head node, no need to update the index */
+              else              /* Not the head node, no need to update the index */
                 {
-                  fseek (index->fp_list, (prevnode * MEM_REG_SIZE) + TITLE_LENGTH, SEEK_SET);
+                  fseek (index->fp_list,
+                         (prevnode * MEM_REG_SIZE) + TITLE_LENGTH, SEEK_SET);
                   fprintf (index->fp_list, "%04d", nextnode);
                 }
 
-                avail_list_push (index->avlist, curnode);
+              avail_list_push (index->avlist, curnode);
 
               break;
             }
 
           prevnode = curnode;
-          curnode  = nextnode;
+          curnode = nextnode;
 
           if (rec->rrn == -1)
-           memory_index_remove (index->record_list, rec);
+            memory_index_remove (index->record_list, rec);
         }
     }
 }

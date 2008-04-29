@@ -10,7 +10,7 @@
 #include "avail.h"
 
 static void
-avail_list_write (AvailList *avlist)
+avail_list_write (AvailList * avlist)
 {
   FILE *fp;
 
@@ -23,7 +23,7 @@ avail_list_write (AvailList *avlist)
 }
 
 void
-avail_list_free (AvailList *avlist)
+avail_list_free (AvailList * avlist)
 {
   if (avlist)
     {
@@ -34,7 +34,7 @@ avail_list_free (AvailList *avlist)
 }
 
 int
-avail_list_get_tail (AvailList *avlist)
+avail_list_get_tail (AvailList * avlist)
 {
   assert (avlist != NULL);
 
@@ -42,7 +42,7 @@ avail_list_get_tail (AvailList *avlist)
 }
 
 int
-avail_list_is_empty (AvailList *avlist)
+avail_list_is_empty (AvailList * avlist)
 {
   assert (avlist != NULL);
 
@@ -50,15 +50,15 @@ avail_list_is_empty (AvailList *avlist)
 }
 
 void
-avail_list_load (AvailList *avlist)
+avail_list_load (AvailList * avlist)
 {
   FILE *fp;
 
   assert (avlist);
 
-  if (!fileExists(avlist->filename))
+  if (!fileExists (avlist->filename))
     return;
-  
+
   fp = fopen (avlist->filename, "r");
   assert (fp);
   fscanf (fp, "%d", &(avlist->tail));
@@ -79,7 +79,7 @@ avail_list_new (const char *filename, size_t page_size)
 }
 
 int
-avail_list_pop (AvailList *avlist, FILE *fp)
+avail_list_pop (AvailList * avlist, FILE * fp)
 {
   int prevpos;
 
@@ -99,7 +99,7 @@ avail_list_pop (AvailList *avlist, FILE *fp)
 }
 
 void
-avail_list_push (AvailList *avlist, int pos)
+avail_list_push (AvailList * avlist, int pos)
 {
   avlist->tail = pos;
 }
