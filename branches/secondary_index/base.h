@@ -4,12 +4,12 @@
 #include <stdio.h>
 #include "avail.h"
 
-#define TITLE_LENGTH   200 
-#define TYPE_LENGTH    100 
-#define AUTHOR_LENGTH  125 
-#define YEAR_LENGTH    4   
-#define VALUE_LENGTH   12  
-#define IMG_LENGTH     9   
+#define TITLE_LENGTH   200
+#define TYPE_LENGTH    100
+#define AUTHOR_LENGTH  125
+#define YEAR_LENGTH    4
+#define VALUE_LENGTH   12
+#define IMG_LENGTH     9
 
 /**
  * Total size of the register.
@@ -26,29 +26,30 @@
 typedef struct
 {
   /** The artwork's title  */
-  char title[TITLE_LENGTH+1]; 
+  char title[TITLE_LENGTH + 1];
   /** The artwork's type  */
-  char type[TYPE_LENGTH+1];
+  char type[TYPE_LENGTH + 1];
   /** The artworks author */
-  char author[AUTHOR_LENGTH+1];
+  char author[AUTHOR_LENGTH + 1];
   /** The year the artwork was made */
-  char year[YEAR_LENGTH+1];
+  char year[YEAR_LENGTH + 1];
  /** The artwork's value */
-  char value[VALUE_LENGTH+1];      
+  char value[VALUE_LENGTH + 1];
   /** The register's identifier */
-  char img[IMG_LENGTH+1];  
+  char img[IMG_LENGTH + 1];
 } ArtworkInfo;
 
-typedef struct {
-  AvailList       *avlist;
-  FILE            *fp;
+typedef struct
+{
+  AvailList *avlist;
+  FILE *fp;
 } Base;
 
-void base_free (Base *b);
-void base_insert (Base *base, ArtworkInfo *info);
-Base* base_new (const char *basename, const char *availname, int writeonly);
-void base_remove (Base *base, int rrn);
-void base_read_input(ArtworkInfo* info);
+void base_free (Base * b);
+void base_insert (Base * base, ArtworkInfo * info);
+Base *base_new (const char *basename, const char *availname, int writeonly);
+void base_remove (Base * base, int rrn);
+void base_read_input (ArtworkInfo * info);
 
 /**
  * Makes the image identifier into an actual file name.
@@ -59,7 +60,7 @@ void base_read_input(ArtworkInfo* info);
  * @return Pointer to the correct string. One must free this pointer later on.
  *
  */
-char* baseGetValidImagePath(const char* s);
+char *baseGetValidImagePath (const char *s);
 
 /**
  * Checks if the image identifier is valid.
@@ -70,7 +71,7 @@ char* baseGetValidImagePath(const char* s);
  * 
  * @return Returns 1 on error and 0 for OK.
  */
-int baseIsValidIdentifier(const char* name);
+int baseIsValidIdentifier (const char *name);
 
 /**
  * \brief Reads one record from the database file \a base and
@@ -79,7 +80,7 @@ int baseIsValidIdentifier(const char* name);
  * \param base File pointer to the database.
  * \param info Pointer to ArtworkInfo structure with info about the register.
  */
-void base_read_artwork_record(FILE *base, ArtworkInfo *info);
+void base_read_artwork_record (FILE * base, ArtworkInfo * info);
 
 /**
  * Writes the data from the struct pointed at by *info
@@ -89,6 +90,6 @@ void base_read_artwork_record(FILE *base, ArtworkInfo *info);
  * @param file File pointer to the database.
  * @param info Pointer to ArtworkInfo structure with info about the register.
  */
-void base_write_data(FILE *file, ArtworkInfo *info);
+void base_write_data (FILE * file, ArtworkInfo * info);
 
 #endif

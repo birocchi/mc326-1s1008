@@ -7,13 +7,13 @@
 /**
  * \brief The group number used in the image identifier.
  */
-#define GROUP_NUMBER "01" 
+#define GROUP_NUMBER "01"
 
 /**
  * \brief Flushes stdin to remove any leftover characters which
  *        may still be lying around.
  */
-void flushBuffer(void);
+void flushBuffer (void);
 
 /**
  * \brief Wrapper around readValue to read a single character (and
@@ -26,7 +26,7 @@ void flushBuffer(void);
  * \retval -1 Error.
  * \retval 0 Success.
  */
-int readChar(char* c);
+int readChar (char *c);
 
 /**
  * \brief Reads input and checks if it's a valid integer. If not,
@@ -38,7 +38,7 @@ int readChar(char* c);
  * \param dest      Pointer to the place where we want to store the input.
  * \param length    The maximum number of characters that can be stored.
  */
-void readInt(const char* inputText, char* dest, size_t length);
+void readInt (const char *inputText, char *dest, size_t length);
 
 /**
  * \brief Read input from the user until it is not null.
@@ -49,7 +49,7 @@ void readInt(const char* inputText, char* dest, size_t length);
  * \param dest      Pointer to the place where we want to store the input.
  * \param length    The maximum number of characters that can be stored.
  */
-void readString(const char* inputText, char* dest, size_t length);
+void readString (const char *inputText, char *dest, size_t length);
 
 /**
  * \brief Read at most length bytes frm stdin. Strip trailing whitespace and
@@ -60,9 +60,17 @@ void readString(const char* inputText, char* dest, size_t length);
  * \param s       Where to store the input.
  * \param length  The maximum number of characters that can be stored.
  */
-void readValue(char s[], size_t length);
+void readValue (char s[], size_t length);
 
-char* str_dup (const char *s);
+/**
+ * @brief strdup implementation.
+ * @param s String to duplicate.
+ * @return Pointer to a newly allocated copy of \a s.
+ *
+ * This is a small strdup implementation, as strdup itself is
+ * not part of ISO C.
+ */
+char *str_dup (const char *s);
 
 /**
  * \brief Replaces the trailing '\\n' character (if it exists) in a string
@@ -72,7 +80,7 @@ char* str_dup (const char *s);
  *
  * \param s The string which should be stripped.
  */
-void stripNewLine(char s[]);
+void stripNewLine (char s[]);
 
 /**
  * \brief Removes whitespace from the beginning and the end of the string,
@@ -80,6 +88,6 @@ void stripNewLine(char s[]);
  *
  * \param str The string which should be stripped.
  */
-void stripWhiteSpace(char str[]);
+void stripWhiteSpace (char str[]);
 
 #endif
