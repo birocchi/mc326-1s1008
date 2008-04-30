@@ -12,7 +12,9 @@ void
 base_free (Base * b)
 {
   if (b)
+    /* If b is allocated.. */
     {
+      /* Free and close everyhing. */
       avail_list_free (b->avlist);
       fclose (b->fp);
       free (b);
@@ -27,14 +29,18 @@ base_insert (Base * base, ArtworkInfo * info)
 {
   int writepos;
 
+  /* Checking consistency... */
   assert (base != NULL && info != NULL);
 
+  /* If there are no available spots, then just insert it to the end. */
   if (avail_list_is_empty (base->avlist))
     {
       fseek (base->fp, 0, SEEK_END);
       base_write_data (base->fp, info);
     }
   else
+    /* In the other hand, if we have available spots, we write it
+     there and remove that position from the avail list. */
     {
       writepos = avail_list_pop (base->avlist, base->fp);
       fseek (base->fp, writepos, SEEK_SET);
@@ -46,15 +52,21 @@ Base *
 base_new (const char *basename, const char *availname, int writeonly)
 {
   Base *b = MEM_ALLOC (Base);
+  
 
+  /* We need a new avail list. */
   b->avlist = avail_list_new (availname, BASE_REG_SIZE);
 
+  /* If the base already exists and is non-empty. */
   if ((fileExists (basename) && (getFileSizeFromName (basename) > 0)))
     {
+      /* Just open it for reading. */
       b->fp = fopen (basename, "r+");
+      /* And load the previously made avail list. */
       avail_list_load (b->avlist);
     }
   else
+    /* If it was empty or didn't even exist, create a new one. */
     b->fp = fopen (basename, "w");
   assert (b->fp);
 
@@ -64,11 +76,15 @@ base_new (const char *basename, const char *availname, int writeonly)
 void
 base_remove (Base * base, int rrn)
 {
+  /* Check consistency. */
   assert (base != NULL);
 
+  /* Go to the desired position. */
   fseek (base->fp, rrn * BASE_REG_SIZE, SEEK_SET);
+  /* Puts the avail list info in that position. */
   fprintf (base->fp, "%04d", avail_list_get_tail (base->avlist));
 
+  /* Add that position to the avail list. */
   avail_list_push (base->avlist, rrn);
 }
 
@@ -125,8 +141,10 @@ baseGetValidImagePath (const char *s)
 {
   char *file;
 
+
   file = MEM_ALLOC_N (char, IMG_LENGTH + 2);
 
+  /* Change the identifier string so it becomes the file path. */
   strncpy (file, s, 6);
   file[6] = '.';
   strncpy (file + 7, s + 6, 3);
@@ -140,6 +158,8 @@ baseIsValidIdentifier (const char *name)
 {
   char *endptr;
   int i;
+
+  /* Checking the extension, length, etc.. */
 
   i = strtol (name, &endptr, 10);
   if ((endptr == name) || (endptr == '\0') || strlen (endptr) != 3
@@ -155,12 +175,14 @@ base_read_artwork_record (FILE * base, ArtworkInfo * info)
 {
   assert ((base != NULL) && (info != NULL));
 
+  /* Read it all... */
   fgets (info->title, TITLE_LENGTH + 1, base);
   fgets (info->type, TYPE_LENGTH + 1, base);
   fgets (info->author, AUTHOR_LENGTH + 1, base);
   fgets (info->year, YEAR_LENGTH + 1, base);
   fgets (info->value, VALUE_LENGTH + 1, base);
   fgets (info->img, IMG_LENGTH + 1, base);
+  /* Strip the whitespaces from it all. */
   stripWhiteSpace (info->title);
   stripWhiteSpace (info->type);
   stripWhiteSpace (info->author);
@@ -172,8 +194,10 @@ base_read_artwork_record (FILE * base, ArtworkInfo * info)
 void
 base_write_data (FILE * file, ArtworkInfo * info)
 {
+  /* Consistency check.. */
   assert (file != NULL && info != NULL);
 
+  /* Right all the fields to the file. */
   fprintf (file, "%-200s", info->title);
   fprintf (file, "%-100s", info->type);
   fprintf (file, "%-125s", info->author);
@@ -181,5 +205,6 @@ base_write_data (FILE * file, ArtworkInfo * info)
   fprintf (file, "%-12s", info->value);
   fprintf (file, "%-9s", info->img);
 
+  /* Make sure it goes to the disk. */
   fflush (file);
 }
