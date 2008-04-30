@@ -14,6 +14,9 @@
 #include "menu.h"
 #include "secindex.h"
 
+
+/* We use this to know which load base we are gonna use. */
+/* Binary & is faster! */
 enum
 {
   LOAD_BASE_PK = 1 << 0,
@@ -29,11 +32,14 @@ load_files_from_base (Adapter * db, int loadflags)
   FILE *base = db->base->fp;
   int i, baselen;
 
+  /* If we had any problems.. */
   if ((!base) || (!loadflags))
     return;
 
+  /* How many registers we have in the database. */
   baselen = getFileSize (base) / BASE_REG_SIZE;
 
+  /* Each time we shift LOAD_BASE and we then load something else. */
   if (loadflags & LOAD_BASE_PK)
     db->pk_index = memory_index_new (PKFILE, 0);
   if (loadflags & LOAD_BASE_AUTHOR)
@@ -49,6 +55,7 @@ load_files_from_base (Adapter * db, int loadflags)
 
   fseek (base, 0, SEEK_SET);
 
+  /* We then read each register from the database. */
   for (i = 0; i < baselen; i++)
     {
       base_read_artwork_record (base, &artwork);
@@ -66,6 +73,7 @@ load_files_from_base (Adapter * db, int loadflags)
     }
 }
 
+
 static void
 print_record (const char *name, int rrn, va_list ap)
 {
@@ -77,11 +85,15 @@ print_record (const char *name, int rrn, va_list ap)
   db = va_arg (ap, Adapter *);
   html_fp = va_arg (ap, FILE *);
 
+  /* We search for it in the indexes. */
   rec = memory_index_find (db->pk_index, name);
   assert (rec);
 
+  /* Go to that register position in the database. */
   fseek (db->base->fp, rec->rrn * BASE_REG_SIZE, SEEK_SET);
+  /* Read it. */
   base_read_artwork_record (db->base->fp, &artwork);
+  /* Then write it to the HTML file. */
   html_write_record_info (html_fp, &artwork);
 }
 
@@ -125,6 +137,7 @@ adapter_find (Adapter * db)
     }
 
   mrec = memory_index_find (mindex, key);
+  /* If it found any artworks. */
   if (mrec)
     {
       fp_html = fopen (HTMLFILE, "w");
@@ -145,6 +158,7 @@ adapter_find (Adapter * db)
       html_end (fp_html);
       fclose (fp_html);
 
+      /* User might want to delete any. */
       if (menuYesOrNo ("   Apagar algum resultado da busca? (s)im, (n)ao? "))
         adapter_remove (db);
     }
@@ -155,6 +169,7 @@ adapter_find (Adapter * db)
 void
 adapter_free (Adapter * db)
 {
+  /* Basically frees any memory allocated. */
   if (db)
     {
       base_free (db->base);
