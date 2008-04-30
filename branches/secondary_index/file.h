@@ -28,6 +28,10 @@ long getFileSize (FILE * f);
  */
 long getFileSizeFromName (const char *filename);
 
+/**
+ * \brief Checks if the file exists and is non-empty.
+ * \return 0 or 1 to show if it's valid.
+ */
 int isValidFile (const char *filename);
 
 #endif
