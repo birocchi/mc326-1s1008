@@ -8,8 +8,12 @@
 void
 html_begin (FILE * htmlfile)
 {
+  
+  /* Check if the was opened ok. */
   if (htmlfile)
     {
+      /* Writing the top part of the html file. */
+
       fprintf (htmlfile,
                "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n");
       fprintf (htmlfile, "<html>\n");
@@ -26,8 +30,10 @@ html_begin (FILE * htmlfile)
 void
 html_end (FILE * htmlfile)
 {
+  /* If it was opened ok.. */
   if (htmlfile)
     {
+      /* Write the bottom part of the html. */
       fprintf (htmlfile, "</table>\n");
       fprintf (htmlfile, "</body>\n");
       fprintf (htmlfile, "</html>\n");
@@ -37,10 +43,13 @@ html_end (FILE * htmlfile)
 void
 html_write_record_info (FILE * htmlfile, ArtworkInfo * info)
 {
+  /* Needed for changing the identifier... */
   char *path = baseGetValidImagePath (info->img);
 
+  /* Check consistency... */
   assert (htmlfile && info);
 
+  /* Write all the fields of the the artwork. */
   fprintf (htmlfile, "<tr>\n");
   fprintf (htmlfile, "<td>\n");
   fprintf (htmlfile, "<img src=\"img/%s\">\n", path);
@@ -55,5 +64,6 @@ html_write_record_info (FILE * htmlfile, ArtworkInfo * info)
   fprintf (htmlfile, "</td>\n");
   fprintf (htmlfile, "</tr>\n");
 
+  /* Must free it. */
   free (path);
 }
