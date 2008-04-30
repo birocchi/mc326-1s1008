@@ -3,6 +3,9 @@
 
 #include <stdlib.h>
 
+/**
+ * The Available List Structure.
+ */
 typedef struct
 {
   char *filename;
@@ -48,7 +51,18 @@ void avail_list_load (AvailList * avlist);
  */
 AvailList *avail_list_new (const char *filename, size_t page_size);
 
+/**
+ * @brief Gets the last item of the avail list.
+ * @param avlist The avail list being used.
+ * @return The last available spot.
+ */
 int avail_list_pop (AvailList * avlist, FILE * fp);
+
+/**
+ * @brief Adds a new item to the avail list.
+ * @param avlist The avail list being used.
+ * @param pos The available position.
+ */
 void avail_list_push (AvailList * avlist, int pos);
 
 #endif
