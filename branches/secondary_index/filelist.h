@@ -6,7 +6,7 @@
 #define PKFILE      "pkfile.pk"    /**< The primary key file name. */
 
 /* Secondary indexes */
-#define SI_AUTHOR_INDEX   "author.sk"
+#define SI_AUTHOR_INDEX   "author.sk" 
 #define SI_AUTHOR_LIST    "author.sl"
 #define SI_TYPE_INDEX     "type.sk"
 #define SI_TYPE_LIST      "type.sl"
