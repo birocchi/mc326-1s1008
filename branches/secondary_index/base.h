@@ -45,10 +45,47 @@ typedef struct
   FILE *fp;
 } Base;
 
+/**
+ * \brief Frees all the base allocated memory.
+ *        
+ * \param b Pointer to Base struct.
+ */
 void base_free (Base * b);
+
+/**
+ * \brief Inserts a new artwork to the database.
+ *        Considers the avail list already.
+ *
+ * \param base Pointer to Base struct.
+ * \param info Pointer to ArtworkInfo struct, where the new info is.
+ */
 void base_insert (Base * base, ArtworkInfo * info);
+
+/**
+ * \brief Creates a new database struct.
+ *        Loads it from file if it exists.
+ *
+ * \param basename Pointer to const char that is the name of the database file.
+ * \param availname Pointer to const char that is the name of avail list file.
+ * \param writeonly Integer that flags if it is write only mode.
+ */
 Base *base_new (const char *basename, const char *availname, int writeonly);
+
+/**
+ * \brief Removes the one register at position \a rrn.
+ *
+ * \param base File pointer to the database.
+ * \param rrn Integer that corresponds to the position in the database.
+ */
 void base_remove (Base * base, int rrn);
+
+/**
+ * \brief Reads all the input fields for the artwork and saves it
+ *        into \a info.
+ *        
+ *
+ * \param info Pointer to ArtworkInfo structure with info about the register.
+ */
 void base_read_input (ArtworkInfo * info);
 
 /**
