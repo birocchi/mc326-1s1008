@@ -25,6 +25,7 @@ getFileSize (FILE * f)
   int fd;
   struct stat buf;
 
+  /* This is pretty straight forward. */
   fd = fileno (f);
 
   if (fstat (fd, &buf) != 0)
@@ -48,5 +49,6 @@ getFileSizeFromName (const char *filename)
 int
 isValidFile (const char *filename)
 {
+  /* Returns 0 or 1. */
   return (fileExists (filename) && (getFileSizeFromName (filename) > 0));
 }
