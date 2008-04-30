@@ -7,9 +7,13 @@
 int
 main (int argc, char *argv[])
 {
+  /* We just need this struct, since  it will hold all the others. */
   Adapter *db;
 
+  /* Allocate it. */
   db = adapter_new ();
+
+  /*Try loading it from the files. */
   adapter_load_files (db);
 
   printWelcome ();
