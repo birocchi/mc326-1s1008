@@ -63,6 +63,6 @@ int avail_list_pop (AvailList * avlist, FILE * fp);
  * @param avlist The avail list being used.
  * @param pos The available position.
  */
-void avail_list_push (AvailList * avlist, int pos);
+void avail_list_push (AvailList * avlist, FILE * fp, int pos);
 
 #endif

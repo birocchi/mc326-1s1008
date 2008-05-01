@@ -15,10 +15,10 @@ avail_list_write (AvailList * avlist)
   FILE *fp;
 
   /* Checking if it's ok. */
-  assert (avlist != NULL);
+  assert (avlist);
 
   fp = fopen (avlist->filename, "w");
-  assert (fp != NULL);
+  assert (fp);
   /* If it opened all-right, then right the tail to it. */
   fprintf (fp, "%d", avlist->tail);
   fclose (fp);
@@ -39,8 +39,8 @@ avail_list_free (AvailList * avlist)
 int
 avail_list_get_tail (AvailList * avlist)
 {
-  assert (avlist != NULL);
-  
+  assert (avlist);
+
   /* If it exists, return the last position of it. */
 
   return avlist->tail;
@@ -49,10 +49,10 @@ avail_list_get_tail (AvailList * avlist)
 int
 avail_list_is_empty (AvailList * avlist)
 {
-  assert (avlist != NULL);
+  assert (avlist);
 
   /* Returns 0 or 1 whether the avail list
-   is empty or not. */
+     is empty or not. */
 
   return avlist->tail == -1;
 }
@@ -67,7 +67,7 @@ avail_list_load (AvailList * avlist)
   /* Check for existence.  */
   if (!fileExists (avlist->filename))
     return;
-  
+
   /* Open it, check it, read it, close it. */
   fp = fopen (avlist->filename, "r");
   assert (fp);
@@ -98,7 +98,7 @@ avail_list_pop (AvailList * avlist, FILE * fp)
   int prevpos;
 
   /* Checks for consistency. */
-  assert (avlist != NULL && fp != NULL);
+  assert (avlist && fp);
 
   /* If it's not empty... */
   if (avlist->tail != -1)
@@ -119,8 +119,12 @@ avail_list_pop (AvailList * avlist, FILE * fp)
 }
 
 void
-avail_list_push (AvailList * avlist, int pos)
+avail_list_push (AvailList * avlist, FILE * fp, int pos)
 {
-  /* New tail is the new available position. */
+  assert (avlist);
+  assert (fp);
+
+  fseek (fp, avlist->page_size * pos, SEEK_SET);
+  fprintf (fp, "%04d", avlist->tail);
   avlist->tail = pos;
 }
