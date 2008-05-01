@@ -5,10 +5,7 @@
 #include <stdio.h>
 #include "base.h"
 
-/**
- * \brief The group number used in the image identifier.
- */
-#define GROUP_NUMBER "01"
+#define GROUP_NUMBER "01" /**< The group number used in the image identifier */
 
 /**
  * \brief Flushes stdin to remove any leftover characters which
@@ -52,6 +49,16 @@ void readInt (const char *inputText, char *dest, size_t length);
  */
 void readString (const char *inputText, char *dest, size_t length);
 
+/**
+ * @brief Read a single word from the user.
+ *
+ * @param msg     Message to print before waiting for input.
+ * @param dest    Pointer to the place where the input should be stored.
+ * @param length  Maximum number of characters that can be stored.
+ *
+ * This function reads some string from the keyboard, and stores to \a dest
+ * the first word (considering that the string is space-delimited).
+ */
 void read_word (const char *msg, char *dest, size_t length);
 
 /**
@@ -67,14 +74,30 @@ void readValue (char s[], size_t length);
 
 /**
  * @brief strdup implementation.
- * @param s String to duplicate.
+ *
+ * @param  s String to duplicate.
+ *
  * @return Pointer to a newly allocated copy of \a s.
  *
- * This is a small strdup implementation, as strdup itself is
- * not part of ISO C.
+ * This is a small strdup implementation, as strdup itself is not
+ * part of ISO C.
  */
 char *str_dup (const char *s);
 
+/**
+ * @brief Runs \a callback on each word of a string.
+ *
+ * @param str       The string which will be parsed.
+ * @param callback  The function which will be called.
+ * @param ...       Additional parameters for \a callback.
+ *
+ * This function calls \a callback on each word (sequence of characters
+ * delimited by a space) of \a str.
+ * \a callback must be a function which takes the current word and a \a va_list
+ * as parameters.
+ * \b WARNING: \a str is going to be changed because this function relies on
+ * \a strtok.
+ */
 void str_foreach (char *str, void (*callback) (const char *, va_list), ...);
 
 /**

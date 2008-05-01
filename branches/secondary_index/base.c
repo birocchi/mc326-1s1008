@@ -21,9 +21,7 @@ base_free (Base * b)
     }
 }
 
-/*
- * TODO: There's room for optimization here (too many disk seeks)
- */
+/* TODO: There's room for optimization here (too many disk seeks) */
 void
 base_insert (Base * base, ArtworkInfo * info)
 {
