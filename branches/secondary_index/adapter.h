@@ -11,11 +11,12 @@
  */
 typedef struct
 {
-  Base * base;
-  MemoryIndex * pk_index;
-  SecondaryIndex * author_index;
-  SecondaryIndex * type_index;
-  SecondaryIndex * year_index;
+  Base *base;
+  MemoryIndex *pk_index;
+  SecondaryIndex *author_index;
+  SecondaryIndex *title_index;
+  SecondaryIndex *type_index;
+  SecondaryIndex *year_index;
 } Adapter;
 
 /**
@@ -60,7 +61,7 @@ void adapter_load_files (Adapter * db);
  * @param db Pointer to Adapter struct
  * @ returns Pointer to Adapter
  */
-Adapter * adapter_new (void);
+Adapter *adapter_new (void);
 
 /**
  * Removes something from the database
