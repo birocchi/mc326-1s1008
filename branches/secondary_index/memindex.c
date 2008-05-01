@@ -150,11 +150,11 @@ memory_index_new (const char *fp_name, size_t nelem)
 }
 
 void
-memory_index_remove (MemoryIndex * index, MemoryIndexRecord * key)
+memory_index_remove (MemoryIndex * index, int rrn)
 {
   int i = 0, j;
 
-  while ((i < index->regnum) && (&index->reclist[i] != key))
+  while ((i < index->regnum) && (index->reclist[i].rrn != rrn))
     i++;
 
   if (i == index->regnum)       /* Match not found, leave function */
