@@ -126,5 +126,7 @@ avail_list_push (AvailList * avlist, FILE * fp, int pos)
 
   fseek (fp, avlist->page_size * pos, SEEK_SET);
   fprintf (fp, "%04d", avlist->tail);
+  fflush (fp);
+
   avlist->tail = pos;
 }
