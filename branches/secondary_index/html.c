@@ -8,7 +8,6 @@
 void
 html_begin (FILE * htmlfile)
 {
-  
   /* Check if the was opened ok. */
   if (htmlfile)
     {
@@ -41,7 +40,7 @@ html_end (FILE * htmlfile)
 }
 
 void
-html_write_record_info (FILE * htmlfile, ArtworkInfo * info)
+html_write_record_info (FILE * htmlfile, int rrn, ArtworkInfo * info)
 {
   /* Needed for changing the identifier... */
   char *path = baseGetValidImagePath (info->img);
@@ -51,6 +50,9 @@ html_write_record_info (FILE * htmlfile, ArtworkInfo * info)
 
   /* Write all the fields of the the artwork. */
   fprintf (htmlfile, "<tr>\n");
+  fprintf (htmlfile, "<td>\n");
+  fprintf (htmlfile, "<b>NRR:</b> %d\n", rrn);
+  fprintf (htmlfile, "</td>\n");
   fprintf (htmlfile, "<td>\n");
   fprintf (htmlfile, "<img src=\"img/%s\">\n", path);
   fprintf (htmlfile, "</td>\n");
