@@ -40,7 +40,7 @@ base_insert (Base * base, ArtworkInfo * info)
     }
   else
     /* In the other hand, if we have available spots, we write it
-     there and remove that position from the avail list. */
+       there and remove that position from the avail list. */
     {
       writepos = avail_list_pop (base->avlist, base->fp);
       fseek (base->fp, writepos, SEEK_SET);
@@ -52,7 +52,6 @@ Base *
 base_new (const char *basename, const char *availname, int writeonly)
 {
   Base *b = MEM_ALLOC (Base);
-  
 
   /* We need a new avail list. */
   b->avlist = avail_list_new (availname, BASE_REG_SIZE);
@@ -77,15 +76,10 @@ void
 base_remove (Base * base, int rrn)
 {
   /* Check consistency. */
-  assert (base != NULL);
-
-  /* Go to the desired position. */
-  fseek (base->fp, rrn * BASE_REG_SIZE, SEEK_SET);
-  /* Puts the avail list info in that position. */
-  fprintf (base->fp, "%04d", avail_list_get_tail (base->avlist));
+  assert (base);
 
   /* Add that position to the avail list. */
-  avail_list_push (base->avlist, rrn);
+  avail_list_push (base->avlist, base->fp, rrn);
 }
 
 /*
