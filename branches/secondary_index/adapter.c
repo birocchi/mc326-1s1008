@@ -319,8 +319,8 @@ adapter_remove (Adapter * db)
       base_remove (db->base, mrec->rrn);
       memory_index_remove (db->pk_index, mrec);
       secondary_index_remove (db->author_index, artwork.author, key);
-      secondary_index_remove (db->type_index, artwork.author, key);
-      secondary_index_remove (db->year_index, artwork.author, key);
+      secondary_index_remove (db->type_index, artwork.type, key);
+      secondary_index_remove (db->year_index, artwork.year, key);
     }
   else
     printf ("   Nao ha nenhuma obra com titulo \"%s\".\n", key);

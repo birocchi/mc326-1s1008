@@ -137,23 +137,24 @@ secondary_index_remove (SecondaryIndex * index, const char *sec_value,
             {
               if (prevnode == -1)
                 rec->rrn = nextnode;
-              else              /* Not the head node, no need to update the index */
+              else /* Not the head node, no need to update the index */
                 {
                   fseek (index->fp_list,
                          (prevnode * MEM_REG_SIZE) + TITLE_LENGTH, SEEK_SET);
                   fprintf (index->fp_list, "%04d", nextnode);
+                  fflush (index->fp_list); /* May be unnecessary */
                 }
 
               avail_list_push (index->avlist, curnode);
+
+              if (rec->rrn == -1)
+                memory_index_remove (index->record_list, rec);
 
               break;
             }
 
           prevnode = curnode;
           curnode = nextnode;
-
-          if (rec->rrn == -1)
-            memory_index_remove (index->record_list, rec);
         }
     }
 }
