@@ -60,8 +60,10 @@ int avail_list_pop (AvailList * avlist, FILE * fp);
 
 /**
  * @brief Adds a new item to the avail list.
- * @param avlist The avail list being used.
- * @param pos The available position.
+ *
+ * @param avlist  The avail list being used.
+ * @param fp      The file related to the avail list.
+ * @param pos     The available position.
  */
 void avail_list_push (AvailList * avlist, FILE * fp, int pos);
 
