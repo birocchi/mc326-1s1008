@@ -117,7 +117,7 @@ secondary_index_remove (SecondaryIndex * index, const char *sec_value,
   char tmpname[TITLE_LENGTH + 1], tmprrn[RRN_LENGTH + 1];
   int prevnode = -1, curnode, nextnode;
 
-  assert (index != NULL);
+  assert (index);
 
   rec = memory_index_find (index->record_list, sec_value);
   if (rec)
@@ -136,19 +136,19 @@ secondary_index_remove (SecondaryIndex * index, const char *sec_value,
           if (!strcasecmp (tmpname, pk_value))
             {
               if (prevnode == -1)
-                rec->rrn = nextnode;
-              else /* Not the head node, no need to update the index */
                 {
-                  fseek (index->fp_list,
-                         (prevnode * MEM_REG_SIZE) + TITLE_LENGTH, SEEK_SET);
+                  if (nextnode == -1)
+                    memory_index_remove (index->record_list, rec->rrn);
+                  else
+                    rec->rrn = nextnode;
+                }
+              else /* Not the head, just make the previous node point to the current's next */ 
+                {
+                  fseek (index->fp_list, prevnode * MEM_REG_SIZE, SEEK_SET);
                   fprintf (index->fp_list, "%04d", nextnode);
-                  fflush (index->fp_list); /* May be unnecessary */
                 }
 
-              avail_list_push (index->avlist, curnode);
-
-              if (rec->rrn == -1)
-                memory_index_remove (index->record_list, rec);
+              avail_list_push (index->avlist, index->fp_list, curnode);
 
               break;
             }
