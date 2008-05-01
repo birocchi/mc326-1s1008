@@ -36,6 +36,8 @@ void printConsultMenu (void);
  */
 void printMainMenu (void);
 
+void print_search_type_menu (void);
+
 /**
  * \brief Print a nifty welcome message.
  */

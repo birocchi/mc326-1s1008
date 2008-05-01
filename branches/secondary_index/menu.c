@@ -43,6 +43,19 @@ printConsultMenu (void)
 }
 
 void
+print_search_type_menu (void)
+{
+  printf ("\n");
+  printf ("   +++++++++++++++++++++++++++++\n");
+  printf ("   Tipo de consulta:\n");
+  printf ("   (e)xata, por titulo\n");
+  printf ("   (p)arcial, por qualquer campo\n");
+  printf ("   +++++++++++++++++++++++++++++\n");
+  printf ("\n");
+}
+
+
+void
 printMainMenu (void)
 {
   printf ("\n");
