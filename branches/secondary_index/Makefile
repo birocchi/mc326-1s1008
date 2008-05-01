@@ -9,7 +9,7 @@
 
 CC=gcc
 CFLAGS=-c -Wall -g -ansi -pedantic
-LDFLAGS=#-lefence
+LDFLAGS=-lefence
 OFILES=adapter.o avail.o base.o file.o io.o html.o main.o mem.o memindex.o menu.o secindex.o
 
 TP=tp3
