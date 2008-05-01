@@ -35,7 +35,6 @@ inflate_list (MemoryIndex * index, size_t size)
   MemoryIndexRecord *tmp;
 
   assert (index);
-  assert (size > index->maxregs);
 
   if (size > index->maxregs)
     {
