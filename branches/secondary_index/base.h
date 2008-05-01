@@ -4,12 +4,12 @@
 #include <stdio.h>
 #include "avail.h"
 
-#define TITLE_LENGTH   200
-#define TYPE_LENGTH    100
-#define AUTHOR_LENGTH  125
-#define YEAR_LENGTH    4
-#define VALUE_LENGTH   12
-#define IMG_LENGTH     9
+#define TITLE_LENGTH   200 /**< Length of the title field. */
+#define TYPE_LENGTH    100 /**< Length of the type field. */
+#define AUTHOR_LENGTH  125 /**< Length of the author field. */
+#define YEAR_LENGTH    4   /**< Length of the year field. */
+#define VALUE_LENGTH   12  /**< Length of the value field. */
+#define IMG_LENGTH     9   /**< Length of the image identifier field. */
 
 /**
  * Total size of the register.
@@ -39,10 +39,14 @@ typedef struct
   char img[IMG_LENGTH + 1];
 } ArtworkInfo;
 
+/**
+ * Structure which represents the base file and
+ * its avail list.
+ */
 typedef struct
 {
-  AvailList *avlist;
-  FILE *fp;
+  AvailList *avlist;  /**< The base's avail list. */
+  FILE *fp;           /**< The base's file representation. */
 } Base;
 
 /**
@@ -68,6 +72,8 @@ void base_insert (Base * base, ArtworkInfo * info);
  * \param basename Pointer to const char that is the name of the database file.
  * \param availname Pointer to const char that is the name of avail list file.
  * \param writeonly Integer that flags if it is write only mode.
+ *
+ * \return A new Base structure.
  */
 Base *base_new (const char *basename, const char *availname, int writeonly);
 
@@ -82,7 +88,6 @@ void base_remove (Base * base, int rrn);
 /**
  * \brief Reads all the input fields for the artwork and saves it
  *        into \a info.
- *        
  *
  * \param info Pointer to ArtworkInfo structure with info about the register.
  */
@@ -95,7 +100,6 @@ void base_read_input (ArtworkInfo * info);
  * @param s The name identifier string.
  *
  * @return Pointer to the correct string. One must free this pointer later on.
- *
  */
 char *baseGetValidImagePath (const char *s);
 
