@@ -1,8 +1,9 @@
 #ifndef __IO_H_
 #define __IO_H_
 
-#include "base.h"
+#include <stdarg.h>
 #include <stdio.h>
+#include "base.h"
 
 /**
  * \brief The group number used in the image identifier.
@@ -51,6 +52,8 @@ void readInt (const char *inputText, char *dest, size_t length);
  */
 void readString (const char *inputText, char *dest, size_t length);
 
+void read_word (const char *msg, char *dest, size_t length);
+
 /**
  * \brief Read at most length bytes frm stdin. Strip trailing whitespace and
  *        newline character if they're present.
@@ -71,6 +74,8 @@ void readValue (char s[], size_t length);
  * not part of ISO C.
  */
 char *str_dup (const char *s);
+
+void str_foreach (char *str, void (*callback) (const char *, va_list), ...);
 
 /**
  * \brief Replaces the trailing '\\n' character (if it exists) in a string

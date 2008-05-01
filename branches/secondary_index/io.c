@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <ctype.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -49,7 +50,7 @@ readInt (const char *inputText, char *dest, size_t length)
         {
           if (!isdigit (dest[i]))
             {
-              printf ("Entrada invalida.\n");
+              printf ("   Entrada invalida.\n");
               invalid = 1;
               break;
             }
@@ -67,12 +68,24 @@ readString (const char *inputText, char *dest, size_t length)
 
       if (strlen (dest) == 0)
         {
-          printf ("   Entrada invalida.");
+          printf ("   Entrada invalida.\n");
           continue;
         }
       else
         break;
     }
+}
+
+void
+read_word (const char *msg, char *dest, size_t length)
+{
+  char *space;
+
+  readString (msg, dest, length);
+
+  space = strchr (dest, ' ');
+  if (space)
+    *space = '\0';
 }
 
 void
@@ -95,6 +108,25 @@ str_dup (const char *s)
 }
 
 void
+str_foreach (char *str, void (*callback) (const char *, va_list), ...)
+{
+  char *next;
+  va_list ap;
+
+  va_start (ap, callback);
+
+  next = strtok (str, " ");
+  while (next)
+    {
+      callback (next, ap);
+      next = strtok (NULL, " ");
+    }
+
+  va_end (ap);
+}
+
+
+void
 stripNewLine (char s[])
 {
   char *pos = strchr (s, '\n');
@@ -110,7 +142,7 @@ stripWhiteSpace (char str[])
 {
   int i, j, pos;
   int len;
-  int space; /* Flag used to indicate if a space has already been immediately read */
+  int space;                    /* Flag used to indicate if a space has already been immediately read */
   char *buffer;
 
   len = strlen (str);
@@ -125,7 +157,8 @@ stripWhiteSpace (char str[])
   /* Skip whitespace at the end */
   for (j = len - 1; j > i && isspace (str[j]); j--);
 
-  pos = 0; space = 0;
+  pos = 0;
+  space = 0;
   for (; i <= j; i++)
     {
       /* If this is the first whitespace we see,
