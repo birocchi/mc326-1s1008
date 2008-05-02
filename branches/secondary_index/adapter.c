@@ -26,6 +26,36 @@ enum
 };
 
 static void
+secindex_insert_wrapper (const char *str, va_list ap)
+{
+  char *pk_value = NULL;
+  SecondaryIndex *secindex = NULL;
+
+  secindex = va_arg (ap, SecondaryIndex *);
+  pk_value = va_arg (ap, char *);
+
+  assert (secindex);
+  assert (pk_value);
+
+  secondary_index_insert (secindex, str, pk_value);
+}
+
+static void
+secindex_remove_wrapper (const char *str, va_list ap)
+{
+  char *pk_value = NULL;
+  SecondaryIndex *secindex = NULL;
+
+  secindex = va_arg (ap, SecondaryIndex *);
+  pk_value = va_arg (ap, char *);
+
+  assert (secindex);
+  assert (pk_value);
+
+  secondary_index_remove (secindex, str, pk_value);
+}
+
+static void
 load_files_from_base (Adapter * db, int loadflags)
 {
   ArtworkInfo artwork;
@@ -138,36 +168,6 @@ read_secindex (Adapter * db, MemoryIndex ** mindex,
       read_word ("   Digite o autor para busca: ", key, AUTHOR_LENGTH);
       break;
     }
-}
-
-static void
-secindex_insert_wrapper (const char *str, va_list ap)
-{
-  char *pk_value = NULL;
-  SecondaryIndex *secindex = NULL;
-
-  secindex = va_arg (ap, SecondaryIndex *);
-  pk_value = va_arg (ap, char *);
-
-  assert (secindex);
-  assert (pk_value);
-
-  secondary_index_insert (secindex, str, pk_value);
-}
-
-static void
-secindex_remove_wrapper (const char *str, va_list ap)
-{
-  char *pk_value = NULL;
-  SecondaryIndex *secindex = NULL;
-
-  secindex = va_arg (ap, SecondaryIndex *);
-  pk_value = va_arg (ap, char *);
-
-  assert (secindex);
-  assert (pk_value);
-
-  secondary_index_remove (secindex, str, pk_value);
 }
 
 void
