@@ -54,6 +54,7 @@ AvailList *avail_list_new (const char *filename, size_t page_size);
 /**
  * @brief Gets the last item of the avail list.
  * @param avlist The avail list being used.
+ * @param fp     The file related to the avail list.
  * @return The last available spot.
  */
 int avail_list_pop (AvailList * avlist, FILE * fp);
