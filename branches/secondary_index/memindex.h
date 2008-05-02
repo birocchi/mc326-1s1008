@@ -30,7 +30,7 @@ typedef struct
 } MemoryIndex;
 
 /**
- * @brief Case-insensitive \aMemoryIndexRecord comparison.
+ * @brief Case-insensitive \a MemoryIndexRecord comparison.
  *
  * @param a Pointer to a \a MemoryIndexRecord.
  * @param b Pointer to another \a MemoryIndexRecord.
