@@ -22,8 +22,8 @@ flush_to_disk (MemoryIndex * index)
 
   for (i = 0; i < index->regnum; i++)
     {
-      fprintf (fp, "%-200s%04d", index->reclist[i].name,
-               index->reclist[i].rrn);
+      fprintf (fp, "%-200s", index->reclist[i].name);
+      fwrite  (&(index->reclist[i].rrn), sizeof (int), 1, fp);
     }
 
   fclose (fp);
@@ -106,7 +106,6 @@ void
 memory_index_load_from_file (MemoryIndex * index, const char *filename)
 {
   FILE *fp = NULL;
-  char strrrn[RRN_LENGTH + 1];
   int i, rrn;
   size_t regnum;
 
@@ -124,10 +123,9 @@ memory_index_load_from_file (MemoryIndex * index, const char *filename)
   for (i = 0; i < regnum; i++)
     {
       fgets (index->reclist[i].name, TITLE_LENGTH + 1, fp);
-      fgets (strrrn, RRN_LENGTH + 1, fp);
+      fread (&rrn, sizeof (int), 1, fp);
 
       stripWhiteSpace (index->reclist[i].name);
-      rrn = atoi (strrrn);
 
       index->reclist[i].rrn = rrn;
       index->regnum++;

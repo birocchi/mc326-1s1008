@@ -16,7 +16,7 @@ void
 secondary_index_foreach (SecondaryIndex * index, MemoryIndexRecord * record,
                          void (*callback) (const char *, int, va_list), ...)
 {
-  char tmpname[TITLE_LENGTH + 1], tmprrn[RRN_LENGTH + 1];
+  char tmpname[TITLE_LENGTH + 1];
   int node, nextnode;
   va_list ap;
 
@@ -27,10 +27,9 @@ secondary_index_foreach (SecondaryIndex * index, MemoryIndexRecord * record,
     {
       fseek (index->fp_list, node * MEM_REG_SIZE, SEEK_SET);
       fgets (tmpname, TITLE_LENGTH + 1, index->fp_list);
-      fgets (tmprrn, RRN_LENGTH + 1, index->fp_list);
+      fread (&nextnode, sizeof (int), 1, index->fp_list);
 
       stripWhiteSpace (tmpname);
-      nextnode = atoi (tmprrn);
 
       callback (tmpname, nextnode, ap);
 
@@ -83,7 +82,8 @@ secondary_index_insert (SecondaryIndex * si_index, const char *si_value,
       rec->rrn = newrrn;
     }
 
-  fprintf (si_index->fp_list, "%-200s%04d", pk_value, nextnode);
+  fprintf (si_index->fp_list, "%-200s", pk_value);
+  fwrite (&nextnode, sizeof (int), 1, si_index->fp_list);
   fflush (si_index->fp_list);
 }
 
@@ -114,7 +114,7 @@ secondary_index_remove (SecondaryIndex * index, const char *sec_value,
                         const char *pk_value)
 {
   MemoryIndexRecord *rec;
-  char tmpname[TITLE_LENGTH + 1], tmprrn[RRN_LENGTH + 1];
+  char tmpname[TITLE_LENGTH + 1];
   int prevnode = -1, curnode, nextnode;
 
   assert (index);
@@ -128,10 +128,9 @@ secondary_index_remove (SecondaryIndex * index, const char *sec_value,
         {
           fseek (index->fp_list, curnode * MEM_REG_SIZE, SEEK_SET);
           fgets (tmpname, TITLE_LENGTH + 1, index->fp_list);
-          fgets (tmprrn, RRN_LENGTH + 1, index->fp_list);
+          fread (&nextnode, sizeof (int), 1, index->fp_list);
 
           stripWhiteSpace (tmpname);
-          nextnode = atoi (tmprrn);
 
           if (!strcasecmp (tmpname, pk_value))
             {
@@ -145,7 +144,7 @@ secondary_index_remove (SecondaryIndex * index, const char *sec_value,
               else /* Not the head, just make the previous node point to the current's next */ 
                 {
                   fseek (index->fp_list, prevnode * MEM_REG_SIZE, SEEK_SET);
-                  fprintf (index->fp_list, "%04d", nextnode);
+                  fwrite (&nextnode, sizeof (int), 1, index->fp_list);
                 }
 
               avail_list_push (index->avlist, index->fp_list, curnode);
