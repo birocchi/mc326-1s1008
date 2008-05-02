@@ -32,13 +32,15 @@ void
 printConsultMenu (void)
 {
   printf ("\n");
-  printf ("   ---------------------\n");
+  printf ("   ------------------------------------\n");
   printf ("   Efetuar consulta por:\n");
   printf ("     (a)no da obra\n");
   printf ("     a(u)tor da obra\n");
   printf ("     t(i)po da obra\n");
   printf ("     (t)itulo da obra\n");
-  printf ("   ---------------------\n");
+  printf ("\n");
+  printf ("   A busca sera por apenas uma palavra.\n");
+  printf ("   ------------------------------------\n");
   printf ("\n");
 }
 
