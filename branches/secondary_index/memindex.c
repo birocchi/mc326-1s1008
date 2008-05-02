@@ -9,6 +9,11 @@
 #include "mem.h"
 #include "memindex.h"
 
+/**
+ * @brief Serializes a memory index to disk.
+ *
+ * @param index The index to be serialized.
+ */
 static void
 flush_to_disk (MemoryIndex * index)
 {
@@ -29,6 +34,15 @@ flush_to_disk (MemoryIndex * index)
   fclose (fp);
 }
 
+/**
+ * @brief Allocate more memory for a memory index.
+ *
+ * @param index The memory index.
+ * @param size  The new size.
+ *
+ * If \a size is smaller than the current size,
+ * this function does nothing.
+ */
 static void
 inflate_list (MemoryIndex * index, size_t size)
 {
@@ -46,6 +60,16 @@ inflate_list (MemoryIndex * index, size_t size)
     }
 }
 
+/**
+ * @brief Binary search comparison function.
+ *
+ * @param a A string.
+ * @param b A \a MemoryIndexRecord.
+ *
+ * @retval -1 a < b.
+ * @retval 0  a == b.
+ * @retval 1  a > b.
+ */
 static int
 bsearch_find_by_name (const void *a, const void *b)
 {
@@ -85,9 +109,11 @@ memory_index_insert (MemoryIndex * index, const char *name, int rrn)
 {
   assert (index && name);
 
+  /* Allocate more memory if necessary */
   if (index->regnum == index->maxregs)
     inflate_list (index, index->maxregs * 2);
 
+  /* Insert the new record's information */
   strncpy (index->reclist[index->regnum].name, name, TITLE_LENGTH + 1);
   index->reclist[index->regnum].rrn = rrn;
   index->regnum++;
@@ -117,9 +143,11 @@ memory_index_load_from_file (MemoryIndex * index, const char *filename)
   fp = fopen (filename, "r");
   assert (fp);
 
+  /* Allocate all the necessary memory at once. */
   regnum = getFileSize (fp) / MEM_REG_SIZE;
   inflate_list (index, regnum);
 
+  /* Add each record back to the index. */
   for (i = 0; i < regnum; i++)
     {
       fgets (index->reclist[i].name, TITLE_LENGTH + 1, fp);
@@ -158,6 +186,7 @@ memory_index_remove (MemoryIndex * index, int rrn)
   if (i == index->regnum)       /* Match not found, leave function */
     return;
 
+  /* Copy each entry back one position */
   for (j = i; j < index->regnum - 1; j++)
     index->reclist[j] = index->reclist[j + 1];
 
