@@ -111,11 +111,18 @@ Desde a versão anterior foi definida uma divisão dos códigos fonte para melho
 \section{Arquivos gerados e existentes}\
 
 \begin{itemize}
+ \item \textbf{author, type, title, year.av}: Avail list dos índices secundários de autores, títulos, tipos e anos.
+ \item \textbf{author, type, title, year.sk}: Índices de memória escritos em disco para os índices de autores, títulos, tipos e anos.
+ \item \textbf{author, type, title, year.sl}: Listas \textit{entry-based} de referências à chave primária para os índices de autores, títulos, tipos e anos.
  \item \textbf{base01.dat}: Base de dados utilizada pelo programa.
  \item \textbf{entrada.in}: Entradas usadas para popular a base dados.
  \item \textbf{lista.html}: Resultado das consultas à base de dados.
- \item \textbf{pkfile.pk}: Arquivo de ``cache'' das chaves primárias.
+ \item \textbf{pkfile.pk}: Arquivo de ``cache'' das chaves primárias (título das obras).
 \end{itemize}
+
+\section{Decisões de design}\
+
+Durante a escrita do código deste trabalho prático, percebeu-se que os indices secundários e primários compartilhavam algumas características em comum. Em tempo de execução, os índices primários ficam armazenados em memória e são compostos por um \textit{nome} (uma string) e um \textit{identificador} (também chamado de \textit{valor}, \textit{id} ou \textit{NRR}). Os índices secundários, por sua vez, são compostos por duas camadas: uma lista em memória em ordem alfabética composta também por \textit{nome} e \textit{identificador} e uma lista em disco com chave primária e seu respectivo NRR. A lista em memória é idêntica à utilizada pelas chaves primárias, contendo apenas valores de nomes e identificadores diferentes. Assim, para reusar código, removeram-se \textit{pk.c} e \textit{pk.h}, que foram substituídos por \textit{memindex.c} e \textit{memindex.h}, que contêm as estruturas \texttt{MemoryIndex} e \texttt{MemoryIndexRecord}.
 
 \section{Chaves primárias}\
 
