@@ -22,16 +22,19 @@ secondary_index_foreach (SecondaryIndex * index, MemoryIndexRecord * record,
 
   va_start (ap, callback);
 
+  /* Iterate over the entry file list */
   node = record->rrn;
   while (node != -1)
     {
+      /* Read the entry */
       fseek (index->fp_list, node * MEM_REG_SIZE, SEEK_SET);
       fgets (tmpname, TITLE_LENGTH + 1, index->fp_list);
       fread (&nextnode, sizeof (int), 1, index->fp_list);
 
       stripWhiteSpace (tmpname);
 
-      callback (tmpname, nextnode, ap);
+      /* Call the function with name, RRN and information */
+      callback (tmpname, node, ap);
 
       node = nextnode;
     }
