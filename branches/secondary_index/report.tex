@@ -14,21 +14,59 @@
 
 \section{Objetivo}\
 
-Este trabalho prático tem como objetivo a implementação de consulta por índices secundários e a remoção de entradas numa base de dados como requisitos adicionais aos já implementados durante o trabalho prático anterior.
+Este trabalho prático tem como objetivo a implementação de consulta por índices secundários e a remoção de entradas numa base de dados como requisitos adicionais aos já implementados durante o trabalho prático anterior.\\
 
 Este relatório detalha algumas decisões de design e arquitetura feitas durante o desenvolvimento, além de uma descrição do código fonte e um guia de uso do programa.
 
+\section{Alterações}\
+
+Dentre as principais alterações no código e nas funcionalidades do programa em relação ao trabalho prático anterior, podemos destacar:\\
+
+\textbf{Funcionalidades}:
+\begin{itemize}
+ \item Adicionada a remoção de entradas por índice primário e índices secundários;
+\item Adicionada consulta por índices secundários;
+\item As informações em HTML são listadas em tabela, com o NRR de cada entrada;
+\item Não há mais diferença entre maiúsculas e minúsculas nas buscas.
+\end{itemize}
+
+\textbf{Código}:
+\begin{itemize}
+ \item Criada uma estrutura \texttt{MemoryIndex} para representar os índices em memória;
+\item Criada uma estrutura \texttt{Adapter}, correspondente ao \textit{design pattern} de mesmo nome, para gerenciar e fazer a interface entre a base de dados, o índice primário e os índices secundários;
+\item Criada a estrutura \texttt{SecondaryIndex} para representar os índices secundários;
+\item Criada a estrutura \texttt{AvailList} para representar a \textit{avail list} utilizada nas remoções e inserções;
+\item A maior parte do código de \textit{main} foi movida para \textit{adapter.c};
+\item pk.c e pk.h foram removidos;
+\end{itemize}
+
 \section{Uso da interface}\
 
-O programa gerado pelo \textit{Makefile} chama-se \textbf{tp2} e deve ser rodado a partir de um terminal. Seu menu inicial apresenta quatro opções: \textbf{inserir} uma nova entrada na base de dados, \textbf{consultar} uma obra existente no banco de dados, \textbf{gerar} uma lista com informações sobre todas as obras da base de dados e \textbf{sair}.
+O programa gerado pelo \textit{Makefile} chama-se \textbf{tp3} e deve ser rodado a partir de um terminal. Seu menu inicial apresenta as seguintes opções: \textbf{inserir} uma nova entrada na base de dados, \textbf{consultar} uma obra existente no banco de dados, \textbf{gerar} uma lista com informações sobre todas as obras da base de dados, \textbf{remover} uma obra e \textbf{sair}.
 
-Cada opção é selecionada digitando-se \textbf{i} para inserir, \textbf{c} para consultar, \textbf{g} para gerar a lista de obras e \textbf{s} para sair.\\
+A opção é selecionada digitando-se \textbf{i} para inserir, \textbf{c} para consultar, \textbf{g} para gerar a lista de obras, \textbf{r} para remover e \textbf{s} para sair.\\
+
+\subsection{Inserção}\
 
 No modo de \textbf{inserção}, o usuário deve digitar as informações para \textit{nome da obra}, \textit{tipo de obra}, \textit{autor da obra}, \textit{ano em que a obra foi feita}, \textit{valor da obra} e um \textit{identificador da obra}. Determinados campos possuem restrições: ano e valor devem conter apenas dígitos, e o identificador precisa terminar nas extensões \textit{png, jpg} ou \textit{gif} e ser precedido por até quatro dígitos. Caso já exista uma obra com mesmo nome na base de dados, o usuário deve entrar com outros dados de obra. Feita a inserção, o usuário pode escolher inserir uma nova obra ou voltar para o menu principal.\\
 
-No modo de \textbf{consulta}, o usuário deve entrar com o nome da obra cujas informações deseja obter. Deve-se tomar atenção, pois a consulta é \textit{case-sensitive}, ou seja, diferencia maiúsculas e minúsculas. Caso uma obra com o título desejado seja encontrada, suas informações (título, tipo, autor, ano de criação, valor e identificador) são escritas no arquivo \textbf{lista.html} para exibição. Se não houver nenhuma obra com esse nome no banco de dados, é exibida uma mensagem de erro.\\
+\subsection{Consulta}\
 
-No modo de \textbf{geração de lista}, escreve-se no arquivo \textbf{lista.html} uma lista com as informações (título, tipo, autor, ano de criação, valor e identificador) de todas as obras cadastradas na base de dados. Caso não haja nenhuma obra na base de dados, exibe-se uma mensagem de erro.
+No modo de \textbf{consulta}, o usuário deve primeiro escolher se deseja uma busca \textit{parcial} ou \textit{exata}. Em ambos os casos, não há diferença entre maiúsculas e minúsculas nos itens pesquisados.\\
+
+Uma busca \textit{parcial} é feita somente nos índices secundários do banco de dados. É possível buscar por \textbf{ano}, \textbf{tipo}, \textbf{título} ou \textbf{autor} da obra. Neste modo de pesquisa, é possível buscar por apenas \textbf{uma} palavra, que retornará as entradas que contiverem a palavra buscada.\\
+
+Uma busca \textit{exata} é feita somente no índice primário (título da obra), e busca o título exato entrado pelo usuário.\\
+
+Os resultados encontrados são escritos com os campos NRR, título, tipo, autor, ano de criação, valor e identificador no arquivo \textbf{lista.html}. Caso não haja nenhum resultado, exibe-se uma mensagem de erro.
+
+\subsection{Geração de lista}
+
+No modo de \textbf{geração de lista}, escreve-se no arquivo \textbf{lista.html} uma lista com as informações (NRR, título, tipo, autor, ano de criação, valor e identificador) de todas as obras cadastradas na base de dados. Caso não haja nenhuma obra na base de dados, exibe-se uma mensagem de erro.
+
+\subsection{Remoção}
+
+No modo de \textbf{remoção}, o usuário deve entrar com o NRR (número relativo de registro) da obra que deseja excluir do banco de dados. O NRR é obtido através de uma \textbf{consulta} ou \textbf{geração} de lista de obras. Enquanto o NRR entrado não for válido, o usuário é perguntado por um novo NRR válido para exclusão.
 
 \section{Descrição do Trabalho}\
 
