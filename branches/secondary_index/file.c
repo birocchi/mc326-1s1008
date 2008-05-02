@@ -49,6 +49,5 @@ getFileSizeFromName (const char *filename)
 int
 isValidFile (const char *filename)
 {
-  /* Returns 0 or 1. */
   return (fileExists (filename) && (getFileSizeFromName (filename) > 0));
 }

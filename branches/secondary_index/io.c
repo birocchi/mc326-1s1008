@@ -104,6 +104,7 @@ str_dup (const char *s)
   assert (dup);
 
   strcpy (dup, s);
+
   return dup;
 }
 
@@ -115,11 +116,12 @@ str_foreach (char *str, void (*callback) (const char *, va_list), ...)
 
   va_start (ap, callback);
 
+  /* Get the first word */
   next = strtok (str, " ");
   while (next)
     {
       callback (next, ap);
-      next = strtok (NULL, " ");
+      next = strtok (NULL, " "); /* Read next word */
     }
 
   va_end (ap);
