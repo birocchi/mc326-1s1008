@@ -37,6 +37,7 @@ Dentre as principais alterações no código e nas funcionalidades do programa e
 \item Criada a estrutura \texttt{SecondaryIndex} para representar os índices secundários;
 \item Criada a estrutura \texttt{AvailList} para representar a \textit{avail list} utilizada nas remoções e inserções;
 \item A maior parte do código de \textit{main} foi movida para \textit{adapter.c};
+\item Agora é feito um uso massivo da função \texttt{assert} para checagem de dados e para facilitar o debugging do programa.
 \item pk.c e pk.h foram removidos;
 \end{itemize}
 
@@ -73,45 +74,39 @@ No modo de \textbf{remoção}, o usuário deve entrar com o NRR (número relativ
 Desde a versão anterior foi definida uma divisão dos códigos fonte para melhor manutenção e escalabilidade. Com o crescimento das funcionalidades e necessidade de melhor base para algumas destas, acabou-se modificando a estrutura dos arquivos para melhor adequação. Atualmente, os seguintes arquivos compõem o programa:
 
 \begin{itemize}
- \item \textbf{base.c, base.h}\\
-	Contêm as funções referentes à manipulação da base de dados e definições relacionadas, como o tamanho dos campos da base de dados e a estrutura que representa uma entrada na base de dados. As funções validam o identificador, lêem uma entrada, escrevem uma entrada e manipulam o identificador para retornar um caminho válido.
+\item \textbf{adapter.c, adapter.h}\\
+	\textit{Design pattern} utilizada como uma espécie de ``cola'' entre as diversas partes do sistema: coordena índices e base para buscas, remoções e inserções.
+
+\item \textbf{avail.c, avail.h}\\
+	Contêm as funções referentes à manipulação das avail lists usadas pelos índices e pela base de dados.
+
+\item \textbf{base.c, base.h}\\
+	Contêm as funções referentes à manipulação da base de dados e definições relacionadas, como o tamanho dos campos da base de dados e a estrutura que representa uma entrada na base de dados. Há funções para adição e remoção na base de dados, além de funções auxiliaries que validam o identificador e lêem entradas na base de dados.
 
  \item \textbf{file.c, file.h}\\
-	Contêm funções relacionadas à manipulação de arquivos quaisquer: atualmente, apenas checa se determinado arquivo existe e retorna o tamanho de determinado arquivo.
+	Contêm funções relacionadas à manipulação de arquivos quaisquer: atualmente, checa se determinado arquivo existe, retorna o tamanho de determinado arquivo e checa se o arquivo é válido para o trabalho (possui tamanho maior que 0).
+
+\item \textbf{filelist.h}\\
+	Contêm os nomes dos arquivos utilizados pelo banco de dados (base, chaves primárias, secundárias e avail lists), de modo a evitar nomes \textit{hardcoded} no código.
 
  \item \textbf{html.c, html.h}\\
 	Contêm as funções relacionadas à manipulação e geração de arquivos HTML para consultas e listas usadas pelo programa, para automatizar o processo de escrita de dados. Atualmente, cria o começo e o fim de um arquivo HTML e escreve as informações de uma entrada no banco de dados em formato HTML.
 
  \item \textbf{io.c, io.h}\\
-	Controlam a leitura e escrita de dados entrados pelo usuário. Foram implementadas também funções para limpar os espaços em branco no começo e no fim da strings, além daqueles espaços duplicados no meio, além de uma função para ler caracteres entrados pelo usuário. Continuam todas as funções do Trabalho Prático 1 para validação de entrada.
+	Controlam a leitura e escrita de dados entrados pelo usuário. Já no Trabalho Prático 2 foi implementada uma função para limpar caracteres em branco em excesso nas strings. Neste trabalho, foram implementadas uma função para ler somente a primeira palavra de uma string e um \textit{foreach} para que uma string tenha uma função chamada para cada palavra.
 
  \item \textbf{main.c}\\
 	Contém a lógica de execução do programa. Inicia a base de dados e a lista de chaves primárias e depois recebe as opções de operações desejadas pelo usuário, tratando-as e chamando as funções necesśarias em outros arquivos.
 
  \item \textbf{mem.c, mem.h}\\
-	Contém macros e funções para facilitar a alocação de memória para o programa: basicamente, as macros alocam o número desejado de bytes na memória e já abortam o programa em caso de erro. Assim, em vez de
-	\texttt{
-	\begin{tabbing}
-		char* c \= = (char*)malloc(5, sizeof(char)); \\
-		if (!c) exit(EXIT\_FAILURE);
-	\end{tabbing}
-	}
-
-	Tem-se
-	\texttt{
-	\begin{tabbing}
-		char* c = MEM\_ALLOC\_N(char, 5);
-	\end{tabbing}
-	}
-
+	Contêm macros e funções para facilitar a alocação de memória para o programa: basicamente, as macros alocam o número desejado de bytes na memória e já abortam o programa em caso de erro.
+	
  \item \textbf{menu.c, menu.h}\\
-	Continuam a possuir as duas funções existentes no Trabalho Prático 1: exibir uma mensagem inicial e o menu de opções para o usuário, agora com mais opções disponíveis.
+	Contêm as funções de exibição dos menus usados pelo programa, além de funções para análise das opções de menu entradas pelo usuário.
 
- \item \textbf{pk.c, pk.h}\\
-	Principal adição deste Trabalho Prático. Responsáveis pela manipulação da estrutura de indexação com chaves primárias. Maiores detalhes seguem depois no relatório.
+ \item \textbf{secindex.c, secindex.h}\\
+	Responsáveis pela manipulação dos índices secundários do banco de dados: adicionam, buscam e removem índices secundários.
 \end{itemize}
-
-Em \textbf{base.h} (antigo \textbf{data.h}), alterou-se o tipo dos campos \textit{year} e \textit{value} da estrutura \textit{artwork\_info} de \textit{int} para um array de \textit{char} para possibilitar a entrada de números grandes (um inteiro de 4 bytes tinha dificuldades em conter um número de 12 dígitos como \textit{value}). Em decorrência, esses campos não são mais preenchidos com zeros quando não estão em seu tamanho máximo, mas com espaços.
 
 \section{Arquivos gerados e existentes}\
 

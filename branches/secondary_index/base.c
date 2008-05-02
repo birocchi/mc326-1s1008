@@ -64,7 +64,7 @@ base_new (const char *basename, const char *availname, int writeonly)
     }
   else
     /* If it was empty or didn't even exist, create a new one. */
-    b->fp = fopen (basename, "w");
+    b->fp = fopen (basename, "w+");
   assert (b->fp);
 
   return b;
