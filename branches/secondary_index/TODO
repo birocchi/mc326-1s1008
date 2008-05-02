@@ -2,3 +2,5 @@
 + Refatorar artwork_info nos moldes de PrimaryKeyList?
 
 + Criar um wrapper para fopen, fazendo o fopen+assert
+
++ Usar fwrite/fread e uma função para ler titulo+rrn de um arquivo.
