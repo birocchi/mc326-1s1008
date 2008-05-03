@@ -1,0 +1,162 @@
+#include <assert.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
+#include "avail.h"
+#include "base.h"
+#include "file.h"
+#include "io.h"
+#include "mem.h"
+#include "memindex.h"
+#include "secindex.h"
+
+void
+secondary_index_foreach (SecondaryIndex * index, MemoryIndexRecord * record,
+                         void (*callback) (const char *, int, va_list), ...)
+{
+  char tmpname[TITLE_LENGTH + 1];
+  int node, nextnode;
+  va_list ap;
+
+  va_start (ap, callback);
+
+  /* Iterate over the entry file list */
+  node = record->rrn;
+  while (node != -1)
+    {
+      /* Read the entry */
+      fseek (index->fp_list, node * MEM_REG_SIZE, SEEK_SET);
+      fgets (tmpname, TITLE_LENGTH + 1, index->fp_list);
+      fread (&nextnode, sizeof (int), 1, index->fp_list);
+
+      stripWhiteSpace (tmpname);
+
+      /* Call the function with name, RRN and information */
+      callback (tmpname, node, ap);
+
+      node = nextnode;
+    }
+
+  va_end (ap);
+}
+
+void
+secondary_index_free (SecondaryIndex * index)
+{
+  if (index)
+    {
+      avail_list_free (index->avlist);
+      memory_index_free (index->record_list);
+      fclose (index->fp_list);
+      free (index);
+    }
+}
+
+void
+secondary_index_insert (SecondaryIndex * si_index, const char *si_value,
+                        const char *pk_value)
+{
+  int nextnode, newrrn, writepos;
+  MemoryIndexRecord *rec;
+
+  if (avail_list_is_empty (si_index->avlist))
+    {
+      fseek (si_index->fp_list, 0, SEEK_END);
+      newrrn = getFileSize (si_index->fp_list) / si_index->avlist->page_size;
+    }
+  else
+    {
+      writepos = avail_list_pop (si_index->avlist, si_index->fp_list);
+      fseek (si_index->fp_list, writepos, SEEK_SET);
+      newrrn = writepos / si_index->avlist->page_size;
+    }
+
+  rec = memory_index_find (si_index->record_list, si_value);
+  if (!rec)
+    {
+      memory_index_insert (si_index->record_list, si_value, newrrn);
+      nextnode = -1;
+    }
+  else
+    {
+      nextnode = rec->rrn;
+      rec->rrn = newrrn;
+    }
+
+  fprintf (si_index->fp_list, "%-200s", pk_value);
+  fwrite (&nextnode, sizeof (int), 1, si_index->fp_list);
+  fflush (si_index->fp_list);
+}
+
+SecondaryIndex *
+secondary_index_new (const char *indexname, const char *listname,
+                     const char *avname, int writeonly)
+{
+  SecondaryIndex *s = MEM_ALLOC (SecondaryIndex);
+
+  s->avlist = avail_list_new (avname, MEM_REG_SIZE);
+  s->record_list = memory_index_new (indexname, 0);
+
+  if (!writeonly)
+    {
+      memory_index_load_from_file (s->record_list, indexname);
+      avail_list_load (s->avlist);
+    }
+
+  s->fp_list =
+    fopen (listname, (!writeonly && fileExists (listname) ? "r+" : "w+"));
+  assert (s->fp_list);
+
+  return s;
+}
+
+void
+secondary_index_remove (SecondaryIndex * index, const char *sec_value,
+                        const char *pk_value)
+{
+  MemoryIndexRecord *rec;
+  char tmpname[TITLE_LENGTH + 1];
+  int prevnode = -1, curnode, nextnode;
+
+  assert (index);
+
+  rec = memory_index_find (index->record_list, sec_value);
+  if (rec)
+    {
+      curnode = rec->rrn;
+
+      while (curnode != -1)
+        {
+          fseek (index->fp_list, curnode * MEM_REG_SIZE, SEEK_SET);
+          fgets (tmpname, TITLE_LENGTH + 1, index->fp_list);
+          fread (&nextnode, sizeof (int), 1, index->fp_list);
+
+          stripWhiteSpace (tmpname);
+
+          if (!strcasecmp (tmpname, pk_value))
+            {
+              if (prevnode == -1)
+                {
+                  if (nextnode == -1)
+                    memory_index_remove (index->record_list, rec->rrn);
+                  else
+                    rec->rrn = nextnode;
+                }
+              else /* Not the head, just make the previous node point to the current's next */ 
+                {
+                  fseek (index->fp_list, prevnode * MEM_REG_SIZE, SEEK_SET);
+                  fwrite (&nextnode, sizeof (int), 1, index->fp_list);
+                }
+
+              avail_list_push (index->avlist, index->fp_list, curnode);
+
+              break;
+            }
+
+          prevnode = curnode;
+          curnode = nextnode;
+        }
+    }
+}

@@ -9,14 +9,14 @@
  * \retval 0 File does not exist.
  * \retval 1 File exists.
  */
-int fileExists(const char* filename);
+int fileExists (const char *filename);
 
 /**
  * \brief Returns the size of a file.
  * \param f The file whose size will be given.
  * \return The size in bytes of the file, -1 if f is an invalid file.
  */
-long getFileSize(FILE* f);
+long getFileSize (FILE * f);
 
 /**
  * \brief Returns the size of a file with name \a filename.
@@ -26,6 +26,12 @@ long getFileSize(FILE* f);
  * This function works the same as \a getFileSize, but receives
  * a const char instead of a FILE as the argument.
  */
-long getFileSizeFromName(const char* filename);
+long getFileSizeFromName (const char *filename);
+
+/**
+ * \brief Checks if the file exists and is non-empty.
+ * \return 0 or 1 to show if it's valid.
+ */
+int isValidFile (const char *filename);
 
 #endif

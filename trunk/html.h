@@ -5,31 +5,22 @@
 #include "base.h"
 
 /**
- * Writes the beginning of an HTML file to /htmlfile/.
- *
- * @param htmlfile The file pointer to the HTML file.
- *
- * @retval Returns nothing.
+ * \brief Writes the beginning of an HTML file to \a htmlfile.
+ * \param htmlfile The file pointer to the HTML file.
  */
-void htmlBegin(FILE* htmlfile);
+void html_begin (FILE * htmlfile);
 
 /**
- * Writes the end of an HTML file to /htmlfile/.
- *
- * @param htmlfile The file pointer to the HTML file.
- *
- * @retval Returns nothing.
+ * \brief Writes the end of an HTML file to \a htmlfile.
+ * \param htmlfile The file pointer to the HTML file.
  */
-void htmlEnd(FILE* htmlfile);
+void html_end (FILE * htmlfile);
 
 /**
- * Writes the information for a single record to /htmlfile/.
- *
- * @param htmlfile The file pointer to the HTML file.
- * @param info The structure that holds all the info fields for the register.
- *
- * @retval Returns nothing.
+ * \brief Writes the information for a single record to \a htmlfile.
+ * \param htmlfile The file pointer to the HTML file.
+ * \param info The structure that holds all the info fields for the register.
  */
-void htmlWriteRecordInfo(FILE* htmlfile, artwork_info* info);
+void html_write_record_info (FILE * htmlfile, int rrn, ArtworkInfo * info);
 
 #endif
