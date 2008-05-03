@@ -2,10 +2,12 @@
 #include <malloc.h>
 #include <stdlib.h>
 
-void* __memAllocate(size_t numelem, size_t elemsize) {
-  void* chunk = calloc(numelem, elemsize); /* Aloc a new array. */
+void *
+__memAllocate (size_t numelem, size_t elemsize)
+{
+  void *chunk = calloc (numelem, elemsize);     /* Aloc a new array. */
 
-  assert(chunk != NULL);
+  assert (chunk != NULL);
 
   return chunk;
 }

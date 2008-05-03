@@ -10,7 +10,7 @@
 CC=gcc
 CFLAGS=-c -Wall -g -ansi -pedantic
 LDFLAGS=-lefence
-OFILES=base.o file.o io.o html.o main.o mem.o menu.o pk.o avail.o
+OFILES=adapter.o avail.o base.o file.o io.o html.o main.o mem.o memindex.o menu.o secindex.o
 
 TP=tp3
 
@@ -18,6 +18,12 @@ all: art
 
 art: $(OFILES)
 	$(CC) $(LDFLAGS) $(OFILES) -o $(TP)
+
+adapter.o: adapter.c adapter.h
+	$(CC) $(CFLAGS) $<
+
+avail.o: avail.c avail.h
+	$(CC) $(CFLAGS) $<
 
 base.o: base.c base.h
 	$(CC) $(CFLAGS) $<
@@ -37,13 +43,13 @@ main.o: main.c base.h menu.h io.h
 mem.o: mem.c mem.h
 	$(CC) $(CFLAGS) $<
 
+memindex.o: memindex.c memindex.h
+	$(CC) $(CFLAGS) $<
+
 menu.o: menu.c menu.h
 	$(CC) $(CFLAGS) $<
 
-pk.o: pk.c pk.h
-	$(CC) $(CFLAGS) $<
-
-avail.o: avail.c avail.h
+secindex.o: secindex.c secindex.h
 	$(CC) $(CFLAGS) $<
 
 clean:

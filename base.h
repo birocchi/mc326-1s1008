@@ -2,20 +2,20 @@
 #define __BASE_H
 
 #include <stdio.h>
+#include "avail.h"
 
-
-#define TITLE_LENGTH   200 
-#define TYPE_LENGTH    100 
-#define AUTHOR_LENGTH  125 
-#define YEAR_LENGTH    4   
-#define VALUE_LENGTH   12  
-#define IMG_LENGTH     9   
+#define TITLE_LENGTH   200 /**< Length of the title field. */
+#define TYPE_LENGTH    100 /**< Length of the type field. */
+#define AUTHOR_LENGTH  125 /**< Length of the author field. */
+#define YEAR_LENGTH    4   /**< Length of the year field. */
+#define VALUE_LENGTH   12  /**< Length of the value field. */
+#define IMG_LENGTH     9   /**< Length of the image identifier field. */
 
 /**
  * Total size of the register.
  */
-#define REG_SIZE (TITLE_LENGTH + TYPE_LENGTH + AUTHOR_LENGTH + \
-                  YEAR_LENGTH + VALUE_LENGTH + IMG_LENGTH)
+#define BASE_REG_SIZE (TITLE_LENGTH + TYPE_LENGTH + AUTHOR_LENGTH + \
+                       YEAR_LENGTH + VALUE_LENGTH + IMG_LENGTH)
 
 /**
  * The main structure which holds data about
@@ -26,18 +26,72 @@
 typedef struct
 {
   /** The artwork's title  */
-  char title[TITLE_LENGTH+1]; 
+  char title[TITLE_LENGTH + 1];
   /** The artwork's type  */
-  char type[TYPE_LENGTH+1];
+  char type[TYPE_LENGTH + 1];
   /** The artworks author */
-  char author[AUTHOR_LENGTH+1];
+  char author[AUTHOR_LENGTH + 1];
   /** The year the artwork was made */
-  char year[YEAR_LENGTH+1];
+  char year[YEAR_LENGTH + 1];
  /** The artwork's value */
-  char value[VALUE_LENGTH+1];      
+  char value[VALUE_LENGTH + 1];
   /** The register's identifier */
-  char img[IMG_LENGTH+1];  
-} artwork_info;
+  char img[IMG_LENGTH + 1];
+} ArtworkInfo;
+
+/**
+ * Structure which represents the base file and
+ * its avail list.
+ */
+typedef struct
+{
+  AvailList *avlist;  /**< The base's avail list. */
+  FILE *fp;           /**< The base's file representation. */
+} Base;
+
+/**
+ * \brief Frees all the base allocated memory.
+ *        
+ * \param b Pointer to Base struct.
+ */
+void base_free (Base * b);
+
+/**
+ * \brief Inserts a new artwork to the database.
+ *        Considers the avail list already.
+ *
+ * \param base Pointer to Base struct.
+ * \param info Pointer to ArtworkInfo struct, where the new info is.
+ */
+void base_insert (Base * base, ArtworkInfo * info);
+
+/**
+ * \brief Creates a new database struct.
+ *        Loads it from file if it exists.
+ *
+ * \param basename Pointer to const char that is the name of the database file.
+ * \param availname Pointer to const char that is the name of avail list file.
+ * \param writeonly Integer that flags if it is write only mode.
+ *
+ * \return A new Base structure.
+ */
+Base *base_new (const char *basename, const char *availname, int writeonly);
+
+/**
+ * \brief Removes the one register at position \a rrn.
+ *
+ * \param base File pointer to the database.
+ * \param rrn Integer that corresponds to the position in the database.
+ */
+void base_remove (Base * base, int rrn);
+
+/**
+ * \brief Reads all the input fields for the artwork and saves it
+ *        into \a info.
+ *
+ * \param info Pointer to ArtworkInfo structure with info about the register.
+ */
+void base_read_input (ArtworkInfo * info);
 
 /**
  * Makes the image identifier into an actual file name.
@@ -46,9 +100,8 @@ typedef struct
  * @param s The name identifier string.
  *
  * @return Pointer to the correct string. One must free this pointer later on.
- *
  */
-char* baseGetValidImagePath(const char* s);
+char *baseGetValidImagePath (const char *s);
 
 /**
  * Checks if the image identifier is valid.
@@ -59,18 +112,16 @@ char* baseGetValidImagePath(const char* s);
  * 
  * @return Returns 1 on error and 0 for OK.
  */
-int baseIsValidIdentifier(const char* name);
+int baseIsValidIdentifier (const char *name);
 
 /**
- * Reads one record from the database file /base/ and
- * stores it in /info/.
+ * \brief Reads one record from the database file \a base and
+ *        stores it in \a info.
  *
- * @param base File pointer to the database.
- * @param info Pointer to artwork_info structure with info about the register.
- *
- * @return Returns 0 on succes and 1 on error.
+ * \param base File pointer to the database.
+ * \param info Pointer to ArtworkInfo structure with info about the register.
  */
-int baseReadArtworkRecord(FILE* base, artwork_info* info);
+void base_read_artwork_record (FILE * base, ArtworkInfo * info);
 
 /**
  * Writes the data from the struct pointed at by *info
@@ -78,10 +129,8 @@ int baseReadArtworkRecord(FILE* base, artwork_info* info);
  * Writes it according to the requested parameters.
  *
  * @param file File pointer to the database.
- * @param info Pointer to artwork_info structure with info about the register.
- *
- * @return Returns 0 on succes and 1 on error.
+ * @param info Pointer to ArtworkInfo structure with info about the register.
  */
-int baseWriteData(FILE *file, artwork_info *info);
+void base_write_data (FILE * file, ArtworkInfo * info);
 
 #endif
