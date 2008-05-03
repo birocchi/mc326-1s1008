@@ -11,12 +11,12 @@
  */
 typedef struct
 {
-  Base *base;
-  MemoryIndex *pk_index;
-  SecondaryIndex *author_index;
-  SecondaryIndex *title_index;
-  SecondaryIndex *type_index;
-  SecondaryIndex *year_index;
+  Base *base; /**< The base used to hold data. */
+  MemoryIndex *pk_index; /**< The primary keys index. */
+  SecondaryIndex *author_index; /**< The author secondary index. */
+  SecondaryIndex *title_index; /**< The title secondary index. */
+  SecondaryIndex *type_index; /**< The type secondary index. */
+  SecondaryIndex *year_index; /**< The year secondary index. */
 } Adapter;
 
 /**
@@ -55,11 +55,9 @@ void adapter_list (Adapter * db);
 void adapter_load_files (Adapter * db);
 
 /**
- * Creates a new adapter pointer.
- * In case it's the first run.
+ * @brief Creates a new adapter structure.
  *
- * @param db Pointer to Adapter struct
- * @ returns Pointer to Adapter
+ * @return A new Adapter. 
  */
 Adapter *adapter_new (void);
 

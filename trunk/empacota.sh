@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 #
 # empacota.sh
@@ -24,6 +24,13 @@ rm report.{aux,log}
 
 echo ">> Adicionando report.pdf à árvore..."
 cp report.pdf $TPOUTPUT
+
+echo ">> Gerando documentação..."
+if [ ! -d doc/api/ ]; then
+  mkdir -p doc/api
+fi
+doxygen doxygen.conf
+mv doc/ $TPOUTPUT
 
 echo ">> Criando zip..."
 zip -9 -r -q $TPNAME $TPOUTPUT
