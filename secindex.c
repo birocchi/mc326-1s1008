@@ -61,6 +61,8 @@ secondary_index_insert (SecondaryIndex * si_index, const char *si_value,
   int nextnode, newrrn, writepos;
   MemoryIndexRecord *rec;
 
+  /* If there's no position in the avail list,
+   * insert in the end of the file */
   if (avail_list_is_empty (si_index->avlist))
     {
       fseek (si_index->fp_list, 0, SEEK_END);
@@ -68,23 +70,26 @@ secondary_index_insert (SecondaryIndex * si_index, const char *si_value,
     }
   else
     {
+      /* Otherwise, seek to an available position */
       writepos = avail_list_pop (si_index->avlist, si_index->fp_list);
       fseek (si_index->fp_list, writepos, SEEK_SET);
       newrrn = writepos / si_index->avlist->page_size;
     }
 
+  /* Check whether or not to append to an existing record. */
   rec = memory_index_find (si_index->record_list, si_value);
   if (!rec)
     {
       memory_index_insert (si_index->record_list, si_value, newrrn);
-      nextnode = -1;
+      nextnode = -1; /* No next position */
     }
   else
     {
-      nextnode = rec->rrn;
+      nextnode = rec->rrn; /* This node is the new head of the list. */
       rec->rrn = newrrn;
     }
 
+  /* Write the data into the file */
   fprintf (si_index->fp_list, "%-200s", pk_value);
   fwrite (&nextnode, sizeof (int), 1, si_index->fp_list);
   fflush (si_index->fp_list);
@@ -99,6 +104,7 @@ secondary_index_new (const char *indexname, const char *listname,
   s->avlist = avail_list_new (avname, MEM_REG_SIZE);
   s->record_list = memory_index_new (indexname, 0);
 
+  /* Only load data if specified by the user */
   if (!writeonly)
     {
       memory_index_load_from_file (s->record_list, indexname);
@@ -122,34 +128,44 @@ secondary_index_remove (SecondaryIndex * index, const char *sec_value,
 
   assert (index);
 
+  /* Check if this is a valid record in the index */
   rec = memory_index_find (index->record_list, sec_value);
   if (rec)
     {
       curnode = rec->rrn;
 
+      /* Iterate over the entry list */
       while (curnode != -1)
         {
+          /* Read the current entry */
           fseek (index->fp_list, curnode * MEM_REG_SIZE, SEEK_SET);
           fgets (tmpname, TITLE_LENGTH + 1, index->fp_list);
           fread (&nextnode, sizeof (int), 1, index->fp_list);
 
           stripWhiteSpace (tmpname);
 
+          /* Check if this is really the match we are looking for */
           if (!strcasecmp (tmpname, pk_value))
             {
+              /* Check whether this is the head of the list */
               if (prevnode == -1)
                 {
+                  /* If this is the head and there's no next item,
+                   * we can delete the entry from the memory list */
                   if (nextnode == -1)
                     memory_index_remove (index->record_list, rec->rrn);
-                  else
+                  else /* Otherwise set the new head */
                     rec->rrn = nextnode;
                 }
-              else /* Not the head, just make the previous node point to the current's next */ 
+              else
                 {
+                  /* Not the head, just make the previous node point to
+                   * the next one and skip the current item */
                   fseek (index->fp_list, prevnode * MEM_REG_SIZE, SEEK_SET);
                   fwrite (&nextnode, sizeof (int), 1, index->fp_list);
                 }
 
+              /* Insert the position into the avail list */
               avail_list_push (index->avlist, index->fp_list, curnode);
 
               break;
