@@ -1,0 +1,145 @@
+\documentclass{article}
+\usepackage[brazil]{babel}
+\usepackage[utf8]{inputenc}
+
+\title{\textbf{Relatório TP3}}
+\author{\textbf{Grupo 1} \\
+  Anderson Phillip Birocchi (072787) \\
+  Miguel Francisco Alves de Mattos Gaiowski (076116) \\
+  Raphael Kubo da Costa (072201)}
+\date{\today}
+\begin{document}
+
+\maketitle
+
+\section{Objetivo}\
+
+Este trabalho prático tem como objetivo a implementação de consulta por índices secundários e a remoção de entradas numa base de dados como requisitos adicionais aos já implementados durante o trabalho prático anterior.\\
+
+Este relatório detalha algumas decisões de design e arquitetura feitas durante o desenvolvimento, além de uma descrição do código fonte e um guia de uso do programa.
+
+\section{Alterações}\
+
+Dentre as principais alterações no código e nas funcionalidades do programa em relação ao trabalho prático anterior, podemos destacar:\\
+
+\textbf{Funcionalidades}:
+\begin{itemize}
+\item Adicionada a remoção de entradas por índice primário e índices secundários;
+\item Adicionada consulta por índices secundários;
+\item As informações em HTML são listadas em tabela, com o NRR de cada entrada;
+\item Não há mais diferença entre maiúsculas e minúsculas nas buscas.
+\end{itemize}
+
+\textbf{Código}:
+\begin{itemize}
+\item Criada uma estrutura \texttt{MemoryIndex} para representar os índices em memória;
+\item Criada uma estrutura \texttt{Adapter}, correspondente ao \textit{design pattern} de mesmo nome, para gerenciar e fazer a interface entre a base de dados, o índice primário e os índices secundários;
+\item Criada a estrutura \texttt{SecondaryIndex} para representar os índices secundários;
+\item Criada a estrutura \texttt{AvailList} para representar a \textit{avail list} utilizada nas remoções e inserções;
+\item A maior parte do código de \textit{main} foi movida para \textit{adapter.c};
+\item Agora é feito um uso massivo da função \texttt{assert} para checagem de dados e para facilitar o debugging do programa.
+\item pk.c e pk.h foram removidos;
+\end{itemize}
+
+\section{Uso da interface}\
+
+O programa gerado pelo \textit{Makefile} chama-se \textbf{tp3} e deve ser rodado a partir de um terminal. Seu menu inicial apresenta as seguintes opções: \textbf{inserir} uma nova entrada na base de dados, \textbf{consultar} uma obra existente no banco de dados, \textbf{gerar} uma lista com informações sobre todas as obras da base de dados, \textbf{remover} uma obra e \textbf{sair}.
+
+A opção é selecionada digitando-se \textbf{i} para inserir, \textbf{c} para consultar, \textbf{g} para gerar a lista de obras, \textbf{r} para remover e \textbf{s} para sair.\\
+
+\subsection{Inserção}\
+
+No modo de \textbf{inserção}, o usuário deve digitar as informações para \textit{nome da obra}, \textit{tipo de obra}, \textit{autor da obra}, \textit{ano em que a obra foi feita}, \textit{valor da obra} e um \textit{identificador da obra}. Determinados campos possuem restrições: ano e valor devem conter apenas dígitos, e o identificador precisa terminar nas extensões \textit{png, jpg} ou \textit{gif} e ser precedido por até quatro dígitos. Caso já exista uma obra com mesmo nome na base de dados, o usuário deve entrar com outros dados de obra. Feita a inserção, o usuário pode escolher inserir uma nova obra ou voltar para o menu principal.\\
+
+\subsection{Consulta}\
+
+No modo de \textbf{consulta}, o usuário deve primeiro escolher se deseja uma busca \textit{parcial} ou \textit{exata}. Em ambos os casos, não há diferença entre maiúsculas e minúsculas nos itens pesquisados.\\
+
+Uma busca \textit{parcial} é feita somente nos índices secundários do banco de dados. É possível buscar por \textbf{ano}, \textbf{tipo}, \textbf{título} ou \textbf{autor} da obra. Neste modo de pesquisa, é possível buscar por apenas \textbf{uma} palavra, que retornará as entradas que contiverem a palavra buscada.\\
+
+Uma busca \textit{exata} é feita somente no índice primário (título da obra), e busca o título exato entrado pelo usuário.\\
+
+Os resultados encontrados são escritos com os campos NRR, título, tipo, autor, ano de criação, valor e identificador no arquivo \textbf{lista.html}. Caso não haja nenhum resultado, exibe-se uma mensagem de erro.
+
+\subsection{Geração de lista}
+
+No modo de \textbf{geração de lista}, escreve-se no arquivo \textbf{lista.html} uma lista com as informações (NRR, título, tipo, autor, ano de criação, valor e identificador) de todas as obras cadastradas na base de dados. Caso não haja nenhuma obra na base de dados, exibe-se uma mensagem de erro.
+
+\subsection{Remoção}
+
+No modo de \textbf{remoção}, o usuário deve entrar com o NRR (número relativo de registro) da obra que deseja excluir do banco de dados. O NRR é obtido através de uma \textbf{consulta} ou \textbf{geração} de lista de obras. Enquanto o NRR entrado não for válido, o usuário é perguntado por um novo NRR válido para exclusão.
+
+\section{Descrição do Trabalho}\
+
+Desde a versão anterior foi definida uma divisão dos códigos fonte para melhor manutenção e escalabilidade. Com o crescimento das funcionalidades e necessidade de melhor base para algumas destas, acabou-se modificando a estrutura dos arquivos para melhor adequação. Atualmente, os seguintes arquivos compõem o programa:
+
+\begin{itemize}
+\item \textbf{adapter.c, adapter.h}\\
+	\textit{Design pattern} utilizada como uma espécie de ``cola'' entre as diversas partes do sistema: coordena índices e base para buscas, remoções e inserções.
+
+\item \textbf{avail.c, avail.h}\\
+	Contêm as funções referentes à manipulação das avail lists usadas pelos índices e pela base de dados.
+
+\item \textbf{base.c, base.h}\\
+	Contêm as funções referentes à manipulação da base de dados e definições relacionadas, como o tamanho dos campos da base de dados e a estrutura que representa uma entrada na base de dados. Há funções para adição e remoção na base de dados, além de funções auxiliares que validam o identificador e lêem entradas na base de dados.
+
+ \item \textbf{file.c, file.h}\\
+	Contêm funções relacionadas à manipulação de arquivos quaisquer: atualmente, checa se determinado arquivo existe, retorna o tamanho de determinado arquivo e checa se o arquivo é válido para o trabalho (possui tamanho maior que 0).
+
+\item \textbf{filelist.h}\\
+	Contêm os nomes dos arquivos utilizados pelo banco de dados (base, chaves primárias, secundárias e avail lists), de modo a evitar nomes \textit{hardcoded} no código.
+
+ \item \textbf{html.c, html.h}\\
+	Contêm as funções relacionadas à manipulação e geração de arquivos HTML para consultas e listas usadas pelo programa, para automatizar o processo de escrita de dados. Atualmente, cria o começo e o fim de um arquivo HTML e escreve as informações de uma entrada no banco de dados em formato HTML.
+
+ \item \textbf{io.c, io.h}\\
+	Controlam a leitura e escrita de dados entrados pelo usuário. Já no Trabalho Prático 2 foi implementada uma função para limpar caracteres em branco em excesso nas strings. Neste trabalho, foram implementadas uma função para ler somente a primeira palavra de uma string e um \textit{foreach} para que uma string tenha uma função chamada para cada palavra.
+
+ \item \textbf{main.c}\\
+	Contém a lógica de execução do programa. Inicia a base de dados e a lista de chaves primárias e depois recebe as opções de operações desejadas pelo usuário, tratando-as e chamando as funções necessárias em outros arquivos.
+
+ \item \textbf{mem.c, mem.h}\\
+	Contêm macros e funções para facilitar a alocação de memória para o programa: basicamente, as macros alocam o número desejado de bytes na memória e já abortam o programa em caso de erro.
+	
+ \item \textbf{menu.c, menu.h}\\
+	Contêm as funções de exibição dos menus usados pelo programa, além de funções para análise das opções de menu entradas pelo usuário.
+
+ \item \textbf{secindex.c, secindex.h}\\
+	Responsáveis pela manipulação dos índices secundários do banco de dados: adicionam, buscam e removem índices secundários.
+\end{itemize}
+
+\section{Arquivos gerados e existentes}\
+
+\begin{itemize}
+ \item \textbf{doc/api/*}: Documentação da API do sistema em HTML e LaTeX.
+ \item \textbf{author, type, title, year.av}: Avail list dos índices secundários de autores, títulos, tipos e anos.
+ \item \textbf{author, type, title, year.sk}: Índices de memória escritos em disco para os índices de autores, títulos, tipos e anos.
+ \item \textbf{author, type, title, year.sl}: Listas \textit{entry-based} de referências à chave primária para os índices de autores, títulos, tipos e anos.
+ \item \textbf{base01.dat}: Base de dados utilizada pelo programa.
+ \item \textbf{doxygen.conf}: Arquivo de configuração para o Doxygen.
+ \item \textbf{entrada.in}: Entradas usadas para popular a base dados.
+ \item \textbf{lista.html}: Resultado das consultas à base de dados.
+ \item \textbf{pkfile.pk}: Arquivo de ``cache'' das chaves primárias (título das obras).
+\end{itemize}
+
+\section{Decisões de design}\
+
+Durante a escrita do código deste trabalho prático, percebeu-se que os índices secundários e primários compartilhavam algumas características em comum. Em tempo de execução, os índices primários ficam armazenados em memória e são compostos por um \textit{nome} (uma string) e um \textit{identificador} (também chamado de \textit{valor}, \textit{id} ou \textit{NRR}). Os índices secundários, por sua vez, são compostos por duas camadas: uma lista em memória em ordem alfabética composta também por \textit{nome} e \textit{identificador} e uma lista em disco com chave primária e seu respectivo NRR. A lista em memória é idêntica à utilizada pelas chaves primárias, contendo apenas valores de nomes e identificadores diferentes. Assim, para reusar código, removeram-se \textit{pk.c} e \textit{pk.h}, que foram substituídos por \textit{memindex.c} e \textit{memindex.h}, que contêm as estruturas \texttt{MemoryIndex} e \texttt{MemoryIndexRecord} utilizadas por índices primários e secundários.\\
+
+Seguindo a tendência do trabalho anterior, tenta-se aprofundar o uso de encapsulamento em todas as estruturas. Assim, usa-se, por exemplo, a função \texttt{avail\_list\_get\_tail} para se obter o próximo registro de uma avail list. Foi feito um esforço para garantir um bom nível de granularidade e independência nas funções do sistema, sendo as funções \textit{foreach} um exemplo dessa característica: elas apenas percorrem um objeto, como string ou índice, e chama uma função qualquer através de um ponteiro para função. Essa função é a verdadeira responsável por realizar alguma tarefa sobre os objetos iterados. Para isso, foram usadas as funções de manipulação presentes no header \textit{stdarg.h}.\\
+
+Desde o primeiro trabalho prático, havia uma preocupação em todo o grupo com o tamanho da função \texttt{main}: muito da lógica do programa estava \textit{hardcoded} e a função estava crescendo muito a cada nova funcionalidade adicionada. O problema foi resolvido usando-se um \textit{Adapter} (        http://en.wikipedia.org/wiki/Adapter\_Pattern) ou \textit{wrapper} que agrega os diversos componentes do sistema (base de dados, índices, avail lists) e os controla de maneira ordenada. Assim, \texttt{main} apenas recebe a opção desejada do usuário e repassa à função responsável por tratá-la no \textit{adapter}.
+
+\section{Resultado final e comentários}\
+
+Conseguimos fazer um programa sem bugs conhecidos e sem vazamentos de memória encontrados. As consultas e remoções funcionam corretamente de acordo com os requisitos mínimos do trabalho prático.\\
+
+Para controle de versões do código, desde o primeiro trabalho é utilizado o \textbf{Subversion}. O repositório do grupo encontra-se em \textit{http://code.google.com/p/mc326-1s1008}. A partir da versão passada, passou-se a utilizar o \textit{Doxygen} para geração de documentação do código-fonte. Por fim, este relatório e seu fonte em LaTeX encontram-se na pasta dos fontes do programa.\\
+
+As maiores dificuldades foram encontradas durante o planejamento da implementação das novas funcionalidades do sistema. Foi somente quando parte da estrutura já havia sido implementada que percebeu-se que era possível criar \texttt{MemoryIndex}, e parte do código teve de ser reescrito. Além disso, o código de \textit{adapter.c} ficou maior do que o esperado devido a detalhes do código, como o carregamento correto dos arquivos e a independência das funções. Entretanto, o uso da função \texttt{assert} facilitou a detecção de erros de segmentação e o \textit{gdb} permitiu que o código fosse debugado rapidamente. Pela primeira vez durante os testes foi utilizado o \textit{bug tracker} do projeto no Google Code para o gerenciamento de bugs e correções.\\
+
+Um detalhe que deve ser notado é o uso das funções \textit{fread} e \textit{fwrite} para leitura e escrita dos NRRs dos índices primários e secundários. Como eles são inteiros, caso fossem escritos com \textit{fprintf} e lidos com \textit{fgets} os 4 bytes seriam ocupados por uma seqüência de bytes em que a conversão de inteiros para strings foi feita de forma literal. Assim, o inteiro -1 seria escrito como ``-001` e não 0xFFFFFFFF. Isso diminui consideravelmente a quantidade possível de inteiros que poderiam ser escritos, além de causar uma corrupção nos arquivos caso o inteiro tivesse mais que 4 dígitos. Para campos string, continuou-se usando \textit{fprintf} e \textit{fgets}.\\
+
+Finalmente, para os próximos trabalhos pretende-se trabalhar nas idéias presentes no arquivo TODO: renomear algumas funções de \textit{base.c} e mexer na estrutura de \textit{ArtworkInfo} se necessário, além de criar um ''wrapper`` para a função \texttt{fopen} para diminuir algumas linhas de código fazendo-se a checagem da abertura dos arquivos automaticamente e uma automatização da leitura da estrutura nome e NRR.
+
+\end{document}
