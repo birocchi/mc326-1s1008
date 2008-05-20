@@ -4,24 +4,25 @@
 #include <stdio.h>
 #include "base.h"
 
-/**
- * \brief Writes the beginning of an HTML file to \a htmlfile.
- * \param htmlfile The file pointer to the HTML file.
+/*
+ * htmlBegin
+ *
+ * Writes the beginning of an HTML file to /htmlfile/.
  */
-void html_begin (FILE * htmlfile);
+void htmlBegin(FILE* htmlfile);
 
-/**
- * \brief Writes the end of an HTML file to \a htmlfile.
- * \param htmlfile The file pointer to the HTML file.
+/*
+ * htmlEnd
+ *
+ * Writes the end of an HTML file to /htmlfile/.
  */
-void html_end (FILE * htmlfile);
+void htmlEnd(FILE* htmlfile);
 
-/**
- * \brief Writes the information for a single record to \a htmlfile.
- * \param htmlfile The file pointer to the HTML file.
- * \param rrn      The RRN of the current entry.
- * \param info The structure that holds all the info fields for the register.
+/*
+ * htmlWriteRecordInfo
+ *
+ * Writes the information for a single record to /htmlfile/.
  */
-void html_write_record_info (FILE * htmlfile, int rrn, ArtworkInfo * info);
+void htmlWriteRecordInfo(FILE* htmlfile, artwork_info* info);
 
 #endif

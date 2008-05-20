@@ -52,8 +52,8 @@ class ArtworkInfo(object):
     self.__title = data.read(200)
     self.__type = data.read(100)
     self.__author = data.read(125)
-    self.__year = data.read(4).strip()
-    self.__value = data.read(12).strip()
+    self.__year = data.read(4)
+    self.__value = data.read(12)
     self.__imageName = data.read(9)
 
   # Getters
@@ -88,7 +88,7 @@ class DatFile(object):
 
   def next(self):
     if self.__file.tell() < self.getSize():
-      return ArtworkInfo(StringIO(self.__file.read(450)))
+      return ArtworkInfo(StringIO(self.__file.read(420)))
 
     raise StopIteration
 

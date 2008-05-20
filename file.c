@@ -1,53 +1,41 @@
-/* Must be defined to have access to fileno() */
-#define _POSIX_C_SOURCE 1
-
 #include <stdio.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include "file.h"
 
-int
-fileExists (const char *filename)
-{
+int fileExists(const char* filename) {
   struct stat buf;
 
-  /* Check if stat return OK and the file is a regular file */
-  if ((stat (filename, &buf) != 0) || (!S_ISREG (buf.st_mode)))
+  /* Get all sorts of info about the file. */
+  if (stat(filename, &buf) != 0)
+    return 0;
+
+  /* Check if it's a regular file. */
+  if (!S_ISREG(buf.st_mode))
     return 0;
 
   return 1;
 }
 
-long
-getFileSize (FILE * f)
-{
-  int fd;
-  struct stat buf;
-
-  /* This is pretty straight forward. */
-  fd = fileno (f);
-
-  if (fstat (fd, &buf) != 0)
+int getFileSize(FILE * f){
+  int file_size;
+  int prev_pos;
+  
+  /* Don't try to get the size of a NULL pointer. */
+  if(!f)
     return -1;
 
-  return buf.st_size;
-}
+  /* Save the current pointer position. */
+  prev_pos = ftell(f);
 
-long
-getFileSizeFromName (const char *filename)
-{
-  struct stat buf;
+  /* Go to the end of the file. */
+  fseek(f, 0, SEEK_END);
+  /* So the pointer position is the file size. */
+  file_size = ftell(f);
+  
+  /* Take the pointer back to it's original position. */
+  fseek(f, prev_pos, SEEK_SET);
 
-  /* Check if stat return OK and the file is a regular file */
-  if ((stat (filename, &buf) != 0) || (!S_ISREG (buf.st_mode)))
-    return -1;
-
-  return buf.st_size;
-}
-
-int
-isValidFile (const char *filename)
-{
-  return (fileExists (filename) && (getFileSizeFromName (filename) > 0));
+  return file_size;
 }

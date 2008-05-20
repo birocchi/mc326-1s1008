@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 #
 # empacota.sh
@@ -7,8 +7,8 @@
 # Creates a valid zip file with our work :)
 #
 
-TPNAME="tp3.zip"
-TPOUTPUT="tp03_grupo01"
+TPNAME="tp2.zip"
+TPOUTPUT="tp02_grupo01"
 
 if [ -f $TPNAME ]; then
   echo ">> Apagando zip anterior..."
@@ -24,13 +24,6 @@ rm report.{aux,log}
 
 echo ">> Adicionando report.pdf à árvore..."
 cp report.pdf $TPOUTPUT
-
-echo ">> Gerando documentação..."
-if [ ! -d doc/api/ ]; then
-  mkdir -p doc/api
-fi
-doxygen doxygen.conf
-mv doc/ $TPOUTPUT
 
 echo ">> Criando zip..."
 zip -9 -r -q $TPNAME $TPOUTPUT

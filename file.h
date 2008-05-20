@@ -3,35 +3,22 @@
 
 #include <stdio.h>
 
-/**
- * \brief Checks for the existence of a file with name filename.
- * \param filename The name of the file we need to check.
- * \retval 0 File does not exist.
- * \retval 1 File exists.
- */
-int fileExists (const char *filename);
-
-/**
- * \brief Returns the size of a file.
- * \param f The file whose size will be given.
- * \return The size in bytes of the file, -1 if f is an invalid file.
- */
-long getFileSize (FILE * f);
-
-/**
- * \brief Returns the size of a file with name \a filename.
- * \param filename The name of the file to be inspected.
- * \return The size in bytes of the file, -1 if f is an invalid file.
+/*
+ * fileExists
  *
- * This function works the same as \a getFileSize, but receives
- * a const char instead of a FILE as the argument.
+ * Checks for the existence of a file with
+ * name /filename/.
+ *
+ * Returns 1 if it exists, and 0 otherwise.
  */
-long getFileSizeFromName (const char *filename);
+int fileExists(const char* filename);
 
-/**
- * \brief Checks if the file exists and is non-empty.
- * \return 0 or 1 to show if it's valid.
+/*
+ * getFileSize
+ *
+ * Returns the size in bytes of a file /f/
+ * if /f/ is a valid file, and -1 otherwise.
  */
-int isValidFile (const char *filename);
+int getFileSize(FILE* f);
 
 #endif
