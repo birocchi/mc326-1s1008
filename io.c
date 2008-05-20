@@ -83,6 +83,7 @@ void readInt(const char* inputText, char* dest, size_t length)
   invalid = 1;
 
   while (invalid) {
+    invalid = 0;
     readString(inputText, dest, length);
 
     for (i = 0; i < strlen(dest); i++) {
@@ -92,8 +93,6 @@ void readInt(const char* inputText, char* dest, size_t length)
         break;
       }
     }
-
-    invalid = 0;
   }
 }
 
