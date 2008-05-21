@@ -391,7 +391,7 @@ adapter_remove (Adapter * db)
       readInt ("   Digite o NRR da obra: ", key, TITLE_LENGTH);
       rrn = atoi (key);
 
-      if (rrn < db->pk_index->regnum)   /* Check if the RRN is valid */
+      if (memory_index_is_valid_rrn (db->pk_index, rrn))
         {
           fseek (db->base->fp, rrn * BASE_REG_SIZE, SEEK_SET);
           base_read_artwork_record (db->base->fp, &artwork);
