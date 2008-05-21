@@ -85,6 +85,17 @@ void memory_index_insert (MemoryIndex * index, const char *name, int rrn);
 int memory_index_is_empty (MemoryIndex * index);
 
 /**
+ * @brief Checks if the RRN exists in the index.
+ *
+ * @param index The memory index to check.
+ * @param rrn   The RRN to look for.
+ *
+ * @retval 0 The RRN is not found.
+ * @retval 1 The RRN is found.
+ */
+int memory_index_is_valid_rrn (MemoryIndex * index, int rrn);
+
+/**
  * @brief Load data from disk.
  *
  * @param index    The memory index.
