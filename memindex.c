@@ -128,6 +128,19 @@ memory_index_is_empty (MemoryIndex * index)
   return (index ? index->regnum == 0 : 1);
 }
 
+int memory_index_is_valid_rrn (MemoryIndex * index, int rrn)
+{
+  int i;
+
+  for (i = 0; i < index->regnum; i++)
+    {
+      if (index->reclist[i].rrn == rrn)
+        return 1;
+    }
+
+  return 0;
+}
+
 void
 memory_index_load_from_file (MemoryIndex * index, const char *filename)
 {
