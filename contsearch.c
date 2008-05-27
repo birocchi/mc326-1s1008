@@ -1,4 +1,5 @@
 #include "contsearch.h"
+#include "libimg.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -21,6 +22,7 @@ int main(){
 
   char a;
 
+  printf("%d\n", numbits(CalculaDescritor("img/012426.png")));
 
   a = 1; /* 00000001 */
   printf("%d\n", numbits(a));
@@ -37,7 +39,6 @@ int main(){
     printf("%d\n", numbits(a));
   }
 
-  
 
   return 0;
 

@@ -9,8 +9,8 @@
 
 CC=gcc
 CFLAGS=-c -Wall -g -ansi -pedantic
-LDFLAGS=-lefence
-OFILES=adapter.o avail.o base.o file.o io.o html.o main.o mem.o memindex.o menu.o secindex.o
+LDFLAGS=-lefence -ljpeg -lgif -lpng
+OFILES=adapter.o avail.o base.o file.o io.o html.o main.o mem.o memindex.o menu.o secindex.o libimg.o
 
 TP=tp3
 
@@ -35,6 +35,9 @@ html.o: html.c html.h
 	$(CC) $(CFLAGS) $<
 
 io.o: io.c io.h
+	$(CC) $(CFLAGS) $<
+
+libimg.o: libimg.c libimg.h
 	$(CC) $(CFLAGS) $<
 
 main.o: main.c base.h menu.h io.h
