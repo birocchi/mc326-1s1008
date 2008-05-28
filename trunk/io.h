@@ -62,7 +62,7 @@ void readString (const char *inputText, char *dest, size_t length);
 void read_word (const char *msg, char *dest, size_t length);
 
 /**
- * \brief Read at most length bytes frm stdin. Strip trailing whitespace and
+ * \brief Read at most length bytes from stdin. Strip trailing whitespace and
  *        newline character if they're present.
  *
  *        If no newline is found, clear the input buffer before leaving.
