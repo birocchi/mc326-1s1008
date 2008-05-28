@@ -8,7 +8,7 @@
 void
 html_begin (FILE * htmlfile)
 {
-  /* Check if the was opened ok. */
+  /* Check if the file was opened ok. */
   if (htmlfile)
     {
       /* Writing the top part of the html file. */
