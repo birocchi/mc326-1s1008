@@ -7,7 +7,7 @@
 
 /**
  * This holds the pointers to each
- * of the indexes and database we hava.
+ * of the indexes and database we have.
  */
 typedef struct
 {
@@ -34,7 +34,7 @@ void adapter_find (Adapter * db);
 void adapter_free (Adapter * db);
 
 /**
- * Performs inserions in the database
+ * Performs insertions in the database
  *
  * @param db Pointer to Adapter struct
  */
