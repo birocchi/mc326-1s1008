@@ -18,13 +18,13 @@ typedef struct
 } MemoryIndexRecord;
 
 /**
- * This structure encapuslates and holds
+ * This structure encapsulates and holds
  * all the information related to a memory index.
  */
 typedef struct
 {
   char *fp_name; /**< The name of the disk representation of the index. */
-  size_t regnum; /**< The current number of used entris. */
+  size_t regnum; /**< The current number of used entries. */
   size_t maxregs; /**< The total number of allocated entries. */
   MemoryIndexRecord *reclist; /**< The record list. */
 } MemoryIndex;

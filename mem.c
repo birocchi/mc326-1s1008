@@ -5,7 +5,7 @@
 void *
 __memAllocate (size_t numelem, size_t elemsize)
 {
-  void *chunk = calloc (numelem, elemsize);     /* Aloc a new array. */
+  void *chunk = calloc (numelem, elemsize);     /* Allocates a new array. */
 
   assert (chunk != NULL);
 
