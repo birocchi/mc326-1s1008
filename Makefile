@@ -54,4 +54,4 @@ secindex.o: secindex.c secindex.h
 
 clean:
 	cp -v base01.dat base01.dat.back ; \
-	rm -rf doc/ *.o $(TP) base01.dat *.av *.sk *.sl pkfile.pk ;
+	rm -rf doc/ *.o $(TP) base01.dat *.av *.sk *.sl pkfile.pk lista.html;
