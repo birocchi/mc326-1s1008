@@ -1,0 +1,25 @@
+#summary Esta página contém uma breve descrição da relação entre chaves primárias e secundárias no TP3, porque sempre me esqueço (é útil para os TPs seguintes também).
+#labels Phase-Design,Phase-Implementation
+
+= Estruturas usadas =
+== MemoryIndex ==
+Até o TP2, era `PrimaryIndexRecord`. Trata-se de uma generalização da antiga estrutura de chave primária - um índice na memória que guarda um nome (ou qualquer _char`*`_) e um RRN (ou qualquer tipo de _int_). A cada inserção, é executado um _qsort_ no índice todo, para organizá-lo sempre em ordem alfabética de nome.
+
+Implementado em *memindex.c* e *memindex.h*.
+
+== SecondaryIndex ==
+Estrutura de armazenamento das chaves secundárias, como *ano*, *autor*, *tipo* e *título* da obra.
+
+A _struct_ que a define possui:
+  * Uma _avail list_
+  * Um arquivo de lista de chaves primárias
+  * Um `MemoryIndex`
+
+A avail list serve para guardar as posições livres para escrita no arquivo. O arquivo de listas possui uma associação _chave primária-RRN_ para cada entrada cadastrada. O índice de memória contém as chaves secundárias (autor, tipo etc) organizadas alfabeticamente e com o RRN apontando para a posição no arquivo de lista com a chave primária correspondente.
+
+= Inserção =
+Para a inserção, primeiro verifica-se se há espaço na _avail list_ do arquivo de lista de chaves primárias, de modo a calcular a posição da nova chave primária (no fim do arquivo ou no local apontado pela _avail list_). A partir dessa posição, é possível calcular o RRN da entrada dividindo-se a posição absoluta do arquivo pelo tamanho de cada entrada.
+
+Depois disso, é feita uma busca no `MemoryIndex` associado pelo valor de chave secundária passado. Se a chave já existir, altera-se o RRN dela para o da nova entrada de chave primária, cujo RRN apontará para o da entrada atual, criando a lista invertida. Se a chave não existir, o RRN dela também apontará para o da nova entrada de chave primária, porém o RRN desta será -1.
+
+É nessa parte que eu sempre me confundo: o `MemoryIndex` tem a entrada de chave secundária e a posição no arquivo da chave primária correspondente. O arquivo de chave primária tem a chave primária e a posição *no mesmo arquivo* da próxima entrada da *lista invertida*.
