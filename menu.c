@@ -56,7 +56,6 @@ print_search_type_menu (void)
   printf ("\n");
 }
 
-
 void
 printMainMenu (void)
 {
