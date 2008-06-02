@@ -21,3 +21,5 @@ A estrutura de chaves secundárias, por sua vez, possui apenas mais uma indireç
 No fim das contas, não muda muita coisa. Entre a chamada e a operação com o `MemoryIndex`, agora temos a parte de *hashing*.
 
 Numa busca por autor, por exemplo, a string de busca é passada para uma função de hash que vai retornar sua posição na hash table. O conteúdo dessa posição é o indicador do arquivo em que aquela entrada está guardada. Carrega-se esse arquivo e daí pra frente a busca é feita normalmente.
+
+A função de hash apenas vai retornar um H qualquer que eu uso para saber qual arquivo carregar. Carregado o arquivo na memória, é tudo igual ao TP3.
