@@ -11,4 +11,8 @@ Esta página explica como funciona a implementação de hashing para o TP, as al
 Além de ajudar a escrever o relatório mais rápido, isso tudo serve para eu não ficar confuso na hora de programar e me lembrar mais facilmente do que preciso fazer ;)
 
 = TP3 =
-Como visto em IndicesSecundariosNoTP3, a base tanto para chaves primárias quanto secundárias é a estrutura MemoryIndex, que, de certa forma, é um grande array ordenado alfabeticamente que representa uma estrutura _chave-valor_ (no caso, a chave é um nome o valor é um RRN).
+Como visto em [IndicesSecundariosNoTP3], a base tanto para chaves primárias quanto secundárias é a estrutura `MemoryIndex`, que, de certa forma, é um grande array ordenado alfabeticamente que representa uma estrutura _chave-valor_ (no caso, a chave é um nome o valor é um RRN).
+
+A estrutura de chaves primárias é, de fato, apenas um `MemoryIndex` com chave primária e RRN na base de dados, que é serializado no início e no fim do programa.
+
+A estrutura de chaves secundárias, por sua vez, possui apenas mais uma indireção - tem-se um `MemoryIndex` com entradas de ano, autor etc e um RRN para o arquivo com chave primária e RRN da próxima entrada da lista invertida (ficou meio confuso, mas é só visitar [IndicesSecundariosNoTP3].
