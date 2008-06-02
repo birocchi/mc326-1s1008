@@ -2,7 +2,7 @@
 #labels Phase-Implementation,Phase-Design
 
 = Introdução =
-No TP3, os índices primários e (pelo menos uma parte dos) secundários eram armazenados em memória - ver IndicesSecundariosNoTP3.
+No TP3, os índices primários e (pelo menos uma parte dos) secundários eram armazenados em memória - ver [IndicesSecundariosNoTP3].
 
 Para o TP4, deve-se assumir que os índices não cabem todos na memória e por isso devem ser divididos em vários arquivos referenciados por _hash tables_ - ver [http://docs.google.com/View?docid=dddc4m7c_17rqjcwbgp TP4].
 
@@ -10,9 +10,14 @@ Esta página explica como funciona a implementação de hashing para o TP, as al
 
 Além de ajudar a escrever o relatório mais rápido, isso tudo serve para eu não ficar confuso na hora de programar e me lembrar mais facilmente do que preciso fazer ;)
 
-= TP3 =
+= Como era no TP3 =
 Como visto em [IndicesSecundariosNoTP3], a base tanto para chaves primárias quanto secundárias é a estrutura `MemoryIndex`, que, de certa forma, é um grande array ordenado alfabeticamente que representa uma estrutura _chave-valor_ (no caso, a chave é um nome o valor é um RRN).
 
 A estrutura de chaves primárias é, de fato, apenas um `MemoryIndex` com chave primária e RRN na base de dados, que é serializado no início e no fim do programa.
 
 A estrutura de chaves secundárias, por sua vez, possui apenas mais uma indireção - tem-se um `MemoryIndex` com entradas de ano, autor etc e um RRN para o arquivo com chave primária e RRN da próxima entrada da lista invertida (ficou meio confuso, mas é só visitar [IndicesSecundariosNoTP3].
+
+= Como deve ser no TP4 =
+No fim das contas, não muda muita coisa. Entre a chamada e a operação com o `MemoryIndex`, agora temos a parte de *hashing*.
+
+Numa busca por autor, por exemplo, a string de busca é passada para uma função de hash que vai retornar sua posição na hash table. O conteúdo dessa posição é o indicador do arquivo em que aquela entrada está guardada. Carrega-se esse arquivo e daí pra frente a busca é feita normalmente.
