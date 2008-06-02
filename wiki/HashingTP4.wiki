@@ -1,0 +1,11 @@
+#summary Descreve o funcionamento do hashing requerido no TP4 e a API planejada.
+#labels Phase-Implementation,Phase-Design
+
+= Introdução =
+No TP3, os índices primários e (pelo menos uma parte dos) secundários eram armazenados em memória - ver IndicesSecundariosNoTP3.
+
+Para o TP4, deve-se assumir que os índices não cabem todos na memória e por isso devem ser divididos em vários arquivos referenciados por _hash tables_ - ver [http://docs.google.com/View?docid=dddc4m7c_17rqjcwbgp TP4].
+
+Esta página explica como funciona a implementação de hashing para o TP, as alterações em relação ao TP3 e como é a API planejada.
+
+Além de ajudar a escrever o relatório mais rápido, isso tudo serve para eu não ficar confuso na hora de programar e me lembrar mais facilmente do que preciso fazer ;)
