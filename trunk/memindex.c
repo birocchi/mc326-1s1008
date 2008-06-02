@@ -128,7 +128,8 @@ memory_index_is_empty (MemoryIndex * index)
   return (index ? index->regnum == 0 : 1);
 }
 
-int memory_index_is_valid_rrn (MemoryIndex * index, int rrn)
+int
+memory_index_is_valid_rrn (MemoryIndex * index, int rrn)
 {
   int i;
 
