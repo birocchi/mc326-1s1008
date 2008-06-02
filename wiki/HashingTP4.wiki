@@ -23,3 +23,8 @@ No fim das contas, não muda muita coisa. Entre a chamada e a operação com o `
 Numa busca por autor, por exemplo, a string de busca é passada para uma função de hash que vai retornar sua posição na hash table. O conteúdo dessa posição é o indicador do arquivo em que aquela entrada está guardada. Carrega-se esse arquivo e daí pra frente a busca é feita normalmente.
 
 A função de hash apenas vai retornar um H qualquer que eu uso para saber qual arquivo carregar. Carregado o arquivo na memória, é tudo igual ao TP3.
+
+= Implementação =
+A implementação das hash tables ficará nos arquivos *hash.c* e *hash.h*. Eles serão incluídos nos arquivos *memindex.c* e *memindex.h*.
+
+Isso significa que a implementação das hash tables será _transparente para o resto do código_, ou seja, somente a implementação de `MemoryIndex` será alterada para incluir as chamadas ao código de hash tables.
