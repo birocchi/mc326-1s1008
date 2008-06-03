@@ -161,7 +161,7 @@ secondary_index_remove (SecondaryIndex * index, const char *sec_value,
                 {
                   /* Not the head, just make the previous node point to
                    * the next one and skip the current item */
-                  fseek (index->fp_list, prevnode * MEM_REG_SIZE, SEEK_SET);
+                  fseek (index->fp_list, (prevnode * MEM_REG_SIZE) + TITLE_LENGTH, SEEK_SET);
                   fwrite (&nextnode, sizeof (int), 1, index->fp_list);
                 }
 
