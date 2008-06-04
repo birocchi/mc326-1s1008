@@ -5,6 +5,7 @@
 #include <strings.h>
 #include "base.h"
 #include "file.h"
+#include "hash.h"
 #include "io.h"
 #include "mem.h"
 #include "memindex.h"
@@ -17,13 +18,16 @@
 static void
 flush_to_disk (MemoryIndex * index)
 {
+  char *filename;
   int i;
   FILE *fp;
 
   assert (index);
 
-  fp = fopen (index->fp_name, "w");
+  filename = hash_get_filename (index->fp_name, index->loaded_file);
+  fp = fopen (filename, "w");
   assert (fp);
+  free (filename);
 
   for (i = 0; i < index->regnum; i++)
     {
@@ -60,6 +64,29 @@ inflate_list (MemoryIndex * index, size_t size)
     }
 }
 
+static void
+change_hash_file (MemoryIndex *index, const char *name)
+{
+  char *filename;
+  unsigned int hashnum;
+
+  hashnum = hash_function (name);
+  /*hashnum = index->hash_function (name);*/
+
+  if (index->loaded_file != hashnum)
+    {
+      /* Flush changes to the previous file before changing */
+      if (index->loaded_file != -1)
+        flush_to_disk (index);
+
+      filename = hash_get_filename (index->fp_name, hashnum);
+      memory_index_load_from_file (index, filename);
+      free (filename);
+
+      index->loaded_file = hashnum;
+    }
+}
+
 /**
  * @brief Binary search comparison function.
  *
@@ -88,6 +115,8 @@ memory_index_find (MemoryIndex * index, const char *name)
 {
   assert (index);
 
+  change_hash_file (index, name);
+
   return bsearch (name, index->reclist, index->regnum,
                   sizeof (MemoryIndexRecord), bsearch_find_by_name);
 }
@@ -108,6 +137,8 @@ void
 memory_index_insert (MemoryIndex * index, const char *name, int rrn)
 {
   assert (index && name);
+
+  change_hash_file (index, name);
 
   /* Allocate more memory if necessary */
   if (index->regnum == index->maxregs)
@@ -132,6 +163,8 @@ int
 memory_index_is_valid_rrn (MemoryIndex * index, int rrn)
 {
   int i;
+
+  assert (index);
 
   for (i = 0; i < index->regnum; i++)
     {
@@ -182,6 +215,7 @@ memory_index_new (const char *fp_name, size_t nelem)
   MemoryIndex *index = MEM_ALLOC (MemoryIndex);
 
   index->regnum = nelem;
+  index->loaded_file = -1;
   index->maxregs = (nelem == 0 ? 40 : 2 * nelem);
   index->reclist = MEM_ALLOC_N (MemoryIndexRecord, index->maxregs);
   index->fp_name = str_dup (fp_name);
