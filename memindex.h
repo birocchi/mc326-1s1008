@@ -24,6 +24,7 @@ typedef struct
 typedef struct
 {
   char *fp_name; /**< The name of the disk representation of the index. */
+  unsigned int loaded_file; /**< The number of the currently loaded file (from the split list). */
   size_t regnum; /**< The current number of used entries. */
   size_t maxregs; /**< The total number of allocated entries. */
   MemoryIndexRecord *reclist; /**< The record list. */
