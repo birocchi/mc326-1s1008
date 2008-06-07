@@ -71,11 +71,10 @@ void base_insert (Base * base, ArtworkInfo * info);
  *
  * \param basename Pointer to const char that is the name of the database file.
  * \param availname Pointer to const char that is the name of avail list file.
- * \param writeonly Integer that flags if it is write only mode.
  *
  * \return A new Base structure.
  */
-Base *base_new (const char *basename, const char *availname, int writeonly);
+Base *base_new (const char *basename, const char *availname);
 
 /**
  * \brief Removes the one register at position \a rrn.

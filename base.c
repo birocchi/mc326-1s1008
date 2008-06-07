@@ -47,7 +47,7 @@ base_insert (Base * base, ArtworkInfo * info)
 }
 
 Base *
-base_new (const char *basename, const char *availname, int writeonly)
+base_new (const char *basename, const char *availname)
 {
   Base *b = MEM_ALLOC (Base);
 
