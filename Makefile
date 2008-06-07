@@ -13,6 +13,7 @@ LDFLAGS=-lefence -ljpeg -lungif -lpng
 OFILES=adapter.o avail.o base.o file.o io.o hash.o html.o main.o mem.o memindex.o menu.o secindex.o# libimg.o
 
 TP=tp4
+BASE=base01.dat
 
 all: art
 
@@ -59,5 +60,5 @@ secindex.o: secindex.c secindex.h
 	$(CC) $(CFLAGS) $<
 
 clean:
-	cp -v base01.dat base01.dat.back ; \
-	rm -rf doc/ *.o $(TP) base01.dat *.av *.sk *.sl pkfile.pk ;
+	cp -v $(BASE) $(BASEBACKUP) ; \
+	rm -rf doc/ *.o $(TP) $(BASE) *.av *.sk.h* *.sl pkfile.pk.h* ;
