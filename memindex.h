@@ -120,6 +120,10 @@ void memory_index_load_from_file (MemoryIndex * index, const char *filename);
  */
 MemoryIndex *memory_index_new (const char *fp_name, size_t nelem);
 
+MemoryIndex *
+memory_index_new_with_hash (const char *fp_name, size_t nelem, unsigned int
+  (*hash_function)(char*));
+
 /**
  * @brief Removes the specified entry from the index.
  *

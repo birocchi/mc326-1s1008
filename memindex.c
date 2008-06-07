@@ -126,7 +126,8 @@ memory_index_free (MemoryIndex * index)
 {
   if (index)
     {
-      flush_to_disk (index);
+      if (index->loaded_file != -1)
+        flush_to_disk (index);
       free (index->fp_name);
       free (index->reclist);
       free (index);
@@ -184,8 +185,14 @@ memory_index_load_from_file (MemoryIndex * index, const char *filename)
 
   assert (index);
 
+  /* If the file doesn't exist, create it and leave */
   if (!fileExists (filename))
-    return;
+    {
+      fp = fopen (filename, "w");
+      assert (fp);
+      fclose (fp);
+      return;
+    }
 
   fp = fopen (filename, "r");
   assert (fp);
@@ -212,13 +219,23 @@ memory_index_load_from_file (MemoryIndex * index, const char *filename)
 MemoryIndex *
 memory_index_new (const char *fp_name, size_t nelem)
 {
+  return memory_index_new_with_hash (fp_name, nelem, hash_function);
+}
+
+MemoryIndex *
+memory_index_new_with_hash (const char *fp_name, size_t nelem, unsigned int
+  (*hash_function)(char*))
+{
   MemoryIndex *index = MEM_ALLOC (MemoryIndex);
 
   index->regnum = nelem;
-  index->loaded_file = -1;
   index->maxregs = (nelem == 0 ? 40 : 2 * nelem);
+
   index->reclist = MEM_ALLOC_N (MemoryIndexRecord, index->maxregs);
   index->fp_name = str_dup (fp_name);
+
+  index->loaded_file = -1;
+  index->hash_function = hash_function;
 
   return index;
 }
