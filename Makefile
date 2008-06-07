@@ -12,7 +12,7 @@ CFLAGS=-c -Wall -g -ansi -pedantic
 LDFLAGS=-lefence -ljpeg -lungif -lpng
 OFILES=adapter.o avail.o base.o file.o io.o hash.o html.o main.o mem.o memindex.o menu.o secindex.o# libimg.o
 
-TP=tp3
+TP=tp4
 
 all: art
 
