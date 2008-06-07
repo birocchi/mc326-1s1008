@@ -53,19 +53,10 @@ base_new (const char *basename, const char *availname)
 
   /* We need a new avail list. */
   b->avlist = avail_list_new (availname, BASE_REG_SIZE);
+  avail_list_load (b->avlist);
 
-  /* If the base already exists and is non-empty. */
-  if ((fileExists (basename) && (getFileSizeFromName (basename) > 0)))
-    {
-      /* Just open it for reading. */
-      b->fp = fopen (basename, "r+");
-      /* And load the previously made avail list. */
-      avail_list_load (b->avlist);
-    }
-  else
-    /* If it was empty or didn't even exist, create a new one. */
-    b->fp = fopen (basename, "w+");
-  assert (b->fp);
+  b->fp = fopen (basename, (isValidFile (basename) ? "r+" : "w+"));
+  assert (fp);
 
   return b;
 }
