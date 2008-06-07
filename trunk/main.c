@@ -22,15 +22,12 @@ main (int argc, char *argv[])
     {
       printMainMenu ();
 
-      switch (menuMultipleAnswers ("   Opcao desejada: ", "cigrs"))
+      switch (menuMultipleAnswers ("   Opcao desejada: ", "cirs"))
         {
         default:               /* This should not happen */
           break;
         case 'c':
           adapter_find (db);
-          break;
-        case 'g':
-          adapter_list (db);
           break;
         case 'i':
           adapter_insert (db);
