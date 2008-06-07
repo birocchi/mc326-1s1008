@@ -57,17 +57,17 @@ void secondary_index_insert (SecondaryIndex * si_index, const char *si_value,
 /**
  * @brief Creates a new secondary index.
  *
- * @param indexname The file name of the serialized memory index part
- *                  of the secondary index.
- * @param listname  The name of the entry list file.
- * @param avname    The name of the avail list file.
- * @param writeonly Whether or not to load data from existing files.
+ * @param indexname       The file name of the serialized memory index part
+ *                        of the secondary index.
+ * @param listname        The name of the entry list file.
+ * @param avname          The name of the avail list file.
+ * @param overwrite_index Whether or not to load data from existing files.
  *
  * @return A new \a SecondaryIndex object.
  */
 SecondaryIndex *secondary_index_new (const char *indexname,
                                      const char *listname, const char *avname,
-                                     int writeonly);
+                                     int overwrite_index);
 
 /**
  * @brief Removes an entry from a secondary index.

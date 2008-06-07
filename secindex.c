@@ -97,22 +97,17 @@ secondary_index_insert (SecondaryIndex * si_index, const char *si_value,
 
 SecondaryIndex *
 secondary_index_new (const char *indexname, const char *listname,
-                     const char *avname, int writeonly)
+                     const char *avname, int overwrite_index)
 {
   SecondaryIndex *s = MEM_ALLOC (SecondaryIndex);
 
-  s->avlist = avail_list_new (avname, MEM_REG_SIZE);
   s->record_list = memory_index_new (indexname, 0);
 
-  /* Only load data if specified by the user */
-  if (!writeonly)
-    {
-      memory_index_load_from_file (s->record_list, indexname);
-      avail_list_load (s->avlist);
-    }
+  s->avlist = avail_list_new (avname, MEM_REG_SIZE);
+  avail_list_load (s->avlist);
 
   s->fp_list =
-    fopen (listname, (!writeonly && fileExists (listname) ? "r+" : "w+"));
+    fopen (listname, (!overwrite_index && isValidFile (listname) ? "r+" : "w+"));
   assert (s->fp_list);
 
   return s;
