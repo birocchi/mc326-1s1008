@@ -14,6 +14,7 @@ OFILES=adapter.o avail.o base.o file.o io.o hash.o html.o main.o mem.o memindex.
 
 TP=tp4
 BASE=base01.dat
+BASEBACKUP=base01.dat.back
 
 all: art
 
