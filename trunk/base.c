@@ -51,12 +51,11 @@ base_new (const char *basename, const char *availname)
 {
   Base *b = MEM_ALLOC (Base);
 
-  /* We need a new avail list. */
-  b->avlist = avail_list_new (availname, BASE_REG_SIZE);
-  avail_list_load (b->avlist);
-
   b->fp = fopen (basename, (isValidFile (basename) ? "r+" : "w+"));
   assert (fp);
+
+  b->avlist = avail_list_new (availname, BASE_REG_SIZE);
+  avail_list_load (b->avlist);
 
   return b;
 }
@@ -64,7 +63,6 @@ base_new (const char *basename, const char *availname)
 void
 base_remove (Base * base, int rrn)
 {
-  /* Check consistency. */
   assert (base);
 
   /* Add that position to the avail list. */
