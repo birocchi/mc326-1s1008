@@ -34,7 +34,7 @@ base_insert (Base * base, ArtworkInfo * info)
   if (avail_list_is_empty (base->avlist))
     {
       fseek (base->fp, 0, SEEK_END);
-      newrrn = ftell (base->fp);
+      newrrn = ftell (base->fp) / BASE_REG_SIZE;
     }
   else
     /* On the other hand, if we have available spots, we write it
