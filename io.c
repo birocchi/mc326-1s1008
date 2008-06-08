@@ -121,7 +121,7 @@ str_foreach (char *str, void (*callback) (char *, va_list), ...)
   while (next)
     {
       callback (next, ap);
-      next = strtok (NULL, " "); /* Read next word */
+      next = strtok (NULL, " ");        /* Read next word */
     }
 
   va_end (ap);

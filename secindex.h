@@ -30,8 +30,7 @@ typedef struct
  */
 void secondary_index_foreach (SecondaryIndex * index,
                               MemoryIndexRecord * record,
-                              void (*callback) (char *, int, va_list),
-                              ...);
+                              void (*callback) (char *, int, va_list), ...);
 
 /**
  * @brief Free memory allocated for a secondary index.

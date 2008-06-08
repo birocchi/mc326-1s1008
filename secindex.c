@@ -102,7 +102,7 @@ secondary_index_new (const char *indexname, const char *listname,
 {
   SecondaryIndex *s = MEM_ALLOC (SecondaryIndex);
 
-  s->record_list = memory_index_new (indexname, 0);
+  s->record_list = memory_index_new (indexname);
 
   s->avlist = avail_list_new (avname);
   avail_list_load (s->avlist);

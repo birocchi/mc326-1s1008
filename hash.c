@@ -21,7 +21,7 @@ hash_function (char *key)
 char *
 hash_get_filename (const char *prefix, unsigned int hashnum)
 {
-  char filename[255]; /* 255 bytes is usually the maximum length of a filename */
+  char filename[255];           /* 255 bytes is usually the maximum length of a filename */
   int count;
 
   assert (hashnum < HASH_FILE_NUM);
