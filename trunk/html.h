@@ -22,6 +22,6 @@ void html_end (FILE * htmlfile);
  * \param rrn      The RRN of the current entry.
  * \param info The structure that holds all the info fields for the register.
  */
-void html_write_record_info (FILE * htmlfile, int rrn, ArtworkInfo * info);
+void html_write_record_info (FILE * htmlfile, ArtworkInfo * info);
 
 #endif
