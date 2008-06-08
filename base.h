@@ -118,8 +118,8 @@ int baseIsValidIdentifier (const char *name);
  * \brief Reads one record from the database file \a base and
  *        stores it in \a info.
  *
- * \param base File pointer to the database.
- * \param info Pointer to ArtworkInfo structure with info about the register.
+ * \param base The base being used. 
+ * \param info ArtworkInfo structure with info about the register.
  */
 void base_read_artwork_record (Base * base, ArtworkInfo * info);
 
