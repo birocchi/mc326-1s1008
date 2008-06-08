@@ -98,7 +98,7 @@ char *str_dup (const char *s);
  * \b WARNING: \a str is going to be changed because this function relies on
  * \a strtok.
  */
-void str_foreach (char *str, void (*callback) (const char *, va_list), ...);
+void str_foreach (char *str, void (*callback) (char *, va_list), ...);
 
 /**
  * \brief Replaces the trailing '\\n' character (if it exists) in a string

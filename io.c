@@ -109,7 +109,7 @@ str_dup (const char *s)
 }
 
 void
-str_foreach (char *str, void (*callback) (const char *, va_list), ...)
+str_foreach (char *str, void (*callback) (char *, va_list), ...)
 {
   char *next;
   va_list ap;
