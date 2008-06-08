@@ -263,11 +263,13 @@ memory_index_new_with_hash (const char *fp_name, unsigned int
 }
 
 void
-memory_index_remove (MemoryIndex * index, int rrn)
+memory_index_remove (MemoryIndex * index, char * name)
 {
   int i = 0, j;
 
-  while ((i < index->regnum) && (index->reclist[i].rrn != rrn))
+  change_hash_file (index, name);
+
+  while ((i < index->regnum) && (strcasecmp(index->reclist[i].name, name) != 0))
     i++;
 
   if (i == index->regnum)       /* Match not found, leave function */

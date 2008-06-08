@@ -91,11 +91,8 @@ MemoryIndex *memory_index_new_with_hash (const char *fp_name,
  * @brief Removes the specified entry from the index.
  *
  * @param index The memory index.
- * @param rrn   The relative register number.
- *
- * Please notice that as the index is sorted alphabetically,
- * this function takes O(n) to find the element and delete it.
+ * @param name  The name of the register to delete.
  */
-void memory_index_remove (MemoryIndex * index, int rrn);
+void memory_index_remove (MemoryIndex * index, char * name);
 
 #endif
