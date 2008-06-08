@@ -286,7 +286,6 @@ adapter_load_files (Adapter * db)
   char *filenames[] = { PKFILE, SI_AUTHOR_INDEX, SI_TITLE_INDEX,
     SI_TYPE_INDEX, SI_YEAR_INDEX };
   int loadbase = 0;
-  unsigned int i, j;
 
   assert (db);
 
