@@ -24,7 +24,10 @@ typedef struct
 typedef struct
 {
   char *fp_name; /**< The name of the disk representation of the index. */
-  unsigned int loaded_file; /**< The number of the currently loaded file (from the split list). */
+
+  size_t loaded_file; /**< The number of the currently loaded file (from the split list). */
+  unsigned int (*hash_function) (char *); /**< The hash function to use with the keys. */
+
   size_t regnum; /**< The current number of used entries. */
   size_t maxregs; /**< The total number of allocated entries. */
   MemoryIndexRecord *reclist; /**< The record list. */
@@ -51,7 +54,7 @@ int memory_index_compare_by_name (const void *a, const void *b);
  * @return A pointer to the record found,
  * or NULL if nothing is found.
  */
-MemoryIndexRecord *memory_index_find (MemoryIndex * index, const char *name);
+MemoryIndexRecord *memory_index_find (MemoryIndex * index, char *name);
 
 /**
  * @brief Frees the allocated memory for an index.
@@ -73,56 +76,28 @@ void memory_index_free (MemoryIndex * index);
  * It is the responsibility of the programmer to check
  * if this is a duplicated entry.
  */
-void memory_index_insert (MemoryIndex * index, const char *name, int rrn);
-
-/**
- * @brief Checks whether the index is empty.
- *
- * @param index The index to check.
- *
- * @retval 0 The index is not empty.
- * @retval 1 The index is empty.
- */
-int memory_index_is_empty (MemoryIndex * index);
-
-/**
- * @brief Checks if the RRN exists in the index.
- *
- * @param index The memory index to check.
- * @param rrn   The RRN to look for.
- *
- * @retval 0 The RRN is not found.
- * @retval 1 The RRN is found.
- */
-int memory_index_is_valid_rrn (MemoryIndex * index, int rrn);
-
-/**
- * @brief Load data from disk.
- *
- * @param index    The memory index.
- * @param filename Name of the serialized index file.
- *
- * This function restores a previously saved memory index
- * into the current index.
- */
-void memory_index_load_from_file (MemoryIndex * index, const char *filename);
+void memory_index_insert (MemoryIndex * index, char *name, int rrn);
 
 /**
  * @brief Creates a new \a MemoryIndex.
  *
  * @param fp_name The name of the file to save the index in the end.
- * @param nelem   The initial number of elements.
  *
  * @return A new \a MemoryIndex.
  *
- * If \a nelem is 0, this function automatically allocates memory
- * for 40 entries.
+ * This is a wrapper around \a memory_index_new_with_hash, using
+ * \a hash_function as the hash function.
  */
-MemoryIndex *memory_index_new (const char *fp_name, size_t nelem);
+MemoryIndex *memory_index_new (const char *fp_name);
 
-MemoryIndex *
-memory_index_new_with_hash (const char *fp_name, size_t nelem, unsigned int
-  (*hash_function)(char*));
+/**
+ * @brief Creates a new \a MemoryIndex.
+ *
+ * @param fp_name         The name of the file to save the index in the end.
+ * @param hash_function   The hash function to be used.
+ */
+MemoryIndex *memory_index_new_with_hash (const char *fp_name,
+                                         unsigned int (*hash_func) (char *));
 
 /**
  * @brief Removes the specified entry from the index.
