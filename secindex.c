@@ -150,7 +150,7 @@ secondary_index_remove (SecondaryIndex * index, char *sec_value,
                   /* If this is the head and there's no next item,
                    * we can delete the entry from the memory list */
                   if (nextnode == -1)
-                    memory_index_remove (index->record_list, rec->rrn);
+                    memory_index_remove (index->record_list, rec->name);
                   else          /* Otherwise set the new head */
                     rec->rrn = nextnode;
                 }
