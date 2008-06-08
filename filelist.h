@@ -1,7 +1,7 @@
 #ifndef __FILELIST_H
 #define __FILELIST_H
 
-#define DBFILE      "base01.dat"   /**< The database file name. */
+#define DBFILE      "base00.dat"   /**< The database file name. */
 #define HTMLFILE    "lista.html"   /**< The HTML output. */
 #define PKFILE      "pkfile.pk"    /**< The primary key file name. */
 
