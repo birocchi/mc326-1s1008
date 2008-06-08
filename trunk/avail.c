@@ -9,6 +9,8 @@
 #include "mem.h"
 #include "avail.h"
 
+static void avail_list_write (AvailList * avlist);
+
 static void
 avail_list_write (AvailList * avlist)
 {
