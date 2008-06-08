@@ -25,7 +25,7 @@ base_free (Base * b)
 int
 base_insert (Base * base, ArtworkInfo * info)
 {
-  int new_rrn;
+  int newrrn;
   int writepos;
 
   /* Checking consistency... */
@@ -42,7 +42,7 @@ base_insert (Base * base, ArtworkInfo * info)
        there and remove that position from the avail list. */
     {
       newrrn = avail_list_pop (base->avlist, base->fp);
-      fseek (base->fp, new_rrn * BASE_REG_SIZE, SEEK_SET);
+      fseek (base->fp, newrrn * BASE_REG_SIZE, SEEK_SET);
     }
 
   base_write_data (base->fp, info);
