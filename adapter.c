@@ -24,6 +24,19 @@ static void read_secindex (Adapter * db, MemoryIndex ** mindex,
 static void secindex_insert_wrapper (char *str, va_list ap);
 static void secindex_remove_wrapper (char *str, va_list ap);
 
+/**
+ * @brief Check if all index files are present and valid.
+ *
+ * @param filenames An array with all the file prefixes to check.
+ * @param n         The number of the elements in the array.
+ *
+ * @retval 0 All the files are valid.
+ * @retval 1 Some file is not valid.
+ *
+ * The file names passed in the array must be only the prefixes,
+ * since the function is responsible for adding the right suffix
+ * based on the number of hash files being used.
+ */
 static int
 check_all_indexes (char *filenames[], size_t n)
 {
@@ -41,6 +54,18 @@ check_all_indexes (char *filenames[], size_t n)
   return 0;
 }
 
+/**
+ * @brief Checks if a given file is valid.
+ *
+ * @param filename The prefix of the file to check.
+ * @param suffix   The number of the hash file to append to the name.
+ *
+ * @retval 0 The file is not valid.
+ * @retval 1 The file is valid.
+ *
+ * This is basically a wrapper around isValidFile, appending the
+ * hash number to the given file.
+ */
 static int
 index_is_valid (char *filename, unsigned int suffix)
 {
@@ -57,23 +82,27 @@ index_is_valid (char *filename, unsigned int suffix)
   return retval;
 }
 
+/**
+ * @brief Read data from the base to all the indexes used.
+ *
+ * @param db The database.
+ */
 static void
 load_files_from_base (Adapter * db)
 {
   ArtworkInfo artwork;
   char *title;
-  FILE *base = db->base->fp;
   int itemcount, i;
 
-  assert (db && base);
+  assert (db);
 
-  itemcount = getFileSize (base) / BASE_REG_SIZE;
+  itemcount = getFileSize (db->base->fp) / BASE_REG_SIZE;
 
-  fseek (base, 0, SEEK_SET);
+  fseek (db->base->fp, 0, SEEK_SET);
 
   for (i = 0; i < itemcount; i++)
     {
-      base_read_artwork_record (base, &artwork);
+      base_read_artwork_record (db->base, &artwork);
 
       title = str_dup (artwork.title);
 
@@ -110,7 +139,7 @@ print_record (char *name, int rrn, va_list ap)
   /* Go to that register position in the database. */
   fseek (db->base->fp, rec->rrn * BASE_REG_SIZE, SEEK_SET);
   /* Read it. */
-  base_read_artwork_record (db->base->fp, &artwork);
+  base_read_artwork_record (db->base, &artwork);
   /* Then write it to the HTML file. */
   html_write_record_info (html_fp, rec->rrn, &artwork);
 }
@@ -210,7 +239,7 @@ adapter_find (Adapter * db)
       else
         {
           fseek (db->base->fp, mrec->rrn * BASE_REG_SIZE, SEEK_SET);
-          base_read_artwork_record (db->base->fp, &artwork);
+          base_read_artwork_record (db->base, &artwork);
           html_write_record_info (fp_html, mrec->rrn, &artwork);
         }
 
@@ -321,43 +350,34 @@ adapter_new (void)
 void
 adapter_remove (Adapter * db)
 {
-  return;
-#if 0
   ArtworkInfo artwork;
   char key[TITLE_LENGTH + 1], *title;
-  int rrn;
+  MemoryIndexRecord *match;
 
-  while (1)
+  readString ("   Digite o titulo da obra: ", key, TITLE_LENGTH);
+
+  match = memory_index_find (db->pk_index, key);
+  if (match)
     {
-      readInt ("   Digite o NRR da obra: ", key, TITLE_LENGTH);
-      rrn = atoi (key);
+      fseek (db->base->fp, match->rrn * BASE_REG_SIZE, SEEK_SET);
+      base_read_artwork_record (db->base, &artwork);
 
-      if (memory_index_is_valid_rrn (db->pk_index, rrn))
-        {
-          fseek (db->base->fp, rrn * BASE_REG_SIZE, SEEK_SET);
-          base_read_artwork_record (db->base->fp, &artwork);
+      title = str_dup (artwork.title);
+      base_remove (db->base, match->rrn);
+      memory_index_remove (db->pk_index, match->name);
+      str_foreach (artwork.author, secindex_remove_wrapper,
+                   db->author_index, title);
+      str_foreach (artwork.title, secindex_remove_wrapper,
+                   db->title_index, title);
+      str_foreach (artwork.type, secindex_remove_wrapper, db->type_index,
+                   title);
+      str_foreach (artwork.year, secindex_remove_wrapper, db->year_index,
+                   title);
 
-          title = str_dup (artwork.title);
+      printf ("   Obra \"%s\" removida com sucesso.\n", title);
 
-          base_remove (db->base, rrn);
-          memory_index_remove (db->pk_index, rrn);
-          str_foreach (artwork.author, secindex_remove_wrapper,
-                       db->author_index, title);
-          str_foreach (artwork.title, secindex_remove_wrapper,
-                       db->title_index, title);
-          str_foreach (artwork.type, secindex_remove_wrapper, db->type_index,
-                       title);
-          str_foreach (artwork.year, secindex_remove_wrapper, db->year_index,
-                       title);
-
-          printf ("   Obra \"%s\" removida com sucesso.\n", title);
-
-          free (title);
-
-          break;
-        }
-      else
-        printf ("   O NRR digitado e invalido.\n");
+      free (title);
     }
-#endif
+  else
+    printf ("   A obra \"%s\" nao foi encontrada..\n", key);
 }
