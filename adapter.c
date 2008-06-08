@@ -141,7 +141,7 @@ print_record (char *name, int rrn, va_list ap)
   /* Read it. */
   base_read_artwork_record (db->base, &artwork);
   /* Then write it to the HTML file. */
-  html_write_record_info (html_fp, rec->rrn, &artwork);
+  html_write_record_info (html_fp, &artwork);
 }
 
 static void
@@ -240,7 +240,7 @@ adapter_find (Adapter * db)
         {
           fseek (db->base->fp, mrec->rrn * BASE_REG_SIZE, SEEK_SET);
           base_read_artwork_record (db->base, &artwork);
-          html_write_record_info (fp_html, mrec->rrn, &artwork);
+          html_write_record_info (fp_html, &artwork);
         }
 
       printf ("   O resultado da busca por \"%s\" foi gravado em \"%s\".\n",
