@@ -33,6 +33,12 @@ bsearch_find_by_name (const void *a, const void *b)
   return strcasecmp ((char *) a, ((MemoryIndexRecord *) b)->name);
 }
 
+/**
+ * @brief Changes the loaded hash file according to the current key.
+ *
+ * @param index The memory index being used.
+ * @param name  The key according to which to change the loaded file.
+ */
 static void
 change_hash_file (MemoryIndex * index, char *name)
 {
@@ -75,6 +81,7 @@ flush_to_disk (MemoryIndex * index)
 
   assert (index);
 
+  /* Gets the filename with the right extension (filename.hXXXX) */
   filename = hash_get_filename (index->fp_name, index->loaded_file);
   fp = fopen (filename, "w");
   assert (fp);
