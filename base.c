@@ -26,7 +26,6 @@ int
 base_insert (Base * base, ArtworkInfo * info)
 {
   int newrrn;
-  int writepos;
 
   /* Checking consistency... */
   assert (base != NULL && info != NULL);
