@@ -284,8 +284,7 @@ void
 adapter_load_files (Adapter * db)
 {
   char *filenames[] = { PKFILE, SI_AUTHOR_INDEX, SI_TITLE_INDEX,
-    SI_TYPE_INDEX, SI_YEAR_INDEX
-  };
+    SI_TYPE_INDEX, SI_YEAR_INDEX };
   int loadbase = 0;
   unsigned int i, j;
 
@@ -294,17 +293,12 @@ adapter_load_files (Adapter * db)
   db->base = base_new (DBFILE, DBFILE_AVAIL);
   db->pk_index = memory_index_new (PKFILE);
 
-  for (i = 0; i < HASH_FILE_NUM; i++)
-    {
-      for (j = 0; j < 5; j++)
-        {
-          if (!index_is_valid (filenames[j], i))
-            loadbase = 1;
-        }
-    }
+  /* Check if all hash files are valid */
+  loadbase = check_all_indexes (filenames, INDEX_TOTAL);
 
-  loadbase = check_all_indexes (filenames, 5);
-
+  /* Create each secondary index, and set the overwrite_index parameter
+   * based on the result of check_all_indexes, ie, overwrite if any
+   * error was found. */
   db->author_index = secondary_index_new (SI_AUTHOR_INDEX, SI_AUTHOR_LIST,
                                           SI_AUTHOR_AVAIL, loadbase);
   db->title_index = secondary_index_new (SI_TITLE_INDEX, SI_TITLE_LIST,
@@ -314,6 +308,7 @@ adapter_load_files (Adapter * db)
   db->year_index = secondary_index_new (SI_YEAR_INDEX, SI_YEAR_LIST,
                                         SI_YEAR_AVAIL, loadbase);
 
+  /* If there was something wrong, reload all data */
   if (loadbase)
     load_files_from_base (db);
 }
