@@ -76,7 +76,7 @@ avail_list_load (AvailList * avlist)
 }
 
 AvailList *
-avail_list_new (const char *filename, size_t page_size)
+avail_list_new (const char *filename)
 {
   AvailList *avlist;
 
@@ -85,7 +85,6 @@ avail_list_new (const char *filename, size_t page_size)
 
   avlist = MEM_ALLOC (AvailList);
   avlist->filename = str_dup (filename);
-  avlist->page_size = page_size;
   avlist->tail = -1;
 
   /* Must free it later on. */
@@ -103,7 +102,7 @@ avail_list_pop (AvailList * avlist, FILE * fp)
   /* If it's not empty... */
   if (avlist->tail != -1)
     {
-      prevpos = avlist->tail * avlist->page_size;
+      prevpos = avlist->tail;
 
       /* Go to the position */
       fseek (fp, prevpos, SEEK_SET);
@@ -124,7 +123,7 @@ avail_list_push (AvailList * avlist, FILE * fp, int pos)
   assert (avlist);
   assert (fp);
 
-  fseek (fp, avlist->page_size * pos, SEEK_SET);
+  fseek (fp, pos, SEEK_SET);
   fwrite (&(avlist->tail), sizeof (int), 1, fp);
   fflush (fp);
 
