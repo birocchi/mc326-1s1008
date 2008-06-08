@@ -22,4 +22,7 @@
 #define SI_TYPE_AVAIL     "type.av"
 #define SI_YEAR_AVAIL     "year.av"
 
+/* Total number of indexes (pk and secondary keys) */
+#define INDEX_TOTAL       5
+
 #endif
