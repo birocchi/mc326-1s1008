@@ -30,7 +30,7 @@ typedef struct
  */
 void secondary_index_foreach (SecondaryIndex * index,
                               MemoryIndexRecord * record,
-                              void (*callback) (const char *, int, va_list),
+                              void (*callback) (char *, int, va_list),
                               ...);
 
 /**
@@ -51,7 +51,7 @@ void secondary_index_free (SecondaryIndex * index);
  * if necessary. If there is already a record with \a si_value as its
  * name, append the entry to the entry list file.
  */
-void secondary_index_insert (SecondaryIndex * si_index, const char *si_value,
+void secondary_index_insert (SecondaryIndex * si_index, char *si_value,
                              const char *pk_value);
 
 /**
@@ -76,7 +76,7 @@ SecondaryIndex *secondary_index_new (const char *indexname,
  * @param sec_value The value in the memory index part.
  * @param pk_value  The value of the primary key in the entry list file.
  */
-void secondary_index_remove (SecondaryIndex * index, const char *sec_value,
+void secondary_index_remove (SecondaryIndex * index, char *sec_value,
                              const char *pk_value);
 
 #endif
