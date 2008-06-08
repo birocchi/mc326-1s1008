@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <ctype.h>
 #include <stdio.h>
 #include "hash.h"
 #include "io.h"
@@ -6,12 +7,12 @@
 unsigned int
 hash_function (char *key)
 {
-  unsigned int retval;
+  unsigned int retval = 0;
 
   while (*key)
     {
       retval *= 0x01000193;
-      retval ^= *key++;
+      retval ^= tolower (*key++);
     }
 
   return retval % HASH_FILE_NUM;
