@@ -34,18 +34,6 @@ typedef struct
 } MemoryIndex;
 
 /**
- * @brief Case-insensitive \a MemoryIndexRecord comparison.
- *
- * @param a Pointer to a \a MemoryIndexRecord.
- * @param b Pointer to another \a MemoryIndexRecord.
- *
- * @retval -1 a < b.
- * @retval 0  a == b.
- * @retval 1  a > b.
- */
-int memory_index_compare_by_name (const void *a, const void *b);
-
-/**
  * @brief Searches the memory index.
  *
  * @param index The memory index.
