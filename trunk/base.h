@@ -121,7 +121,7 @@ int baseIsValidIdentifier (const char *name);
  * \param base File pointer to the database.
  * \param info Pointer to ArtworkInfo structure with info about the register.
  */
-void base_read_artwork_record (FILE * base, ArtworkInfo * info);
+void base_read_artwork_record (Base * base, ArtworkInfo * info);
 
 /**
  * Writes the data from the struct pointed at by *info

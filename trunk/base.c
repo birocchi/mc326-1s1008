@@ -156,17 +156,17 @@ baseIsValidIdentifier (const char *name)
 }
 
 void
-base_read_artwork_record (FILE * base, ArtworkInfo * info)
+base_read_artwork_record (Base * base, ArtworkInfo * info)
 {
   assert ((base != NULL) && (info != NULL));
 
   /* Read it all... */
-  fgets (info->title, TITLE_LENGTH + 1, base);
-  fgets (info->type, TYPE_LENGTH + 1, base);
-  fgets (info->author, AUTHOR_LENGTH + 1, base);
-  fgets (info->year, YEAR_LENGTH + 1, base);
-  fgets (info->value, VALUE_LENGTH + 1, base);
-  fgets (info->img, IMG_LENGTH + 1, base);
+  fgets (info->title, TITLE_LENGTH + 1, base->fp);
+  fgets (info->type, TYPE_LENGTH + 1, base->fp);
+  fgets (info->author, AUTHOR_LENGTH + 1, base->fp);
+  fgets (info->year, YEAR_LENGTH + 1, base->fp);
+  fgets (info->value, VALUE_LENGTH + 1, base->fp);
+  fgets (info->img, IMG_LENGTH + 1, base->fp);
   /* Strip the whitespaces from it all. */
   stripWhiteSpace (info->title);
   stripWhiteSpace (info->type);
