@@ -14,7 +14,7 @@
 
 void
 secondary_index_foreach (SecondaryIndex * index, MemoryIndexRecord * record,
-                         void (*callback) (const char *, int, va_list), ...)
+                         void (*callback) (char *, int, va_list), ...)
 {
   char tmpname[TITLE_LENGTH + 1];
   int node, nextnode;
@@ -55,7 +55,7 @@ secondary_index_free (SecondaryIndex * index)
 }
 
 void
-secondary_index_insert (SecondaryIndex * si_index, const char *si_value,
+secondary_index_insert (SecondaryIndex * si_index, char *si_value,
                         const char *pk_value)
 {
   int nextnode, newrrn, writepos;
@@ -66,14 +66,15 @@ secondary_index_insert (SecondaryIndex * si_index, const char *si_value,
   if (avail_list_is_empty (si_index->avlist))
     {
       fseek (si_index->fp_list, 0, SEEK_END);
-      newrrn = getFileSize (si_index->fp_list) / si_index->avlist->page_size;
+      newrrn = getFileSize (si_index->fp_list) / MEM_REG_SIZE;
     }
   else
     {
       /* Otherwise, seek to an available position */
-      writepos = avail_list_pop (si_index->avlist, si_index->fp_list);
+      writepos = avail_list_pop (si_index->avlist, si_index->fp_list) *
+        MEM_REG_SIZE;
       fseek (si_index->fp_list, writepos, SEEK_SET);
-      newrrn = writepos / si_index->avlist->page_size;
+      newrrn = writepos / MEM_REG_SIZE;
     }
 
   /* Check whether or not to append to an existing record. */
@@ -81,11 +82,11 @@ secondary_index_insert (SecondaryIndex * si_index, const char *si_value,
   if (!rec)
     {
       memory_index_insert (si_index->record_list, si_value, newrrn);
-      nextnode = -1; /* No next position */
+      nextnode = -1;            /* No next position */
     }
   else
     {
-      nextnode = rec->rrn; /* This node is the new head of the list. */
+      nextnode = rec->rrn;      /* This node is the new head of the list. */
       rec->rrn = newrrn;
     }
 
@@ -103,18 +104,19 @@ secondary_index_new (const char *indexname, const char *listname,
 
   s->record_list = memory_index_new (indexname, 0);
 
-  s->avlist = avail_list_new (avname, MEM_REG_SIZE);
+  s->avlist = avail_list_new (avname);
   avail_list_load (s->avlist);
 
   s->fp_list =
-    fopen (listname, (!overwrite_index && isValidFile (listname) ? "r+" : "w+"));
+    fopen (listname,
+           (!overwrite_index && isValidFile (listname) ? "r+" : "w+"));
   assert (s->fp_list);
 
   return s;
 }
 
 void
-secondary_index_remove (SecondaryIndex * index, const char *sec_value,
+secondary_index_remove (SecondaryIndex * index, char *sec_value,
                         const char *pk_value)
 {
   MemoryIndexRecord *rec;
@@ -149,19 +151,21 @@ secondary_index_remove (SecondaryIndex * index, const char *sec_value,
                    * we can delete the entry from the memory list */
                   if (nextnode == -1)
                     memory_index_remove (index->record_list, rec->rrn);
-                  else /* Otherwise set the new head */
+                  else          /* Otherwise set the new head */
                     rec->rrn = nextnode;
                 }
               else
                 {
                   /* Not the head, just make the previous node point to
                    * the next one and skip the current item */
-                  fseek (index->fp_list, (prevnode * MEM_REG_SIZE) + TITLE_LENGTH, SEEK_SET);
+                  fseek (index->fp_list,
+                         (prevnode * MEM_REG_SIZE) + TITLE_LENGTH, SEEK_SET);
                   fwrite (&nextnode, sizeof (int), 1, index->fp_list);
                 }
 
               /* Insert the position into the avail list */
-              avail_list_push (index->avlist, index->fp_list, curnode);
+              avail_list_push (index->avlist, index->fp_list, curnode *
+                               MEM_REG_SIZE);
 
               break;
             }
