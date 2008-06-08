@@ -10,12 +10,13 @@
 #include "mem.h"
 #include "memindex.h"
 
-static int bsearch_find_by_name (const void *a, const void *b);
+static int bsearch_compare (const void *a, const void *b);
 static void change_hash_file (MemoryIndex * index, char *name);
 static void flush_to_disk (MemoryIndex * index);
 static void inflate_list (MemoryIndex * index, size_t size);
-static void memory_index_load_from_file (MemoryIndex * index, const char
+static void load_file (MemoryIndex * index, const char
                                          *filename);
+static int qsort_compare (const void *a, const void *b);
 
 /**
  * @brief Binary search comparison function.
@@ -28,9 +29,10 @@ static void memory_index_load_from_file (MemoryIndex * index, const char
  * @retval 1  a > b.
  */
 static int
-bsearch_find_by_name (const void *a, const void *b)
+bsearch_compare (const void *a, const void *b)
 {
-  return strcasecmp ((char *) a, ((MemoryIndexRecord *) b)->name);
+  return strcasecmp ((char *) a,
+                     ((MemoryIndexRecord *) b)->name);
 }
 
 /**
@@ -60,7 +62,7 @@ change_hash_file (MemoryIndex * index, char *name)
         }
 
       filename = hash_get_filename (index->fp_name, hashnum);
-      memory_index_load_from_file (index, filename);
+      load_file (index, filename);
       free (filename);
 
       index->loaded_file = hashnum;
@@ -135,7 +137,7 @@ inflate_list (MemoryIndex * index, size_t size)
  * into the current index.
  */
 static void
-memory_index_load_from_file (MemoryIndex * index, const char *filename)
+load_file (MemoryIndex * index, const char *filename)
 {
   FILE *fp = NULL;
   int i, rrn;
@@ -174,8 +176,18 @@ memory_index_load_from_file (MemoryIndex * index, const char *filename)
   fclose (fp);
 }
 
-int
-memory_index_compare_by_name (const void *a, const void *b)
+/**
+ * @brief Case-insensitive \a MemoryIndexRecord comparison.
+ *
+ * @param a Pointer to a \a MemoryIndexRecord.
+ * @param b Pointer to another \a MemoryIndexRecord.
+ *
+ * @retval -1 a < b.
+ * @retval 0  a == b.
+ * @retval 1  a > b.
+ */
+static int
+qsort_compare (const void *a, const void *b)
 {
   return strcasecmp (((MemoryIndexRecord *) a)->name,
                      ((MemoryIndexRecord *) b)->name);
@@ -189,7 +201,7 @@ memory_index_find (MemoryIndex * index, char *name)
   change_hash_file (index, name);
 
   return bsearch (name, index->reclist, index->regnum,
-                  sizeof (MemoryIndexRecord), bsearch_find_by_name);
+                  sizeof (MemoryIndexRecord), bsearch_compare);
 }
 
 void
@@ -223,7 +235,7 @@ memory_index_insert (MemoryIndex * index, char *name, int rrn)
   index->regnum++;
 
   qsort (index->reclist, index->regnum,
-         sizeof (MemoryIndexRecord), memory_index_compare_by_name);
+         sizeof (MemoryIndexRecord), qsort_compare);
 }
 
 MemoryIndex *
@@ -268,5 +280,5 @@ memory_index_remove (MemoryIndex * index, int rrn)
   index->regnum--;
 
   qsort (index->reclist, index->regnum,
-         sizeof (MemoryIndexRecord), memory_index_compare_by_name);
+         sizeof (MemoryIndexRecord), qsort_compare);
 }
