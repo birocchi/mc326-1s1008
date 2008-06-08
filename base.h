@@ -62,8 +62,9 @@ void base_free (Base * b);
  *
  * \param base Pointer to Base struct.
  * \param info Pointer to ArtworkInfo struct, where the new info is.
+ * @return The RRN of the new entry.
  */
-void base_insert (Base * base, ArtworkInfo * info);
+int base_insert (Base * base, ArtworkInfo * info);
 
 /**
  * \brief Creates a new database struct.

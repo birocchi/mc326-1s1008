@@ -22,9 +22,10 @@ base_free (Base * b)
 }
 
 /* TODO: There's room for optimization here (too many disk seeks) */
-void
+int
 base_insert (Base * base, ArtworkInfo * info)
 {
+  int new_rrn;
   int writepos;
 
   /* Checking consistency... */
@@ -34,16 +35,19 @@ base_insert (Base * base, ArtworkInfo * info)
   if (avail_list_is_empty (base->avlist))
     {
       fseek (base->fp, 0, SEEK_END);
-      base_write_data (base->fp, info);
+      newrrn = ftell (base->fp);
     }
   else
-    /* In the other hand, if we have available spots, we write it
+    /* On the other hand, if we have available spots, we write it
        there and remove that position from the avail list. */
     {
-      writepos = avail_list_pop (base->avlist, base->fp) * BASE_REG_SIZE;
-      fseek (base->fp, writepos, SEEK_SET);
-      base_write_data (base->fp, info);
+      newrrn = avail_list_pop (base->avlist, base->fp);
+      fseek (base->fp, new_rrn * BASE_REG_SIZE, SEEK_SET);
     }
+
+  base_write_data (base->fp, info);
+
+  return newrrn;
 }
 
 Base *
