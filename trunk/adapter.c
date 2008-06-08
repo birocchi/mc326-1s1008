@@ -7,6 +7,7 @@
 #include "base.h"
 #include "file.h"
 #include "filelist.h"
+#include "hash.h"
 #include "html.h"
 #include "io.h"
 #include "mem.h"
@@ -14,110 +15,85 @@
 #include "menu.h"
 #include "secindex.h"
 
-/* We use this to know which load base we are gonna use. */
-/* Binary & is faster! */
-enum
+static int check_all_indexes (char *filenames[], size_t n);
+static int index_is_valid (char *filename, unsigned int suffix);
+static void load_files_from_base (Adapter * db);
+static void print_record (char *name, int rrn, va_list ap);
+static void read_secindex (Adapter * db, MemoryIndex ** mindex,
+                           SecondaryIndex ** secindex, char *key);
+static void secindex_insert_wrapper (char *str, va_list ap);
+static void secindex_remove_wrapper (char *str, va_list ap);
+
+static int
+check_all_indexes (char *filenames[], size_t n)
 {
-  LOAD_BASE_PK = 1 << 0,
-  LOAD_BASE_AUTHOR = 1 << 1,
-  LOAD_BASE_TITLE = 1 << 2,
-  LOAD_BASE_TYPE = 1 << 3,
-  LOAD_BASE_YEAR = 1 << 4
-};
+  unsigned int i, j;
 
-static void
-secindex_insert_wrapper (const char *str, va_list ap)
+  for (i = 0; i < HASH_FILE_NUM; i++)
+    {
+      for (j = 0; j < n; j++)
+        {
+          if (!index_is_valid (filenames[j], i))
+            return 1;
+        }
+    }
+
+  return 0;
+}
+
+static int
+index_is_valid (char *filename, unsigned int suffix)
 {
-  char *pk_value = NULL;
-  SecondaryIndex *secindex = NULL;
+  char *fullname = hash_get_filename (filename, suffix);
+  int retval;
 
-  secindex = va_arg (ap, SecondaryIndex *);
-  pk_value = va_arg (ap, char *);
+  if (isValidFile (fullname))
+    retval = 1;
+  else
+    retval = 0;
 
-  assert (secindex);
-  assert (pk_value);
+  free (fullname);
 
-  secondary_index_insert (secindex, str, pk_value);
+  return retval;
 }
 
 static void
-secindex_remove_wrapper (const char *str, va_list ap)
-{
-  char *pk_value = NULL;
-  SecondaryIndex *secindex = NULL;
-
-  secindex = va_arg (ap, SecondaryIndex *);
-  pk_value = va_arg (ap, char *);
-
-  assert (secindex);
-  assert (pk_value);
-
-  secondary_index_remove (secindex, str, pk_value);
-}
-
-static void
-load_files_from_base (Adapter * db, int loadflags)
+load_files_from_base (Adapter * db)
 {
   ArtworkInfo artwork;
   char *title;
   FILE *base = db->base->fp;
-  int i, baselen;
+  int itemcount, i;
 
-  /* If we had any problems.. */
-  if ((!base) || (!loadflags))
-    return;
+  assert (db && base);
 
-  /* How many registers we have in the database. */
-  baselen = getFileSize (base) / BASE_REG_SIZE;
-
-  /* Each time we shift LOAD_BASE and we then load something else. */
-  if (loadflags & LOAD_BASE_PK)
-    db->pk_index = memory_index_new (PKFILE, 0);
-  if (loadflags & LOAD_BASE_AUTHOR)
-    db->author_index =
-      secondary_index_new (SI_AUTHOR_INDEX, SI_AUTHOR_LIST, SI_AUTHOR_AVAIL,
-                           1);
-  if (loadflags & LOAD_BASE_TITLE)
-    db->title_index =
-      secondary_index_new (SI_TITLE_INDEX, SI_TITLE_LIST, SI_TITLE_AVAIL, 1);
-  if (loadflags & LOAD_BASE_TYPE)
-    db->type_index =
-      secondary_index_new (SI_TYPE_INDEX, SI_TYPE_LIST, SI_TYPE_AVAIL, 1);
-  if (loadflags & LOAD_BASE_YEAR)
-    db->year_index =
-      secondary_index_new (SI_YEAR_INDEX, SI_YEAR_LIST, SI_YEAR_AVAIL, 1);
+  itemcount = getFileSize (base) / BASE_REG_SIZE;
 
   fseek (base, 0, SEEK_SET);
 
-  /* We then read each register from the database. */
-  for (i = 0; i < baselen; i++)
+  for (i = 0; i < itemcount; i++)
     {
       base_read_artwork_record (base, &artwork);
 
       title = str_dup (artwork.title);
 
-      if (loadflags & LOAD_BASE_PK)
-        memory_index_insert (db->pk_index, title, db->pk_index->regnum);
+      memory_index_insert (db->pk_index, title, i);
 
-      if (loadflags & LOAD_BASE_AUTHOR)
-        str_foreach (artwork.author, secindex_insert_wrapper,
-                     db->author_index, title);
-      if (loadflags & LOAD_BASE_TITLE)
-        str_foreach (artwork.title, secindex_insert_wrapper, db->title_index,
-                     title);
-      if (loadflags & LOAD_BASE_TYPE)
-        str_foreach (artwork.type, secindex_insert_wrapper, db->type_index,
-                     title);
-      if (loadflags & LOAD_BASE_YEAR)
-        str_foreach (artwork.year, secindex_insert_wrapper, db->year_index,
-                     title);
+      str_foreach (artwork.author, secindex_insert_wrapper,
+                   db->author_index, title);
+      str_foreach (artwork.title, secindex_insert_wrapper, db->title_index,
+                   title);
+      str_foreach (artwork.type, secindex_insert_wrapper, db->type_index,
+                   title);
+      str_foreach (artwork.year, secindex_insert_wrapper, db->year_index,
+                   title);
 
       free (title);
     }
 }
 
 static void
-print_record (const char *name, int rrn, va_list ap)
+print_record (char *name, int rrn, va_list ap)
 {
   Adapter *db;
   ArtworkInfo artwork;
@@ -170,6 +146,36 @@ read_secindex (Adapter * db, MemoryIndex ** mindex,
     }
 }
 
+static void
+secindex_insert_wrapper (char *str, va_list ap)
+{
+  char *pk_value = NULL;
+  SecondaryIndex *secindex = NULL;
+
+  secindex = va_arg (ap, SecondaryIndex *);
+  pk_value = va_arg (ap, char *);
+
+  assert (secindex);
+  assert (pk_value);
+
+  secondary_index_insert (secindex, str, pk_value);
+}
+
+static void
+secindex_remove_wrapper (char *str, va_list ap)
+{
+  char *pk_value = NULL;
+  SecondaryIndex *secindex = NULL;
+
+  secindex = va_arg (ap, SecondaryIndex *);
+  pk_value = va_arg (ap, char *);
+
+  assert (secindex);
+  assert (pk_value);
+
+  secondary_index_remove (secindex, str, pk_value);
+}
+
 void
 adapter_find (Adapter * db)
 {
@@ -193,7 +199,6 @@ adapter_find (Adapter * db)
     }
 
   mrec = memory_index_find (mindex, key);
-  /* If it found any artworks. */
   if (mrec)
     {
       fp_html = fopen (HTMLFILE, "w");
@@ -244,6 +249,7 @@ adapter_insert (Adapter * db)
 {
   ArtworkInfo artwork;
   char *title;
+  int baserrn;
 
   do
     {
@@ -253,13 +259,9 @@ adapter_insert (Adapter * db)
         {
           title = str_dup (artwork.title);
 
-          memory_index_insert (db->pk_index, title,
-                               (avail_list_is_empty (db->base->avlist) ? db->
-                                pk_index->regnum : avail_list_get_tail (db->
-                                                                        base->
-                                                                        avlist)));
+          baserrn = base_insert (db->base, &artwork);
 
-          base_insert (db->base, &artwork);
+          memory_index_insert (db->pk_index, title, baserrn);
 
           str_foreach (artwork.author, secindex_insert_wrapper,
                        db->author_index, title);
@@ -279,98 +281,41 @@ adapter_insert (Adapter * db)
 }
 
 void
-adapter_list (Adapter * db)
-{
-  ArtworkInfo artwork;
-  FILE *fp_html;
-  int i;
-
-  if (memory_index_is_empty (db->pk_index))
-    printf ("   O catalogo ainda nao possui obras.\n");
-  else
-    {
-      fp_html = fopen (HTMLFILE, "w");
-      assert (fp_html);
-
-      html_begin (fp_html);
-
-      for (i = 0; i < db->pk_index->regnum; i++)
-        {
-          fseek (db->base->fp, (db->pk_index->reclist[i].rrn) * BASE_REG_SIZE,
-                 SEEK_SET);
-          base_read_artwork_record (db->base->fp, &artwork);
-          html_write_record_info (fp_html, db->pk_index->reclist[i].rrn,
-                                  &artwork);
-        }
-
-      html_end (fp_html);
-      fclose (fp_html);
-
-      printf ("   Lista \"%s\" gerada com sucesso.\n", HTMLFILE);
-    }
-}
-
-void
 adapter_load_files (Adapter * db)
 {
+  char *filenames[] = { PKFILE, SI_AUTHOR_INDEX, SI_TITLE_INDEX,
+    SI_TYPE_INDEX, SI_YEAR_INDEX
+  };
   int loadbase = 0;
+  unsigned int i, j;
+
   assert (db);
 
-  if (!isValidFile (DBFILE))
-    {
-      db->base = base_new (DBFILE, DBFILE_AVAIL, 1);
-      db->pk_index = memory_index_new (PKFILE, 0);
-      db->author_index =
-        secondary_index_new (SI_AUTHOR_INDEX, SI_AUTHOR_LIST, SI_AUTHOR_AVAIL,
-                             1);
-      db->title_index =
-        secondary_index_new (SI_TITLE_INDEX, SI_TITLE_LIST, SI_TITLE_AVAIL,
-                             1);
-      db->type_index =
-        secondary_index_new (SI_TYPE_INDEX, SI_TYPE_LIST, SI_TYPE_AVAIL, 1);
-      db->year_index =
-        secondary_index_new (SI_YEAR_INDEX, SI_YEAR_LIST, SI_YEAR_AVAIL, 1);
-    }
-  else
-    {
-      db->base = base_new (DBFILE, DBFILE_AVAIL, 0);
+  db->base = base_new (DBFILE, DBFILE_AVAIL);
+  db->pk_index = memory_index_new (PKFILE);
 
-      if (!isValidFile (PKFILE))
-        loadbase |= LOAD_BASE_PK;
-      else
+  for (i = 0; i < HASH_FILE_NUM; i++)
+    {
+      for (j = 0; j < 5; j++)
         {
-          db->pk_index = memory_index_new (PKFILE, 0);
-          memory_index_load_from_file (db->pk_index, PKFILE);
+          if (!index_is_valid (filenames[j], i))
+            loadbase = 1;
         }
-
-      if (!isValidFile (SI_AUTHOR_INDEX) || !isValidFile (SI_AUTHOR_LIST))
-        loadbase |= LOAD_BASE_AUTHOR;
-      else
-        db->author_index =
-          secondary_index_new (SI_AUTHOR_INDEX, SI_AUTHOR_LIST,
-                               SI_AUTHOR_AVAIL, 0);
-
-      if (!isValidFile (SI_TITLE_INDEX) || !isValidFile (SI_TITLE_LIST))
-        loadbase |= LOAD_BASE_TITLE;
-      else
-        db->title_index =
-          secondary_index_new (SI_TITLE_INDEX, SI_TITLE_LIST, SI_TITLE_AVAIL,
-                               0);
-
-      if (!isValidFile (SI_TYPE_INDEX) || !isValidFile (SI_TYPE_LIST))
-        loadbase |= LOAD_BASE_TYPE;
-      else
-        db->type_index =
-          secondary_index_new (SI_TYPE_INDEX, SI_TYPE_LIST, SI_TYPE_AVAIL, 0);
-
-      if (!isValidFile (SI_YEAR_INDEX) || !isValidFile (SI_YEAR_LIST))
-        loadbase |= LOAD_BASE_YEAR;
-      else
-        db->year_index =
-          secondary_index_new (SI_YEAR_INDEX, SI_YEAR_LIST, SI_YEAR_AVAIL, 0);
-
-      load_files_from_base (db, loadbase);
     }
+
+  loadbase = check_all_indexes (filenames, 5);
+
+  db->author_index = secondary_index_new (SI_AUTHOR_INDEX, SI_AUTHOR_LIST,
+                                          SI_AUTHOR_AVAIL, loadbase);
+  db->title_index = secondary_index_new (SI_TITLE_INDEX, SI_TITLE_LIST,
+                                         SI_TITLE_AVAIL, loadbase);
+  db->type_index = secondary_index_new (SI_TYPE_INDEX, SI_TYPE_LIST,
+                                        SI_TYPE_AVAIL, loadbase);
+  db->year_index = secondary_index_new (SI_YEAR_INDEX, SI_YEAR_LIST,
+                                        SI_YEAR_AVAIL, loadbase);
+
+  if (loadbase)
+    load_files_from_base (db);
 }
 
 Adapter *
@@ -382,6 +327,8 @@ adapter_new (void)
 void
 adapter_remove (Adapter * db)
 {
+  return;
+#if 0
   ArtworkInfo artwork;
   char key[TITLE_LENGTH + 1], *title;
   int rrn;
@@ -418,4 +365,5 @@ adapter_remove (Adapter * db)
       else
         printf ("   O NRR digitado e invalido.\n");
     }
+#endif
 }

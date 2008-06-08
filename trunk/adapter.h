@@ -41,13 +41,6 @@ void adapter_free (Adapter * db);
 void adapter_insert (Adapter * db);
 
 /**
- * Lists the artworks.
- *
- * @param db Pointer to Adapter struct
- */
-void adapter_list (Adapter * db);
-
-/**
  * Load the indexes from files.
  *
  * @param db Pointer to Adapter struct
