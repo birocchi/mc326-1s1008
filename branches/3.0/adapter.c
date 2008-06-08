@@ -386,36 +386,31 @@ adapter_remove (Adapter * db)
   char key[TITLE_LENGTH + 1], *title;
   int rrn;
 
-  while (1)
+  readInt ("   Digite o NRR da obra: ", key, TITLE_LENGTH);
+  rrn = atoi (key);
+
+  if (memory_index_is_valid_rrn (db->pk_index, rrn))
     {
-      readInt ("   Digite o NRR da obra: ", key, TITLE_LENGTH);
-      rrn = atoi (key);
+      fseek (db->base->fp, rrn * BASE_REG_SIZE, SEEK_SET);
+      base_read_artwork_record (db->base->fp, &artwork);
 
-      if (memory_index_is_valid_rrn (db->pk_index, rrn))
-        {
-          fseek (db->base->fp, rrn * BASE_REG_SIZE, SEEK_SET);
-          base_read_artwork_record (db->base->fp, &artwork);
+      title = str_dup (artwork.title);
 
-          title = str_dup (artwork.title);
+      base_remove (db->base, rrn);
+      memory_index_remove (db->pk_index, rrn);
+      str_foreach (artwork.author, secindex_remove_wrapper,
+                   db->author_index, title);
+      str_foreach (artwork.title, secindex_remove_wrapper,
+                   db->title_index, title);
+      str_foreach (artwork.type, secindex_remove_wrapper, db->type_index,
+                   title);
+      str_foreach (artwork.year, secindex_remove_wrapper, db->year_index,
+                   title);
 
-          base_remove (db->base, rrn);
-          memory_index_remove (db->pk_index, rrn);
-          str_foreach (artwork.author, secindex_remove_wrapper,
-                       db->author_index, title);
-          str_foreach (artwork.title, secindex_remove_wrapper,
-                       db->title_index, title);
-          str_foreach (artwork.type, secindex_remove_wrapper, db->type_index,
-                       title);
-          str_foreach (artwork.year, secindex_remove_wrapper, db->year_index,
-                       title);
+      printf ("   Obra \"%s\" removida com sucesso.\n", title);
 
-          printf ("   Obra \"%s\" removida com sucesso.\n", title);
-
-          free (title);
-
-          break;
-        }
-      else
-        printf ("   O NRR digitado e invalido.\n");
+      free (title);
     }
+  else
+    printf ("   O NRR digitado e invalido.\n");
 }
