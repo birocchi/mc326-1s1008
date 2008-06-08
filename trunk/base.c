@@ -40,7 +40,7 @@ base_insert (Base * base, ArtworkInfo * info)
     /* In the other hand, if we have available spots, we write it
        there and remove that position from the avail list. */
     {
-      writepos = avail_list_pop (base->avlist, base->fp);
+      writepos = avail_list_pop (base->avlist, base->fp) * BASE_REG_SIZE;
       fseek (base->fp, writepos, SEEK_SET);
       base_write_data (base->fp, info);
     }
@@ -54,7 +54,7 @@ base_new (const char *basename, const char *availname)
   b->fp = fopen (basename, (isValidFile (basename) ? "r+" : "w+"));
   assert (b->fp);
 
-  b->avlist = avail_list_new (availname, BASE_REG_SIZE);
+  b->avlist = avail_list_new (availname);
   avail_list_load (b->avlist);
 
   return b;
@@ -67,7 +67,7 @@ base_remove (Base * base, int rrn)
   assert (base);
 
   /* Add that position to the avail list. */
-  avail_list_push (base->avlist, base->fp, rrn);
+  avail_list_push (base->avlist, base->fp, rrn * BASE_REG_SIZE);
 }
 
 /*

@@ -9,7 +9,6 @@
 typedef struct
 {
   char *filename;
-  size_t page_size;
   int tail;
 } AvailList;
 
@@ -45,11 +44,9 @@ void avail_list_load (AvailList * avlist);
 /**
  * @brief Create a new available list.
  * @param filename The name of the avail list in disk.
- * @param page_size The size of a record in the base which
- *                  uses the avail list.
  * @return A new \a AvailList.
  */
-AvailList *avail_list_new (const char *filename, size_t page_size);
+AvailList *avail_list_new (const char *filename);
 
 /**
  * @brief Gets the last item of the avail list.
