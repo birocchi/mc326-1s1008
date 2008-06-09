@@ -2,6 +2,7 @@
 #define __ADAPTER_H
 
 #include "base.h"
+#include "descriptor.h"
 #include "memindex.h"
 #include "secindex.h"
 
@@ -13,6 +14,7 @@ typedef struct
 {
   Base *base; /**< The base used to hold data. */
   MemoryIndex *pk_index; /**< The primary keys index. */
+  Descriptor *desc; /**< The image list descriptor. */
   SecondaryIndex *author_index; /**< The author secondary index. */
   SecondaryIndex *title_index; /**< The title secondary index. */
   SecondaryIndex *type_index; /**< The type secondary index. */
