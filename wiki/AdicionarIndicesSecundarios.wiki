@@ -1,0 +1,80 @@
+#summary Descreve como criar novos índices secundários.
+#labels Phase-Implementation,Phase-Design
+
+= Introdução =
+
+Esta página descreve quais arquivos devem ser editados para adicionar novos índices secundários ao programa, como acontece no *TP4*.
+
+= Arquivos que devem ser editados =
+
+Para adicionar um índice secundário, é preciso editar os seguintes arquivos:
+  * `adapter.c`
+  * `adapter.h`
+  * `filelist.h`
+
+= Edição dos arquivos =
+
+== filelist.h ==
+Vamos começar pelo arquivo mais simples, `filelist.h`. Ele contém a lista de arquivos usados pelo programa, obviamente.
+
+Um índice secundário possui uma parte em memória, uma parte em disco e uma avail list para a parte em disco.
+
+Então, é preciso definir esses três arquivos:
+
+  * A parte em memória segue o formato *SI_nome_INDEX*
+  * A parte em disco segue o formato *SI_nome_LIST*
+  * A avail list da parte em disco segue o formato *SI_nome_AVAIL*
+
+Assim, para criar um índice secundário por valor da obra, é preciso fazer:
+
+{{{
+#define SI_VALUE_INDEX "value.sk"
+#define SI_VALUE_LIST  "value.sl"
+#define SI_VALUE_AVAIL "value.av"
+}}}
+
+Depois, é preciso atualizar a contagem de índices utilizados pelo programa, o define *INDEX_TOTAL*.
+
+{{{
+#define INDEX_TOTAL 6
+}}}
+
+== adapter.h ==
+
+Este arquivo contém os índices usados pela estrutura `Adapter` do programa. Ela contém os ponteiros para a PK e para os índices secudários.
+
+Edite a _struct_ `Adapter`, adicionando, no caso
+
+{{{
+SecondaryIndex *value_index;
+}}}
+
+à estrutura.
+
+== adapter.c ==
+
+No _wrapper_ de funções do programa, adapter.c, é preciso fazer mais edições. Vamos continuar trabalhando com o exemplo de índice secundário por valor da obra.
+
+Cada vez que uma entrada é adicionada ou removida do programa, todos os índices são atualizados. Por isso, é preciso editar as funções *adapter_insert*, *adapter_remove*, *adapter_free*, *adapter_load_files* e *load_files_from_base*.
+
+=== adapter_load_files ===
+
+A função responsável por carregar os dados em cada índice deve ser editada para incluir o novo arquivo para a leitura dos dados.
+
+  * O array `filenames` deve ser atualizado com a inclusão do define com a parte em memória do novo índice (no caso, `SI_VALUE_INDEX`).
+  * O novo índice precisa ser inicializado junto com os outros.
+{{{
+db->value_index = secondary_index_new (SI_VALUE_INDEX, SI_VALUE_LIST, SI_VALUE_AVAIL, loadbase);
+}}}
+
+=== adapter_insert, adapter_remove e load_files_from_base ===
+
+É preciso adicionar o novo índice às chamadas da função `str_foreach`, que executa uma função para cada palavra da entrada.
+
+=== adapter_free ===
+
+Incluir um `secondary_index_free (db->value_index)` à lista de estruturas liberadas na função.
+
+== Outros arquivos ==
+
+Se for o caso, é preciso editar o *menu.c* com mais opções de busca por índices.
