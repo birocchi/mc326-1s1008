@@ -5,18 +5,19 @@
 #include <string.h>
 #include "adapter.h"
 #include "base.h"
+#include "descriptor.h"
 #include "file.h"
 #include "filelist.h"
 #include "hash.h"
 #include "html.h"
 #include "io.h"
+#include "libimg/libimg.h"
 #include "mem.h"
 #include "memindex.h"
 #include "menu.h"
 #include "secindex.h"
 
-static int check_all_indexes (char *filenames[], size_t n);
-static int index_is_valid (char *filename, unsigned int suffix);
+static int check_all_indexes (char *filenames[], size_t n, size_t maxhash);
 static void load_files_from_base (Adapter * db);
 static void print_record (char *name, int rrn, va_list ap);
 static void read_secindex (Adapter * db, MemoryIndex ** mindex,
@@ -38,46 +39,30 @@ static void secindex_remove_wrapper (char *str, va_list ap);
  * based on the number of hash files being used.
  */
 static int
-check_all_indexes (char *filenames[], size_t n)
+check_all_indexes (char *filenames[], size_t n, size_t maxhash)
 {
+  char *filename;
+  FILE *fp;
+  int retval = 0;
   unsigned int i, j;
 
-  for (i = 0; i < HASH_FILE_NUM; i++)
+  for (i = 0; i < n; i++)
     {
-      for (j = 0; j < n; j++)
+      for (j = 0; j < maxhash; j++)
         {
-          if (!index_is_valid (filenames[j], i))
-            return 1;
+          filename = hash_get_filename (filenames[i], j, maxhash);
+
+          if (!fileExists (filename))
+            {
+              fp = fopen (filename, "w");
+              fclose (fp);
+
+              retval = 1;
+            }
+
+          free (filename);
         }
     }
-
-  return 0;
-}
-
-/**
- * @brief Checks if a given file is valid.
- *
- * @param filename The prefix of the file to check.
- * @param suffix   The number of the hash file to append to the name.
- *
- * @retval 0 The file is not valid.
- * @retval 1 The file is valid.
- *
- * This is basically a wrapper around isValidFile, appending the
- * hash number to the given file.
- */
-static int
-index_is_valid (char *filename, unsigned int suffix)
-{
-  char *fullname = hash_get_filename (filename, suffix);
-  int retval;
-
-  if (isValidFile (fullname))
-    retval = 1;
-  else
-    retval = 0;
-
-  free (fullname);
 
   return retval;
 }
@@ -107,6 +92,7 @@ load_files_from_base (Adapter * db)
       title = str_dup (artwork.title);
 
       memory_index_insert (db->pk_index, title, i);
+      descriptor_insert (db->desc, title, CalculaDescritor (baseGetValidImagePath (artwork.img)));
 
       str_foreach (artwork.author, secindex_insert_wrapper,
                    db->author_index, title);
@@ -210,13 +196,14 @@ adapter_find (Adapter * db)
 {
   ArtworkInfo artwork;
   char key[TITLE_LENGTH + 1];   /* TITLE_LENGTH is the largest of all lengths */
+  char img[255];
   FILE *fp_html;
   MemoryIndex *mindex = NULL;
   MemoryIndexRecord *mrec = NULL;
   SecondaryIndex *secindex = NULL;
 
   print_search_type_menu ();
-  switch (menuMultipleAnswers ("   Opcao desejada: ", "ep"))
+  switch (menuMultipleAnswers ("   Opcao desejada: ", "eps"))
     {
     case 'e':
       readString ("   Digite o titulo para busca: ", key, TITLE_LENGTH);
@@ -225,6 +212,10 @@ adapter_find (Adapter * db)
     case 'p':
       read_secindex (db, &mindex, &secindex, key);
       break;
+    case 's':
+      readString ("   Digite o nome da imagem de comparacao: ", img, 255);
+      descriptor_find (db->desc, img, db->pk_index, db->base->fp, 50);
+      return;
     }
 
   mrec = memory_index_find (mindex, key);
@@ -265,6 +256,7 @@ adapter_free (Adapter * db)
     {
       base_free (db->base);
       memory_index_free (db->pk_index);
+      descriptor_free (db->desc);
       secondary_index_free (db->author_index);
       secondary_index_free (db->title_index);
       secondary_index_free (db->type_index);
@@ -291,6 +283,7 @@ adapter_insert (Adapter * db)
           baserrn = base_insert (db->base, &artwork);
 
           memory_index_insert (db->pk_index, title, baserrn);
+          descriptor_insert (db->desc, title, CalculaDescritor (baseGetValidImagePath (artwork.img)));
 
           str_foreach (artwork.author, secindex_insert_wrapper,
                        db->author_index, title);
@@ -314,15 +307,18 @@ adapter_load_files (Adapter * db)
 {
   char *filenames[] = { PKFILE, SI_AUTHOR_INDEX, SI_TITLE_INDEX,
     SI_TYPE_INDEX, SI_YEAR_INDEX };
-  int loadbase = 0;
+  char *descnames[] = { DESCFILE };
+  int loadbase = 0, loadbase2 = 0;
 
   assert (db);
 
   db->base = base_new (DBFILE, DBFILE_AVAIL);
   db->pk_index = memory_index_new (PKFILE);
+  db->desc = descriptor_new (DESCFILE);
 
   /* Check if all hash files are valid */
-  loadbase = check_all_indexes (filenames, INDEX_TOTAL);
+  loadbase = check_all_indexes (filenames, INDEX_TOTAL, HASH_FILE_NUM);
+  loadbase2 = check_all_indexes (descnames, 1, DESC_HASH_NUM);
 
   /* Create each secondary index, and set the overwrite_index parameter
    * based on the result of check_all_indexes, ie, overwrite if any
@@ -337,8 +333,11 @@ adapter_load_files (Adapter * db)
                                         SI_YEAR_AVAIL, loadbase);
 
   /* If there was something wrong, reload all data */
-  if (loadbase)
+  if (loadbase || loadbase2)
+  {
+    printf ("loading\n");
     load_files_from_base (db);
+  }
 }
 
 Adapter *
