@@ -311,6 +311,8 @@ memory_index_remove (MemoryIndex * index, char * name)
 {
   int i = 0, j;
 
+  assert (index && name);
+
   change_hash_file (index, name);
 
   while ((i < index->regnum) && (strcasecmp(index->reclist[i].name, name) != 0))
