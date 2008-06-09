@@ -131,17 +131,26 @@ base_read_input (ArtworkInfo * info)
 char *
 baseGetValidImagePath (const char *s)
 {
-  char *file;
+  char *basename, *fullname;
 
-  file = MEM_ALLOC_N (char, IMG_LENGTH + 2);
+  /* 6 == "img/" + '.' + '\0' */
+  fullname = MEM_ALLOC_N (char, IMG_LENGTH + 6);
+  strcat (fullname, "img/");
+
+  /* fullpath == 1 needs space for "img/" */
+  basename = MEM_ALLOC_N (char, IMG_LENGTH + 2);
 
   /* Change the identifier string so it becomes the file path. */
-  strncpy (file, s, 6);
-  file[6] = '.';
-  strncpy (file + 7, s + 6, 3);
-  file[10] = '\0';
+  strncpy (basename, s, 6);
+  basename[6] = '.';
+  strncpy (basename + 7, s + 6, 3);
+  basename[10] = '\0';
 
-  return file;
+  strcat (fullname, basename);
+
+  free (basename);
+
+  return fullname;
 }
 
 int
