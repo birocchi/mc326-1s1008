@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <ctype.h>
 #include <stdio.h>
+#include "filelist.h"
 #include "hash.h"
 #include "io.h"
 
@@ -15,7 +16,7 @@ hash_function (char *key)
       retval ^= tolower (*key++);
     }
 
-  return retval % HASH_FILE_NUM;
+  return retval % INDEX_HASH_NUM;
 }
 
 char *

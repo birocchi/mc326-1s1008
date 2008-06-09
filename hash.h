@@ -1,14 +1,12 @@
 #ifndef __HASH_H
 #define __HASH_H
 
-#define HASH_FILE_NUM 5 /**< Number of files the memory index is split into */
-
 /**
  * @brief The default hash function (Fowler/Noll/Vo algorithm)
  *
  * @param key The key to be hashed.
  *
- * @return The result of the hash function modulo \a HASH_FILE_NUM.
+ * @return The result of the hash function modulo \a INDEX_HASH_NUM. 
  */
 unsigned int hash_function (char *key);
 

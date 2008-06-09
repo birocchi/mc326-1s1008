@@ -322,7 +322,7 @@ adapter_load_files (Adapter * db)
   db->desc = descriptor_new (DESCFILE);
 
   /* Check if all hash files are valid */
-  loadbase = check_all_indexes (filenames, INDEX_TOTAL, HASH_FILE_NUM);
+  loadbase = check_all_indexes (filenames, INDEX_TOTAL, INDEX_HASH_NUM);
   loadbase2 = check_all_indexes (descnames, 1, DESC_HASH_NUM);
 
   /* Create each secondary index, and set the overwrite_index parameter
