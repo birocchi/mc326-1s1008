@@ -67,7 +67,7 @@ secondary_index_insert (SecondaryIndex * si_index, char *si_value,
   if (avail_list_is_empty (si_index->avlist))
     {
       fseek (si_index->fp_list, 0, SEEK_END);
-      newrrn = getFileSize (si_index->fp_list) / MEM_REG_SIZE;
+      newrrn = file_get_size (si_index->fp_list) / MEM_REG_SIZE;
     }
   else
     {
@@ -119,7 +119,7 @@ secondary_index_new_with_hash (const char *indexname, const char *listname,
 
   s->fp_list =
     fopen (listname,
-           (!overwrite_index && isValidFile (listname) ? "r+" : "w+"));
+           (!overwrite_index && file_is_valid (listname) ? "r+" : "w+"));
   assert (s->fp_list);
 
   return s;

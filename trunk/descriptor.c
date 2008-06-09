@@ -182,7 +182,7 @@ descriptor_find (Descriptor * desc, char *imgname, MemoryIndex * pk, FILE
 
   assert (desc);
 
-  if (!isValidFile (imgname))
+  if (!file_is_valid (imgname))
     return;
 
   ds = CalculaDescritor (imgname);

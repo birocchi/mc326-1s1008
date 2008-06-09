@@ -156,7 +156,7 @@ load_file (MemoryIndex * index, const char *filename)
   assert (fp);
 
   /* Allocate all the necessary memory at once. */
-  regnum = getFileSize (fp) / MEM_REG_SIZE;
+  regnum = file_get_size (fp) / MEM_REG_SIZE;
   inflate_list (index, regnum);
 
   /* Add each record back to the index. */
