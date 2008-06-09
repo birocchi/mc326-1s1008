@@ -67,7 +67,7 @@ avail_list_load (AvailList * avlist)
   assert (avlist);
 
   /* Check for existence.  */
-  if (!fileExists (avlist->filename))
+  if (!file_exists (avlist->filename))
     return;
 
   /* Open it, check it, read it, close it. */

@@ -9,7 +9,7 @@
  * \retval 0 File does not exist.
  * \retval 1 File exists.
  */
-int fileExists (const char *filename);
+int file_exists (const char *filename);
 
 /**
  * \brief Returns the size of a file.

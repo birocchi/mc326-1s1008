@@ -144,7 +144,7 @@ load_file (MemoryIndex * index, const char *filename)
   assert (index);
 
   /* If the file doesn't exist, create it and leave */
-  if (!fileExists (filename))
+  if (!file_exists (filename))
     {
       fp = fopen (filename, "w");
       assert (fp);

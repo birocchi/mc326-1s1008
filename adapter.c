@@ -52,7 +52,7 @@ check_all_indexes (char *filenames[], size_t n, size_t maxhash)
         {
           filename = hash_get_filename (filenames[i], j, maxhash);
 
-          if (!fileExists (filename))
+          if (!file_exists (filename))
             {
               fp = fopen (filename, "w");
               fclose (fp);
