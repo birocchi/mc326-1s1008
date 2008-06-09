@@ -51,6 +51,10 @@ MemoryIndexRecord *memory_index_find (MemoryIndex * index, char *name);
  */
 void memory_index_free (MemoryIndex * index);
 
+MemoryIndex * memory_index_get_next (MemoryIndex * index, char *key);
+
+MemoryIndex * memory_index_get_previous (MemoryIndex * index, char *key);
+
 /**
  * @brief Inserts an entry into the index.
  *
