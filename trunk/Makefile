@@ -10,7 +10,7 @@
 CC=gcc
 CFLAGS=-c -Wall -g -ansi -pedantic
 LDFLAGS=-lefence -ljpeg -lungif -lpng
-OFILES=adapter.o avail.o base.o file.o io.o hash.o html.o main.o mem.o memindex.o menu.o secindex.o# libimg.o
+OFILES=adapter.o avail.o base.o descriptor.o file.o io.o hash.o html.o main.o mem.o memindex.o menu.o secindex.o libimg.o
 
 TP=tp4
 BASE=base00.dat
@@ -28,6 +28,9 @@ avail.o: avail.c avail.h
 	$(CC) $(CFLAGS) $<
 
 base.o: base.c base.h
+	$(CC) $(CFLAGS) $<
+
+descriptor.o: descriptor.c descriptor.h
 	$(CC) $(CFLAGS) $<
 
 file.o: file.c file.h
@@ -62,4 +65,4 @@ secindex.o: secindex.c secindex.h
 
 clean:
 	cp -v $(BASE) $(BASEBACKUP) ; \
-	rm -rf doc/ *.o $(TP) $(BASE) *.av *.sk.h* *.sl pkfile.pk.h* ;
+	rm -rf doc/ *.o $(TP) $(BASE) *.av descriptor.desc* *.sk.h* *.sl pkfile.pk.h* ;
