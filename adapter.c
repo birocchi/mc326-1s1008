@@ -216,7 +216,12 @@ adapter_find (Adapter * db)
       break;
     case 's':
       readString ("   Digite o nome da imagem de comparacao: ", img, 255);
-      descriptor_find (db->desc, img, db->pk_index, db->base->fp, 50);
+
+      if (isValidFile (img))
+        descriptor_find (db->desc, img, db->pk_index, db->base->fp, 50);
+      else
+        printf ("   Imagem \"%s\" invalida ou nao encontrada.", img);
+
       return;
     }
 
