@@ -12,7 +12,7 @@
 #include "memindex.h"
 
 static int bsearch_compare (const void *a, const void *b);
-static void change_hash_file (MemoryIndex * index, char *name);
+static void change_hash_file (MemoryIndex * index, unsigned int hashnum);
 static void flush_to_disk (MemoryIndex * index);
 static void inflate_list (MemoryIndex * index, size_t size);
 static void load_file (MemoryIndex * index, const char
@@ -39,16 +39,13 @@ bsearch_compare (const void *a, const void *b)
 /**
  * @brief Changes the loaded hash file according to the current key.
  *
- * @param index The memory index being used.
- * @param name  The key according to which to change the loaded file.
+ * @param index   The memory index being used.
+ * @param hashnum The hash returned by the hash function.
  */
 static void
-change_hash_file (MemoryIndex * index, char *name)
+change_hash_file (MemoryIndex * index, unsigned int hashnum)
 {
   char *filename;
-  unsigned int hashnum;
-
-  hashnum = index->hash_function (name);
 
   if (index->loaded_file != hashnum)
     {
@@ -199,7 +196,7 @@ memory_index_find (MemoryIndex * index, char *name)
 {
   assert (index);
 
-  change_hash_file (index, name);
+  change_hash_file (index, index->hash_function (name));
 
   return bsearch (name, index->reclist, index->regnum,
                   sizeof (MemoryIndexRecord), bsearch_compare);
@@ -267,7 +264,7 @@ memory_index_insert (MemoryIndex * index, char *name, int rrn)
 {
   assert (index && name);
 
-  change_hash_file (index, name);
+  change_hash_file (index, index->hash_function (name));
 
   /* Allocate more memory if necessary */
   if (index->regnum == index->maxregs)
@@ -314,7 +311,7 @@ memory_index_remove (MemoryIndex * index, char * name)
 
   assert (index && name);
 
-  change_hash_file (index, name);
+  change_hash_file (index, index->hash_function (name));
 
   while ((i < index->regnum) && (strcasecmp(index->reclist[i].name, name) != 0))
     i++;
