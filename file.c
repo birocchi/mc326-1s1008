@@ -25,9 +25,8 @@ file_get_size (FILE * f)
   int fd;
   struct stat buf;
 
-  /* This is pretty straight forward. */
+  /* Get the file descriptor and stat it to get information */
   fd = fileno (f);
-
   if (fstat (fd, &buf) != 0)
     return -1;
 
@@ -39,7 +38,7 @@ file_get_size_from_name (const char *filename)
 {
   struct stat buf;
 
-  /* Check if stat return OK and the file is a regular file */
+  /* Check if stat returns OK and the file is a regular file */
   if ((stat (filename, &buf) != 0) || (!S_ISREG (buf.st_mode)))
     return -1;
 
