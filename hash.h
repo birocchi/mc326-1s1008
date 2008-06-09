@@ -17,11 +17,12 @@ unsigned int hash_function (char *key);
  *
  * @param prefix  The base filename.
  * @param hashnum The number to append to the filename.
+ * @param maxhash The maximum acceptable value for \ahashum.
  *
  * @return The filename with the suffix appended to it.
  *
  * Remember to free() the name returned by this function.
  */
-char *hash_get_filename (const char *prefix, unsigned int hashnum);
+char *hash_get_filename (const char *prefix, unsigned int hashnum, unsigned int maxhash);
 
 #endif
