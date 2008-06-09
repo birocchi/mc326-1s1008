@@ -20,7 +20,7 @@ file_exists (const char *filename)
 }
 
 long
-getFileSize (FILE * f)
+file_get_size (FILE * f)
 {
   int fd;
   struct stat buf;
@@ -35,7 +35,7 @@ getFileSize (FILE * f)
 }
 
 long
-getFileSizeFromName (const char *filename)
+file_get_size_from_name (const char *filename)
 {
   struct stat buf;
 
@@ -47,7 +47,7 @@ getFileSizeFromName (const char *filename)
 }
 
 int
-isValidFile (const char *filename)
+file_is_valid (const char *filename)
 {
-  return (file_exists (filename) && (getFileSizeFromName (filename) > 0));
+  return (file_exists (filename) && (file_get_size_from_name (filename) > 0));
 }

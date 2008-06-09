@@ -16,22 +16,22 @@ int file_exists (const char *filename);
  * \param f The file whose size will be given.
  * \return The size in bytes of the file, -1 if f is an invalid file.
  */
-long getFileSize (FILE * f);
+long file_get_size (FILE * f);
 
 /**
  * \brief Returns the size of a file with name \a filename.
  * \param filename The name of the file to be inspected.
  * \return The size in bytes of the file, -1 if f is an invalid file.
  *
- * This function works the same as \a getFileSize, but receives
+ * This function works the same as \a file_get_size, but receives
  * a const char instead of a FILE as the argument.
  */
-long getFileSizeFromName (const char *filename);
+long file_get_size_from_name (const char *filename);
 
 /**
  * \brief Checks if the file exists and is non-empty.
  * \return 0 or 1 to show if it's valid.
  */
-int isValidFile (const char *filename);
+int file_is_valid (const char *filename);
 
 #endif

@@ -81,7 +81,7 @@ load_files_from_base (Adapter * db)
 
   assert (db);
 
-  itemcount = getFileSize (db->base->fp) / BASE_REG_SIZE;
+  itemcount = file_get_size (db->base->fp) / BASE_REG_SIZE;
 
   fseek (db->base->fp, 0, SEEK_SET);
 
@@ -217,7 +217,7 @@ adapter_find (Adapter * db)
     case 's':
       readString ("   Digite o nome da imagem de comparacao: ", img, 255);
 
-      if (isValidFile (img))
+      if (file_is_valid (img))
         descriptor_find (db->desc, img, db->pk_index, db->base->fp, 50);
       else
         printf ("   Imagem \"%s\" invalida ou nao encontrada.", img);

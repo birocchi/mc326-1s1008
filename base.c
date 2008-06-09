@@ -54,7 +54,7 @@ base_new (const char *basename, const char *availname)
 {
   Base *b = MEM_ALLOC (Base);
 
-  b->fp = fopen (basename, (isValidFile (basename) ? "r+" : "w+"));
+  b->fp = fopen (basename, (file_is_valid (basename) ? "r+" : "w+"));
   assert (b->fp);
 
   b->avlist = avail_list_new (availname);
@@ -112,7 +112,7 @@ base_read_input (ArtworkInfo * info)
           strncpy (info->img, GROUP_NUMBER, 2);
           strncpy (info->img + 2, img, (IMG_LENGTH - 2) + 1);
 
-          if (!isValidFile (info->img))
+          if (!file_is_valid (info->img))
             {
               printf ("   Imagem \"%s\" nao encontrada.\n", info->img);
               continue;
