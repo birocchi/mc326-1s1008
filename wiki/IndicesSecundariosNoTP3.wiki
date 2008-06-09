@@ -1,4 +1,4 @@
-#summary Esta página contém uma breve descrição da relação entre chaves primárias e secundárias no TP3, porque sempre me esqueço (é útil para os TPs seguintes também).
+#summary Descreve a relação entre chaves primárias e secundárias no TP3, porque sempre me esqueço (é útil para os TPs seguintes também).
 #labels Phase-Design,Phase-Implementation
 
 = Estruturas usadas =
