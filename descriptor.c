@@ -100,14 +100,13 @@ change_hash_file (Descriptor * desc, unsigned int hashnum)
   if (hashnum != desc->loaded_file)
     {
       if (desc->loaded_file != -1)
-        {
-          fclose (desc->fp);
-        }
+        fclose (desc->fp);
 
       filename = hash_get_filename (desc->fp_name, hashnum, DESC_HASH_NUM);
 
       desc->fp = fopen (filename, "r+");
-      /*desc->fp = fopen (filename, (isValidFile (filename) ? "r+" : "w+")); */
+      assert (desc->fp);
+
       desc->loaded_file = hashnum;
 
       free (filename);
