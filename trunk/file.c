@@ -8,7 +8,7 @@
 #include "file.h"
 
 int
-fileExists (const char *filename)
+file_exists (const char *filename)
 {
   struct stat buf;
 
@@ -49,5 +49,5 @@ getFileSizeFromName (const char *filename)
 int
 isValidFile (const char *filename)
 {
-  return (fileExists (filename) && (getFileSizeFromName (filename) > 0));
+  return (file_exists (filename) && (getFileSizeFromName (filename) > 0));
 }
