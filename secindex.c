@@ -7,6 +7,7 @@
 #include "avail.h"
 #include "base.h"
 #include "file.h"
+#include "hash.h"
 #include "io.h"
 #include "mem.h"
 #include "memindex.h"
