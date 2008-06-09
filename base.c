@@ -111,6 +111,13 @@ base_read_input (ArtworkInfo * info)
         {
           strncpy (info->img, GROUP_NUMBER, 2);
           strncpy (info->img + 2, img, (IMG_LENGTH - 2) + 1);
+
+          if (!isValidFile (info->img))
+            {
+              printf ("   Imagem \"%s\" nao encontrada.\n", info->img);
+              continue;
+            }
+
           break;
         }
       else
@@ -125,7 +132,6 @@ char *
 baseGetValidImagePath (const char *s)
 {
   char *file;
-
 
   file = MEM_ALLOC_N (char, IMG_LENGTH + 2);
 
