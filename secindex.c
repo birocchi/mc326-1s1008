@@ -97,12 +97,21 @@ secondary_index_insert (SecondaryIndex * si_index, char *si_value,
 }
 
 SecondaryIndex *
-secondary_index_new (const char *indexname, const char *listname,
-                     const char *avname, int overwrite_index)
+secondary_index_new (const char *indexname, const char *listname, const char
+  *avname, int overwrite_index)
+{
+  return secondary_index_new_with_hash (indexname, listname, avname,
+    overwrite_index, hash_function);
+}
+
+SecondaryIndex *
+secondary_index_new_with_hash (const char *indexname, const char *listname,
+                     const char *avname, int overwrite_index, unsigned int
+                     (*hash_func)(char*))
 {
   SecondaryIndex *s = MEM_ALLOC (SecondaryIndex);
 
-  s->record_list = memory_index_new (indexname);
+  s->record_list = memory_index_new_with_hash (indexname, hash_func);
 
   s->avlist = avail_list_new (avname);
   avail_list_load (s->avlist);
