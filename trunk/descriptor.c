@@ -117,20 +117,17 @@ find_similarities (Descriptor *desc, SimilarityList *simlist, char *imgname, uns
       change_hash_file (desc, hashnum);
 
       fseek (desc->fp, 0, SEEK_SET);
-      /*fseek (base_fp, 0, SEEK_SET);*/
 
       while (!feof (desc->fp))
         {
           di = fgetc (desc->fp);
-          printf (">> %ld %u\n", ftell (desc->fp), desc->loaded_file);
           fgets (pkname, TITLE_LENGTH + 1, desc->fp);
           stripWhiteSpace (pkname);
-
-          printf ("-- %s %u\n", pkname, descriptor_hash (di^ds));
 
           if (descriptor_hash(di ^ ds) <= 2)
             {
               match = memory_index_find (pk, pkname);
+
               if (match)
                 {
                   fseek (base_fp, (match->rrn * BASE_REG_SIZE) +
@@ -140,12 +137,6 @@ find_similarities (Descriptor *desc, SimilarityList *simlist, char *imgname, uns
 
                   simlist_append (simlist, imgfile, ComputaSimilaridade
                     (baseGetValidImagePath (imgfile), imgname));
-                }
-              else
-                {
-                  /*printf ("-- %ld %ld", ftell (base_fp), ftell (base_fp) + (BASE_REG_SIZE-TITLE_LENGTH));*/
-                  /*fseek (base_fp, BASE_REG_SIZE, SEEK_CUR);*/
-                  continue;
                 }
             }
         }
@@ -180,10 +171,7 @@ descriptor_find (Descriptor *desc, char *imgname, MemoryIndex *pk, FILE
   assert (desc);
 
   if (!isValidFile (imgname))
-  {
-    printf ("here: %s\n", imgname);
     return;
-  }
 
   ds = CalculaDescritor (imgname);
   change_hash_file (desc, descriptor_hash (ds));
