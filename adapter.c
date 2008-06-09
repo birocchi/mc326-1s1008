@@ -92,7 +92,9 @@ load_files_from_base (Adapter * db)
       title = str_dup (artwork.title);
 
       memory_index_insert (db->pk_index, title, i);
-      descriptor_insert (db->desc, title, CalculaDescritor (baseGetValidImagePath (artwork.img)));
+      descriptor_insert (db->desc, title,
+                         CalculaDescritor (baseGetValidImagePath
+                                           (artwork.img)));
 
       str_foreach (artwork.author, secindex_insert_wrapper,
                    db->author_index, title);
@@ -283,7 +285,9 @@ adapter_insert (Adapter * db)
           baserrn = base_insert (db->base, &artwork);
 
           memory_index_insert (db->pk_index, title, baserrn);
-          descriptor_insert (db->desc, title, CalculaDescritor (baseGetValidImagePath (artwork.img)));
+          descriptor_insert (db->desc, title,
+                             CalculaDescritor (baseGetValidImagePath
+                                               (artwork.img)));
 
           str_foreach (artwork.author, secindex_insert_wrapper,
                        db->author_index, title);
@@ -306,7 +310,8 @@ void
 adapter_load_files (Adapter * db)
 {
   char *filenames[] = { PKFILE, SI_AUTHOR_INDEX, SI_TITLE_INDEX,
-    SI_TYPE_INDEX, SI_YEAR_INDEX };
+    SI_TYPE_INDEX, SI_YEAR_INDEX
+  };
   char *descnames[] = { DESCFILE };
   int loadbase = 0, loadbase2 = 0;
 
@@ -334,10 +339,10 @@ adapter_load_files (Adapter * db)
 
   /* If there was something wrong, reload all data */
   if (loadbase || loadbase2)
-  {
-    printf ("loading\n");
-    load_files_from_base (db);
-  }
+    {
+      printf ("loading\n");
+      load_files_from_base (db);
+    }
 }
 
 Adapter *

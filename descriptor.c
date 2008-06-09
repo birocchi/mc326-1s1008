@@ -13,11 +13,21 @@
 #include "mem.h"
 #include "memindex.h"
 
-static unsigned int
-descriptor_hash (unsigned char key);
+static void simlist_append (SimilarityList * simlist, const char *imgfile,
+                            double sim);
+static int simlist_compare (const void *a, const void *b);
+static void simlist_free (SimilarityList * simlist);
+static SimilarityList *simlist_new (void);
+static void change_hash_file (Descriptor * desc, unsigned int hashnum);
+static void find_similarities (Descriptor * desc, SimilarityList * simlist,
+                               char *imgname, unsigned char ds,
+                               MemoryIndex * pk, FILE * base_fp, int hashnum);
+static unsigned int descriptor_hash (unsigned char key);
+static void inflate (SimilarityList * simlist, size_t newsize);
+static unsigned int descriptor_hash (unsigned char key);
 
 static void
-inflate (SimilarityList *simlist, size_t newsize)
+inflate (SimilarityList * simlist, size_t newsize)
 {
   SimilarityRecord *tmp;
 
@@ -25,17 +35,17 @@ inflate (SimilarityList *simlist, size_t newsize)
     newsize = 50;
 
   if (newsize > simlist->maxregs)
-  {
-    tmp = realloc (simlist->list, newsize * sizeof (SimilarityRecord));
-    assert (tmp);
+    {
+      tmp = realloc (simlist->list, newsize * sizeof (SimilarityRecord));
+      assert (tmp);
 
-    simlist->list = tmp;
-    simlist->maxregs = newsize;
-  }
+      simlist->list = tmp;
+      simlist->maxregs = newsize;
+    }
 }
 
 static void
-simlist_append (SimilarityList *simlist, const char *imgfile, double sim)
+simlist_append (SimilarityList * simlist, const char *imgfile, double sim)
 {
   if (simlist->regnum == simlist->maxregs)
     inflate (simlist, simlist->maxregs * 2);
@@ -49,8 +59,8 @@ simlist_append (SimilarityList *simlist, const char *imgfile, double sim)
 static int
 simlist_compare (const void *a, const void *b)
 {
-  double sa = (((SimilarityRecord*)&a)->similarity);
-  double sb = (((SimilarityRecord*)&b)->similarity);
+  double sa = (((SimilarityRecord *) & a)->similarity);
+  double sb = (((SimilarityRecord *) & b)->similarity);
 
   if (sa < sb)
     return 1;
@@ -61,13 +71,13 @@ simlist_compare (const void *a, const void *b)
 }
 
 static void
-simlist_free (SimilarityList *simlist)
+simlist_free (SimilarityList * simlist)
 {
   if (simlist)
-  {
-    free (simlist->list);
-    free (simlist);
-  }
+    {
+      free (simlist->list);
+      free (simlist);
+    }
 }
 
 static SimilarityList *
@@ -83,7 +93,7 @@ simlist_new (void)
 }
 
 static void
-change_hash_file (Descriptor *desc, unsigned int hashnum)
+change_hash_file (Descriptor * desc, unsigned int hashnum)
 {
   char *filename;
 
@@ -97,7 +107,7 @@ change_hash_file (Descriptor *desc, unsigned int hashnum)
       filename = hash_get_filename (desc->fp_name, hashnum, DESC_HASH_NUM);
 
       desc->fp = fopen (filename, "r+");
-      /*desc->fp = fopen (filename, (isValidFile (filename) ? "r+" : "w+"));*/
+      /*desc->fp = fopen (filename, (isValidFile (filename) ? "r+" : "w+")); */
       desc->loaded_file = hashnum;
 
       free (filename);
@@ -105,7 +115,9 @@ change_hash_file (Descriptor *desc, unsigned int hashnum)
 }
 
 static void
-find_similarities (Descriptor *desc, SimilarityList *simlist, char *imgname, unsigned char ds, MemoryIndex *pk, FILE *base_fp, int hashnum)
+find_similarities (Descriptor * desc, SimilarityList * simlist, char *imgname,
+                   unsigned char ds, MemoryIndex * pk, FILE * base_fp,
+                   int hashnum)
 {
   unsigned char di;
   char pkname[TITLE_LENGTH + 1];
@@ -124,19 +136,19 @@ find_similarities (Descriptor *desc, SimilarityList *simlist, char *imgname, uns
           fgets (pkname, TITLE_LENGTH + 1, desc->fp);
           stripWhiteSpace (pkname);
 
-          if (descriptor_hash(di ^ ds) <= 2)
+          if (descriptor_hash (di ^ ds) <= 2)
             {
               match = memory_index_find (pk, pkname);
 
               if (match)
                 {
                   fseek (base_fp, (match->rrn * BASE_REG_SIZE) +
-                    (BASE_REG_SIZE - IMG_LENGTH), SEEK_SET);
+                         (BASE_REG_SIZE - IMG_LENGTH), SEEK_SET);
 
                   fgets (imgfile, IMG_LENGTH + 1, base_fp);
 
                   simlist_append (simlist, imgfile, ComputaSimilaridade
-                    (baseGetValidImagePath (imgfile), imgname));
+                                  (baseGetValidImagePath (imgfile), imgname));
                 }
             }
         }
@@ -149,18 +161,19 @@ descriptor_hash (unsigned char key)
   unsigned int hashnum = 0;
   unsigned char comp = 1;
 
-  while(comp) {
-    if (key & comp)
-      hashnum++;
-    comp <<= 1;
-  }
+  while (comp)
+    {
+      if (key & comp)
+        hashnum++;
+      comp <<= 1;
+    }
 
   return hashnum;
 }
 
 void
-descriptor_find (Descriptor *desc, char *imgname, MemoryIndex *pk, FILE
-  *base_fp, size_t maxresults)
+descriptor_find (Descriptor * desc, char *imgname, MemoryIndex * pk, FILE
+                 * base_fp, size_t maxresults)
 {
   unsigned char ds;
   SimilarityList *simlist = simlist_new ();
@@ -182,27 +195,25 @@ descriptor_find (Descriptor *desc, char *imgname, MemoryIndex *pk, FILE
   find_similarities (desc, simlist, imgname, ds, pk, base_fp, curload + 1);
 
   if (simlist->regnum == 0)
-    {
-      simlist_free (simlist);
-
-      printf ("   Nao ha imagens semelhantes a \"%s\".\n", imgname);
-      return;
-    }
+    printf ("   Nao ha imagens semelhantes a \"%s\".\n", imgname);
   else
     {
-      qsort (simlist->list, simlist->regnum, sizeof (SimilarityRecord), simlist_compare);
+      qsort (simlist->list, simlist->regnum, sizeof (SimilarityRecord),
+             simlist_compare);
 
       htmlfile = fopen (HTMLFILE, "w+");
 
       html_begin (htmlfile);
-      fprintf (htmlfile, "<tr><td><img src=\"%s\"></td><td></td></tr>\n", imgname);
+      fprintf (htmlfile, "<tr><td><img src=\"%s\"></td><td></td></tr>\n",
+               imgname);
 
       for (i = 0; (i < maxresults) && (i < simlist->regnum); i++)
         {
           fprintf (htmlfile, "<tr><td>\n");
-          fprintf (htmlfile, "<img src=\"%s\"></td><td></td></tr>\n", baseGetValidImagePath (simlist->list[i].img));
+          fprintf (htmlfile, "<img src=\"%s\"></td><td></td></tr>\n",
+                   baseGetValidImagePath (simlist->list[i].img));
         }
-      
+
       html_end (htmlfile);
       fclose (htmlfile);
     }
@@ -211,20 +222,20 @@ descriptor_find (Descriptor *desc, char *imgname, MemoryIndex *pk, FILE
 }
 
 void
-descriptor_free (Descriptor *desc)
+descriptor_free (Descriptor * desc)
 {
   if (desc)
-  {
-    if (desc->fp)
-      fclose (desc->fp);
+    {
+      if (desc->fp)
+        fclose (desc->fp);
 
-    free (desc->fp_name);
-    free (desc);
-  }
+      free (desc->fp_name);
+      free (desc);
+    }
 }
 
 void
-descriptor_insert (Descriptor *desc, const char *pkname, unsigned char d)
+descriptor_insert (Descriptor * desc, const char *pkname, unsigned char d)
 {
   assert (desc);
 
