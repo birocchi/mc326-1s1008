@@ -52,6 +52,7 @@ print_search_type_menu (void)
   printf ("   Tipo de consulta:\n");
   printf ("   (e)xata, por titulo\n");
   printf ("   (p)arcial, por qualquer campo\n");
+  printf ("   (s)imilaridade\n");
   printf ("   +++++++++++++++++++++++++++++\n");
   printf ("\n");
 }
