@@ -19,12 +19,12 @@ hash_function (char *key)
 }
 
 char *
-hash_get_filename (const char *prefix, unsigned int hashnum)
+hash_get_filename (const char *prefix, unsigned int hashnum, unsigned int maxhash)
 {
   char filename[255];           /* 255 bytes is usually the maximum length of a filename */
   int count;
 
-  assert (hashnum < HASH_FILE_NUM);
+  assert (hashnum < maxhash);
 
   count = sprintf (filename, "%s.h%04u", prefix, hashnum);
   assert (count <= 255);
