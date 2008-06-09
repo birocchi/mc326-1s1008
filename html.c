@@ -51,7 +51,7 @@ html_write_record_info (FILE * htmlfile, ArtworkInfo * info)
   /* Write all the fields of the the artwork. */
   fprintf (htmlfile, "<tr>\n");
   fprintf (htmlfile, "<td>\n");
-  fprintf (htmlfile, "<img src=\"img/%s\">\n", path);
+  fprintf (htmlfile, "<img src=\"%s\">\n", path);
   fprintf (htmlfile, "</td>\n");
   fprintf (htmlfile, "<td>\n");
   fprintf (htmlfile, "<p><b>Titulo:</b> %s</p>\n", info->title);
