@@ -7,25 +7,21 @@
 int
 main (int argc, char *argv[])
 {
-  /* We just need this struct, since  it will hold all the others. */
   Adapter *db;
+  int halt = 0;
 
-  /* Allocate it. */
   db = adapter_new ();
 
-  /*Try loading it from the files. */
   adapter_load_files (db);
 
   printWelcome ();
 
-  while (1)
+  while (!halt)
     {
       printMainMenu ();
 
       switch (menuMultipleAnswers ("   Opcao desejada: ", "cirs"))
         {
-        default:               /* This should not happen */
-          break;
         case 'c':
           adapter_find (db);
           break;
@@ -36,11 +32,13 @@ main (int argc, char *argv[])
           adapter_remove (db);
           break;
         case 's':
-          adapter_free (db);
           printf ("Saindo...\n");
-          return 0;
+          halt = 1;
+          break;
         }
     }
+
+  adapter_free (db);
 
   return 0;
 }
