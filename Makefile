@@ -13,8 +13,8 @@ LDFLAGS=-lefence -ljpeg -lungif -lpng
 OFILES=adapter.o avail.o base.o descriptor.o file.o io.o hash.o html.o main.o mem.o memindex.o menu.o secindex.o libimg.o
 
 TP=tp4
-BASE=base00.dat
-BASEBACKUP=base00.dat.back
+BASE=base01.dat
+BASEBACKUP=base01.dat.back
 
 all: art
 
