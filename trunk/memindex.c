@@ -5,6 +5,7 @@
 #include <strings.h>
 #include "base.h"
 #include "file.h"
+#include "filelist.h"
 #include "hash.h"
 #include "io.h"
 #include "mem.h"
@@ -61,7 +62,7 @@ change_hash_file (MemoryIndex * index, char *name)
           index->regnum = index->maxregs = 0;
         }
 
-      filename = hash_get_filename (index->fp_name, hashnum, HASH_FILE_NUM);
+      filename = hash_get_filename (index->fp_name, hashnum, INDEX_HASH_NUM);
       load_file (index, filename);
       free (filename);
 
@@ -84,7 +85,7 @@ flush_to_disk (MemoryIndex * index)
   assert (index);
 
   /* Gets the filename with the right extension (filename.hXXXX) */
-  filename = hash_get_filename (index->fp_name, index->loaded_file, HASH_FILE_NUM);
+  filename = hash_get_filename (index->fp_name, index->loaded_file, INDEX_HASH_NUM);
   fp = fopen (filename, "w");
   assert (fp);
   free (filename);
@@ -226,10 +227,10 @@ memory_index_get_next (MemoryIndex * index, char *key)
 
   hashnum = index->hash_function (key);
 
-  if (hashnum >= HASH_FILE_NUM)
+  if (hashnum >= INDEX_HASH_NUM)
     return NULL;
 
-  filename = hash_get_filename (index->fp_name, hashnum + 1, HASH_FILE_NUM);
+  filename = hash_get_filename (index->fp_name, hashnum + 1, INDEX_HASH_NUM);
 
   mindex = memory_index_new_with_hash (index->fp_name, index->hash_function);
   load_file (mindex, filename);
@@ -251,7 +252,7 @@ memory_index_get_previous (MemoryIndex * index, char *key)
   if (hashnum == 0)
     return NULL;
 
-  filename = hash_get_filename (index->fp_name, hashnum - 1, HASH_FILE_NUM);
+  filename = hash_get_filename (index->fp_name, hashnum - 1, INDEX_HASH_NUM);
 
   mindex = memory_index_new_with_hash (index->fp_name, index->hash_function);
   load_file (mindex, filename);

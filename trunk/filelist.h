@@ -27,4 +27,7 @@
 /* Total number of indexes (pk and secondary keys) */
 #define INDEX_TOTAL       5
 
+/* Total number of hash files for each index */
+#define INDEX_HASH_NUM    5
+
 #endif
