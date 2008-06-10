@@ -17,6 +17,13 @@
 #include "menu.h"
 #include "secindex.h"
 
+typedef struct
+{
+  char prefix[255];
+  unsigned int hashcount;
+} FileLoadTuple;
+
+static int create_indexes_if_needed (FileLoadTuple *files, size_t count);
 static int check_all_indexes (char *filenames[], size_t n, size_t maxhash);
 static void load_files_from_base (Adapter * db);
 static void print_record (char *name, int rrn, va_list ap);
@@ -25,43 +32,16 @@ static void read_secindex (Adapter * db, MemoryIndex ** mindex,
 static void secindex_insert_wrapper (char *str, va_list ap);
 static void secindex_remove_wrapper (char *str, va_list ap);
 
-/**
- * @brief Check if all index files are present and valid.
- *
- * @param filenames An array with all the file prefixes to check.
- * @param n         The number of the elements in the array.
- *
- * @retval 0 All the files are valid.
- * @retval 1 Some file is not valid.
- *
- * The file names passed in the array must be only the prefixes,
- * since the function is responsible for adding the right suffix
- * based on the number of hash files being used.
- */
 static int
-check_all_indexes (char *filenames[], size_t n, size_t maxhash)
+create_indexes_if_needed (FileLoadTuple *files, size_t count)
 {
-  char *filename;
-  FILE *fp;
   int retval = 0;
-  unsigned int i, j;
+  unsigned int i;
 
-  for (i = 0; i < n; i++)
+  for (i = 0; i < count; i++)
     {
-      for (j = 0; j < maxhash; j++)
-        {
-          filename = hash_get_filename (filenames[i], j, maxhash);
-
-          if (!file_exists (filename))
-            {
-              fp = fopen (filename, "w");
-              fclose (fp);
-
-              retval = 1;
-            }
-
-          free (filename);
-        }
+      if (file_create_if_needed (files[i].prefix, files[i].hashcount))
+        retval = 1;
     }
 
   return retval;
@@ -314,40 +294,37 @@ adapter_insert (Adapter * db)
 void
 adapter_load_files (Adapter * db)
 {
-  char *filenames[] = { PKFILE, SI_AUTHOR_INDEX, SI_TITLE_INDEX,
-    SI_TYPE_INDEX, SI_YEAR_INDEX
+  int found_invalid;
+  FileLoadTuple files[] = {
+    { PKFILE, INDEX_HASH_NUM },
+    { SI_AUTHOR_INDEX, INDEX_HASH_NUM },
+    { SI_TITLE_INDEX, INDEX_HASH_NUM },
+    { SI_TYPE_INDEX, INDEX_HASH_NUM },
+    { SI_YEAR_INDEX, INDEX_HASH_NUM },
+    { DESCFILE, DESC_HASH_NUM }
   };
-  char *descnames[] = { DESCFILE };
-  int loadbase = 0, loadbase2 = 0;
 
   assert (db);
+
+  found_invalid = create_indexes_if_needed (files, INDEX_TOTAL);
 
   db->base = base_new (DBFILE, DBFILE_AVAIL);
   db->pk_index = memory_index_new (PKFILE);
   db->desc = descriptor_new (DESCFILE);
-
-  /* Check if all hash files are valid */
-  loadbase = check_all_indexes (filenames, INDEX_TOTAL, INDEX_HASH_NUM);
-  loadbase2 = check_all_indexes (descnames, 1, DESC_HASH_NUM);
-
-  /* Create each secondary index, and set the overwrite_index parameter
-   * based on the result of check_all_indexes, ie, overwrite if any
-   * error was found. */
   db->author_index = secondary_index_new (SI_AUTHOR_INDEX, SI_AUTHOR_LIST,
-                                          SI_AUTHOR_AVAIL, loadbase);
+                                          SI_AUTHOR_AVAIL, found_invalid);
   db->title_index = secondary_index_new (SI_TITLE_INDEX, SI_TITLE_LIST,
-                                         SI_TITLE_AVAIL, loadbase);
+                                         SI_TITLE_AVAIL, found_invalid);
   db->type_index = secondary_index_new (SI_TYPE_INDEX, SI_TYPE_LIST,
-                                        SI_TYPE_AVAIL, loadbase);
+                                        SI_TYPE_AVAIL, found_invalid);
   db->year_index = secondary_index_new (SI_YEAR_INDEX, SI_YEAR_LIST,
-                                        SI_YEAR_AVAIL, loadbase);
+                                        SI_YEAR_AVAIL, found_invalid);
 
-  /* If there was something wrong, reload all data */
-  if (loadbase || loadbase2)
-    {
-      printf ("loading\n");
-      load_files_from_base (db);
-    }
+  if (found_invalid)
+  {
+    printf ("   Loading data for the first time...\n");
+    load_files_from_base (db);
+  }
 }
 
 Adapter *
