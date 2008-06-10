@@ -3,6 +3,8 @@
 
 #include <stdio.h>
 
+int file_create_if_needed (const char *prefix, size_t maxhash);
+
 /**
  * \brief Checks for the existence of a file with name filename.
  * \param filename The name of the file we need to check.
