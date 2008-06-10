@@ -89,6 +89,8 @@ unsigned char CalculaDescritor(char* NomeImagem)
   if (cmb>128)
     descritor|=0x01;
 
+  libera_memoria (&im);
+
   return descritor;
 }
 double ComputaSimilaridade(char* im1, char* im2)
