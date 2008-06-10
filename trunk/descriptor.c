@@ -123,32 +123,32 @@ find_similarities (Descriptor * desc, SimilarityList * simlist, char *imgname,
   char imgfile[IMG_LENGTH + 1];
   MemoryIndexRecord *match;
 
-  if ((hashnum >= 0) && (hashnum < DESC_HASH_NUM))
+  if ((hashnum < 0) || (hashnum >= DESC_HASH_NUM))
+    return;
+
+  change_hash_file (desc, hashnum);
+
+  fseek (desc->fp, 0, SEEK_SET);
+
+  while (!feof (desc->fp))
     {
-      change_hash_file (desc, hashnum);
+      di = fgetc (desc->fp);
+      fgets (pkname, TITLE_LENGTH + 1, desc->fp);
+      stripWhiteSpace (pkname);
 
-      fseek (desc->fp, 0, SEEK_SET);
-
-      while (!feof (desc->fp))
+      if (descriptor_hash (di ^ ds) <= 2)
         {
-          di = fgetc (desc->fp);
-          fgets (pkname, TITLE_LENGTH + 1, desc->fp);
-          stripWhiteSpace (pkname);
+          match = memory_index_find (pk, pkname);
 
-          if (descriptor_hash (di ^ ds) <= 2)
+          if (match)
             {
-              match = memory_index_find (pk, pkname);
+              fseek (base_fp, (match->rrn * BASE_REG_SIZE) +
+                     (BASE_REG_SIZE - IMG_LENGTH), SEEK_SET);
 
-              if (match)
-                {
-                  fseek (base_fp, (match->rrn * BASE_REG_SIZE) +
-                         (BASE_REG_SIZE - IMG_LENGTH), SEEK_SET);
+              fgets (imgfile, IMG_LENGTH + 1, base_fp);
 
-                  fgets (imgfile, IMG_LENGTH + 1, base_fp);
-
-                  simlist_append (simlist, imgfile, ComputaSimilaridade
-                                  (base_get_valid_image_path (imgfile), imgname));
-                }
+              simlist_append (simlist, imgfile, ComputaSimilaridade
+                              (base_get_valid_image_path (imgfile), imgname));
             }
         }
     }
