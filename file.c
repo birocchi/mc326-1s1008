@@ -2,10 +2,38 @@
 #define _POSIX_C_SOURCE 1
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include "file.h"
+#include "hash.h"
+
+int
+file_create_if_needed (const char *prefix, size_t maxhash)
+{
+  char *filename;
+  FILE *fp;
+  int retval = 0;
+  size_t i;
+
+  for (i = 0; i < maxhash; i++)
+    {
+      filename = hash_get_filename (prefix, i, maxhash);
+
+      if (!file_exists (filename))
+        {
+          fp = fopen (filename, "w");
+          fclose (fp);
+
+          retval = 1;
+        }
+
+      free (filename);
+    }
+
+  return retval;
+}
 
 int
 file_exists (const char *filename)
