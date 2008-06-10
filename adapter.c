@@ -55,7 +55,7 @@ static void
 load_files_from_base (Adapter * db)
 {
   ArtworkInfo artwork;
-  char *title;
+  char *imgpath, *title;
   int itemcount, i;
 
   assert (db);
@@ -68,12 +68,11 @@ load_files_from_base (Adapter * db)
     {
       base_read_artwork_record (db->base, &artwork);
 
+      imgpath = base_get_image_path (artwork.img);
       title = str_dup (artwork.title);
 
       memory_index_insert (db->pk_index, title, i);
-      descriptor_insert (db->desc, title,
-                         CalculaDescritor (base_get_valid_image_path
-                                           (artwork.img)));
+      descriptor_insert (db->desc, title, CalculaDescritor (imgpath));
 
       str_foreach (artwork.author, secindex_insert_wrapper,
                    db->author_index, title);
@@ -84,6 +83,7 @@ load_files_from_base (Adapter * db)
       str_foreach (artwork.year, secindex_insert_wrapper, db->year_index,
                    title);
 
+      free (imgpath);
       free (title);
     }
 }
@@ -255,7 +255,7 @@ void
 adapter_insert (Adapter * db)
 {
   ArtworkInfo artwork;
-  char *title;
+  char *imgpath, *title;
   int baserrn;
 
   do
@@ -264,14 +264,13 @@ adapter_insert (Adapter * db)
 
       if (memory_index_find (db->pk_index, artwork.title) == NULL)
         {
+          imgpath = base_get_image_path (artwork.img);
           title = str_dup (artwork.title);
 
           baserrn = base_insert (db->base, &artwork);
 
           memory_index_insert (db->pk_index, title, baserrn);
-          descriptor_insert (db->desc, title,
-                             CalculaDescritor (base_get_valid_image_path
-                                               (artwork.img)));
+          descriptor_insert (db->desc, title, CalculaDescritor (imgpath));
 
           str_foreach (artwork.author, secindex_insert_wrapper,
                        db->author_index, title);
