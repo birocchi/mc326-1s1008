@@ -43,7 +43,7 @@ void
 html_write_record_info (FILE * htmlfile, ArtworkInfo * info)
 {
   /* Needed for changing the identifier... */
-  char *path = baseGetValidImagePath (info->img);
+  char *path = base_get_valid_image_path (info->img);
 
   /* Check consistency... */
   assert (htmlfile && info);
