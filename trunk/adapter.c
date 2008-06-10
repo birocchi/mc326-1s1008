@@ -24,7 +24,6 @@ typedef struct
 } FileLoadTuple;
 
 static int create_indexes_if_needed (FileLoadTuple *files, size_t count);
-static int check_all_indexes (char *filenames[], size_t n, size_t maxhash);
 static void load_files_from_base (Adapter * db);
 static void print_record (char *name, int rrn, va_list ap);
 static void read_secindex (Adapter * db, MemoryIndex ** mindex,
@@ -309,16 +308,16 @@ adapter_load_files (Adapter * db)
   found_invalid = create_indexes_if_needed (files, INDEX_TOTAL);
 
   db->base = base_new (DBFILE, DBFILE_AVAIL);
-  db->pk_index = memory_index_new (PKFILE);
+  db->pk_index = memory_index_new (PKFILE, hash_function);
   db->desc = descriptor_new (DESCFILE);
   db->author_index = secondary_index_new (SI_AUTHOR_INDEX, SI_AUTHOR_LIST,
-                                          SI_AUTHOR_AVAIL, found_invalid);
+                                          SI_AUTHOR_AVAIL, hash_function, found_invalid);
   db->title_index = secondary_index_new (SI_TITLE_INDEX, SI_TITLE_LIST,
-                                         SI_TITLE_AVAIL, found_invalid);
+                                         SI_TITLE_AVAIL, hash_function, found_invalid);
   db->type_index = secondary_index_new (SI_TYPE_INDEX, SI_TYPE_LIST,
-                                        SI_TYPE_AVAIL, found_invalid);
+                                        SI_TYPE_AVAIL, hash_function, found_invalid);
   db->year_index = secondary_index_new (SI_YEAR_INDEX, SI_YEAR_LIST,
-                                        SI_YEAR_AVAIL, found_invalid);
+                                        SI_YEAR_AVAIL, hash_function, found_invalid);
 
   if (found_invalid)
   {
