@@ -51,10 +51,6 @@ MemoryIndexRecord *memory_index_find (MemoryIndex * index, char *name);
  */
 void memory_index_free (MemoryIndex * index);
 
-MemoryIndex * memory_index_get_next (MemoryIndex * index, char *key);
-
-MemoryIndex * memory_index_get_previous (MemoryIndex * index, char *key);
-
 /**
  * @brief Inserts an entry into the index.
  *
@@ -80,16 +76,7 @@ void memory_index_insert (MemoryIndex * index, char *name, int rrn);
  * This is a wrapper around \a memory_index_new_with_hash, using
  * \a hash_function as the hash function.
  */
-MemoryIndex *memory_index_new (const char *fp_name);
-
-/**
- * @brief Creates a new \a MemoryIndex.
- *
- * @param fp_name         The name of the file to save the index in the end.
- * @param hash_function   The hash function to be used.
- */
-MemoryIndex *memory_index_new_with_hash (const char *fp_name,
-                                         unsigned int (*hash_func) (char *));
+MemoryIndex *memory_index_new (const char *fp_name, unsigned int (*hash_func)(char*));
 
 /**
  * @brief Removes the specified entry from the index.
