@@ -215,50 +215,6 @@ memory_index_free (MemoryIndex * index)
     }
 }
 
-MemoryIndex *
-memory_index_get_next (MemoryIndex * index, char *key)
-{
-  char *filename;
-  MemoryIndex *mindex;
-  unsigned int hashnum;
-
-  hashnum = index->hash_function (key);
-
-  if (hashnum >= INDEX_HASH_NUM)
-    return NULL;
-
-  filename = hash_get_filename (index->fp_name, hashnum + 1, INDEX_HASH_NUM);
-
-  mindex = memory_index_new_with_hash (index->fp_name, index->hash_function);
-  load_file (mindex, filename);
-
-  free (filename);
-
-  return mindex;
-}
-
-MemoryIndex *
-memory_index_get_previous (MemoryIndex * index, char *key)
-{
-  char *filename;
-  MemoryIndex *mindex;
-  unsigned int hashnum;
-
-  hashnum = index->hash_function (key);
-
-  if (hashnum == 0)
-    return NULL;
-
-  filename = hash_get_filename (index->fp_name, hashnum - 1, INDEX_HASH_NUM);
-
-  mindex = memory_index_new_with_hash (index->fp_name, index->hash_function);
-  load_file (mindex, filename);
-
-  free (filename);
-
-  return mindex;
-}
-
 void
 memory_index_insert (MemoryIndex * index, char *name, int rrn)
 {
@@ -281,14 +237,7 @@ memory_index_insert (MemoryIndex * index, char *name, int rrn)
 }
 
 MemoryIndex *
-memory_index_new (const char *fp_name)
-{
-  return memory_index_new_with_hash (fp_name, hash_function);
-}
-
-MemoryIndex *
-memory_index_new_with_hash (const char *fp_name, unsigned int
-                            (*hash_func) (char *))
+memory_index_new (const char *fp_name, unsigned int (*hash_func)(char *))
 {
   MemoryIndex *index = MEM_ALLOC (MemoryIndex);
 
