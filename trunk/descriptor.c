@@ -147,7 +147,7 @@ find_similarities (Descriptor * desc, SimilarityList * simlist, char *imgname,
                   fgets (imgfile, IMG_LENGTH + 1, base_fp);
 
                   simlist_append (simlist, imgfile, ComputaSimilaridade
-                                  (baseGetValidImagePath (imgfile), imgname));
+                                  (base_get_valid_image_path (imgfile), imgname));
                 }
             }
         }
@@ -210,7 +210,7 @@ descriptor_find (Descriptor * desc, char *imgname, MemoryIndex * pk, FILE
         {
           fprintf (htmlfile, "<tr><td>\n");
           fprintf (htmlfile, "<img src=\"%s\"></td><td></td></tr>\n",
-                   baseGetValidImagePath (simlist->list[i].img));
+                   base_get_valid_image_path (simlist->list[i].img));
         }
 
       html_end (htmlfile);

@@ -8,6 +8,34 @@
 #include "io.h"
 #include "mem.h"
 
+static int is_valid_identifier (const char *name);
+
+/**
+ * Checks if the image identifier is valid.
+ * This time we use strtol to get past the digits and also
+ * check the file extension.
+ *
+ * @param name The image identifier string.
+ * 
+ * @return Returns 1 on error and 0 for OK.
+ */
+static int
+is_valid_identifier (const char *name)
+{
+  char *endptr;
+  int i;
+
+  /* Checking the extension, length, etc.. */
+
+  i = strtol (name, &endptr, 10);
+  if ((endptr == name) || (endptr == '\0') || strlen (endptr) != 3
+      || ((strncmp (endptr, "jpg", 3)) && strncmp (endptr, "gif", 3)
+          && (strncmp (endptr, "png", 3))))
+    return 1;
+  else
+    return 0;
+}
+
 void
 base_free (Base * b)
 {
@@ -107,7 +135,7 @@ base_read_input (ArtworkInfo * info)
          img, IMG_LENGTH - 2);
 
       /* Validate the image identifier */
-      if (!baseIsValidIdentifier (img))
+      if (!is_valid_identifier (img))
         {
           strncpy (info->img, GROUP_NUMBER, 2);
           strncpy (info->img + 2, img, (IMG_LENGTH - 2) + 1);
@@ -129,7 +157,7 @@ base_read_input (ArtworkInfo * info)
 }
 
 char *
-baseGetValidImagePath (const char *s)
+base_get_valid_image_path (const char *s)
 {
   char *basename, *fullname;
 
@@ -151,23 +179,6 @@ baseGetValidImagePath (const char *s)
   free (basename);
 
   return fullname;
-}
-
-int
-baseIsValidIdentifier (const char *name)
-{
-  char *endptr;
-  int i;
-
-  /* Checking the extension, length, etc.. */
-
-  i = strtol (name, &endptr, 10);
-  if ((endptr == name) || (endptr == '\0') || strlen (endptr) != 3
-      || ((strncmp (endptr, "jpg", 3)) && strncmp (endptr, "gif", 3)
-          && (strncmp (endptr, "png", 3))))
-    return 1;
-  else
-    return 0;
 }
 
 void

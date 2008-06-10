@@ -101,18 +101,8 @@ void base_read_input (ArtworkInfo * info);
  *
  * @return Pointer to the correct string. One must free this pointer later on.
  */
-char *baseGetValidImagePath (const char *s);
+char *base_get_valid_image_path (const char *s);
 
-/**
- * Checks if the image identifier is valid.
- * This time we use strtol to get past the digits and also
- * check the file extension.
- *
- * @param name The image identifier string.
- * 
- * @return Returns 1 on error and 0 for OK.
- */
-int baseIsValidIdentifier (const char *name);
 
 /**
  * \brief Reads one record from the database file \a base and

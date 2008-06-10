@@ -72,7 +72,7 @@ load_files_from_base (Adapter * db)
 
       memory_index_insert (db->pk_index, title, i);
       descriptor_insert (db->desc, title,
-                         CalculaDescritor (baseGetValidImagePath
+                         CalculaDescritor (base_get_valid_image_path
                                            (artwork.img)));
 
       str_foreach (artwork.author, secindex_insert_wrapper,
@@ -270,7 +270,7 @@ adapter_insert (Adapter * db)
 
           memory_index_insert (db->pk_index, title, baserrn);
           descriptor_insert (db->desc, title,
-                             CalculaDescritor (baseGetValidImagePath
+                             CalculaDescritor (base_get_valid_image_path
                                                (artwork.img)));
 
           str_foreach (artwork.author, secindex_insert_wrapper,
