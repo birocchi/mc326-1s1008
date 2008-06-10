@@ -9,7 +9,7 @@
 
 CC=gcc
 CFLAGS=-c -Wall -g -ansi -pedantic
-LDFLAGS=-lefence -ljpeg -lungif -lpng
+LDFLAGS=-ljpeg -lungif -lpng
 OFILES=adapter.o avail.o base.o descriptor.o file.o io.o hash.o html.o main.o mem.o memindex.o menu.o secindex.o libimg.o
 
 TP=tp4
