@@ -42,13 +42,10 @@ html_end (FILE * htmlfile)
 void
 html_write_record_info (FILE * htmlfile, ArtworkInfo * info)
 {
-  /* Needed for changing the identifier... */
   char *imgpath = base_get_image_path (info->img);
 
-  /* Check consistency... */
   assert (htmlfile && info);
 
-  /* Write all the fields of the the artwork. */
   fprintf (htmlfile, "<tr>\n");
   fprintf (htmlfile, "<td>\n");
   fprintf (htmlfile, "<img src=\"%s\">\n", imgpath);
@@ -63,6 +60,5 @@ html_write_record_info (FILE * htmlfile, ArtworkInfo * info)
   fprintf (htmlfile, "</td>\n");
   fprintf (htmlfile, "</tr>\n");
 
-  /* Must free it. */
-  free (path);
+  free (imgpath);
 }
