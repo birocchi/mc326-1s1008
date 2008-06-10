@@ -157,7 +157,7 @@ base_read_input (ArtworkInfo * info)
 }
 
 char *
-base_get_valid_image_path (const char *s)
+base_get_image_path (const char *s)
 {
   char *basename, *fullname;
 

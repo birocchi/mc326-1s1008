@@ -101,7 +101,7 @@ void base_read_input (ArtworkInfo * info);
  *
  * @return Pointer to the correct string. One must free this pointer later on.
  */
-char *base_get_valid_image_path (const char *s);
+char *base_get_image_path (const char *s);
 
 
 /**

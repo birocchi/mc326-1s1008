@@ -119,6 +119,7 @@ find_similarities (Descriptor * desc, SimilarityList * simlist, char *imgname,
                    int hashnum)
 {
   unsigned char di;
+  char *imgpath = NULL;
   char pkname[TITLE_LENGTH + 1];
   char imgfile[IMG_LENGTH + 1];
   MemoryIndexRecord *match;
@@ -147,8 +148,9 @@ find_similarities (Descriptor * desc, SimilarityList * simlist, char *imgname,
 
               fgets (imgfile, IMG_LENGTH + 1, base_fp);
 
-              simlist_append (simlist, imgfile, ComputaSimilaridade
-                              (base_get_valid_image_path (imgfile), imgname));
+              imgpath = base_get_image_path (imgfile);
+              simlist_append (simlist, imgfile, ComputaSimilaridade (imgpath, imgname));
+              free (imgpath);
             }
         }
     }
@@ -174,6 +176,7 @@ void
 descriptor_find (Descriptor * desc, char *imgname, MemoryIndex * pk, FILE
                  * base_fp, size_t maxresults)
 {
+  char *imgpath = NULL;
   unsigned char ds;
   SimilarityList *simlist = simlist_new ();
   int i;
@@ -208,9 +211,12 @@ descriptor_find (Descriptor * desc, char *imgname, MemoryIndex * pk, FILE
 
       for (i = 0; (i < maxresults) && (i < simlist->regnum); i++)
         {
+          imgpath = base_get_image_path (simlist->list[i].img);
+
           fprintf (htmlfile, "<tr><td>\n");
-          fprintf (htmlfile, "<img src=\"%s\"></td><td></td></tr>\n",
-                   base_get_valid_image_path (simlist->list[i].img));
+          fprintf (htmlfile, "<img src=\"%s\"></td><td></td></tr>\n", imgpath);
+
+          free (imgpath);
         }
 
       html_end (htmlfile);
