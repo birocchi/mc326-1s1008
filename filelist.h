@@ -25,9 +25,9 @@
 #define SI_YEAR_AVAIL     "year.av"
 
 /* Total number of indexes (pk and secondary keys) */
-#define INDEX_TOTAL       5
+#define INDEX_TOTAL       6
 
-/* Total number of hash files for each index */
-#define INDEX_HASH_NUM    6
+/* Total number of hash files for each index (except the descriptor )*/
+#define INDEX_HASH_NUM    5
 
 #endif
