@@ -174,8 +174,6 @@ void
 descriptor_find (Descriptor * desc, char *imgname, MemoryIndex * pk, Base
                  *base, size_t maxresults)
 {
-  ArtworkInfo artwork;
-  char *imgpath;
   FILE *htmlfile;
   int i;
   SimilarityList *simlist = simlist_new ();
