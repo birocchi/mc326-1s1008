@@ -103,7 +103,6 @@ void base_read_input (ArtworkInfo * info);
  */
 char *base_get_image_path (const char *s);
 
-
 /**
  * \brief Reads one record from the database file \a base and
  *        stores it in \a info.
@@ -113,9 +112,25 @@ char *base_get_image_path (const char *s);
  */
 void base_read_artwork_record (Base * base, ArtworkInfo * info);
 
+/**
+ * @brief Reads one record from the database and store it.
+ *
+ * @param base The base being used.
+ * @param info \a ArtworkInfo structure with info about the register.
+ * @param rrn  The RRN of the entry to seek in the base.
+ */
 void base_read_artwork_record_with_rrn (Base * base, ArtworkInfo * info, int
                                         rrn);
 
+/**
+ * @brief Reads one record from the database and write it to an HTML output.
+ *
+ * @param base    The base being used.
+ * @param html_fp HTML output file pointer.
+ * @param rrn     The RRN of the entry to seek in the base.
+ *
+ * This s basically a wrapper around \a base_read_artwork_record_with_rrn and
+ * \a html_write_record_info.
 void base_read_artwork_write_html (Base * base, FILE * html_fp, int rrn);
 
 /**
