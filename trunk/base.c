@@ -9,8 +9,6 @@
 #include "io.h"
 #include "mem.h"
 
-static int is_valid_identifier (const char *name);
-
 /**
  * Checks if the image identifier is valid.
  * This time we use strtol to get past the digits and also
@@ -20,6 +18,8 @@ static int is_valid_identifier (const char *name);
  * 
  * @return Returns 1 on error and 0 for OK.
  */
+static int is_valid_identifier (const char *name);
+
 static int
 is_valid_identifier (const char *name)
 {
