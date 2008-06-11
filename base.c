@@ -27,7 +27,6 @@ is_valid_identifier (const char *name)
   int i;
 
   /* Checking the extension, length, etc.. */
-
   i = strtol (name, &endptr, 10);
   if ((endptr == name) || (endptr == '\0') || strlen (endptr) != 3
       || ((strncmp (endptr, "jpg", 3)) && strncmp (endptr, "gif", 3)
@@ -41,9 +40,7 @@ void
 base_free (Base * b)
 {
   if (b)
-    /* If b is allocated.. */
     {
-      /* Free and close everyhing. */
       avail_list_free (b->avlist);
       fclose (b->fp);
       free (b);
@@ -56,8 +53,7 @@ base_insert (Base * base, ArtworkInfo * info)
 {
   int newrrn;
 
-  /* Checking consistency... */
-  assert (base != NULL && info != NULL);
+  assert (base && info);
 
   /* If there are no available spots, then just insert it to the end. */
   if (avail_list_is_empty (base->avlist))
@@ -95,10 +91,8 @@ base_new (const char *basename, const char *availname)
 void
 base_remove (Base * base, int rrn)
 {
-  /* Check consistency. */
   assert (base);
 
-  /* Add that position to the avail list. */
   avail_list_push (base->avlist, base->fp, rrn * BASE_REG_SIZE);
 }
 
@@ -217,10 +211,8 @@ base_read_artwork_write_html (Base * base, FILE * html_fp, int rrn)
 void
 base_write_data (FILE * file, ArtworkInfo * info)
 {
-  /* Consistency check.. */
-  assert (file != NULL && info != NULL);
+  assert (file && info);
 
-  /* Right all the fields to the file. */
   fprintf (file, "%-200s", info->title);
   fprintf (file, "%-100s", info->type);
   fprintf (file, "%-125s", info->author);
