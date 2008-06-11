@@ -13,15 +13,81 @@
 #include "mem.h"
 #include "memindex.h"
 
+/**
+ * @brief Appends an entry to the similarity list.
+ *
+ * @param simlist
+ * @param artwork The artwork to append.
+ * @param sim     The similarity to a given image.
+ */
 static void simlist_append (SimilarityList * simlist, ArtworkInfo artwork,
                             double sim);
+
+/**
+ * @brief Compariso function to order a similarity list.
+ *
+ * @param a A \a SimilarityRecord.
+ * @param b A \a SimilarityRecord.
+ *
+ * @retval -1 \a a's similarity is bigger than \a b's.
+ * @retval 0 \a a's similarity is equal to \a b's.
+ * @retval 1 \a a's similarity is smaller than \a b's.
+ *
+ * It sorts in descending order.
+ */
 static int simlist_compare (const void *a, const void *b);
+
+
+/**
+ * @brief Frees memory allocated for a similarity list.
+ *
+ * @param simlist
+ */
 static void simlist_free (SimilarityList * simlist);
+
+/**
+ * @brief Allocates more memory for a similarity list.
+ *
+ * @param simlist
+ * @param newsize The new size of the list.
+ */
 static void simlist_inflate (SimilarityList * simlist, size_t newsize);
+
+/**
+ * @brief Creates a new similarity list structure.
+ *
+ * @return A new \a SimilarityList structure.
+ */
 static SimilarityList *simlist_new (void);
 
+/**
+ * @brief Changes the loaded hash file according to the given hash number.
+ *
+ * @param desc    The descriptor in use.
+ * @param hashnum The hash returned by the hash function.
+ */
 static void change_hash_file (Descriptor * desc, unsigned int hashnum);
+
+/**
+ * @brief Hashes a given key (a character).
+ *
+ * @param key The key to hash.
+ *
+ * @return The number of bits 1 in the given byte.
+ */
 static unsigned int descriptor_hash (unsigned char key);
+
+/**
+ * @brief Finds the images that pass a similarity threshold in the base.
+ *
+ * @param desc        The descriptor in use.
+ * @param simlist     The similarity list to use.
+ * @param imgname     The filename of the base image.
+ * @param ds          The descriptor of the base image.
+ * @param pk          The primary key list.
+ * @param base        The base being used.
+ * @param hashnum     The hash file number to search.
+ */
 static void find_similarities (Descriptor * desc, SimilarityList * simlist,
                                char *imgname, unsigned char ds,
                                MemoryIndex * pk, Base * base, int hashnum);
@@ -46,7 +112,7 @@ simlist_compare (const void *a, const void *b)
 
   if (sa < sb)
     return 1;
-  else if (sb > sb)
+  else if (sa > sb)
     return -1;
   else
     return 0;
@@ -148,10 +214,12 @@ find_similarities (Descriptor * desc, SimilarityList * simlist, char *imgname,
 
   while (!feof (desc->fp))
     {
+      /* Read an entry */
       di = fgetc (desc->fp);
       fgets (pkname, TITLE_LENGTH + 1, desc->fp);
       stripWhiteSpace (pkname);
 
+      /* Check if it passes the threshold */
       if (descriptor_hash (di ^ ds) <= 2)
         {
           match = memory_index_find (pk, pkname);
