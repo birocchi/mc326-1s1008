@@ -92,7 +92,6 @@ static void
 print_record (char *name, int rrn, va_list ap)
 {
   Adapter *db;
-  ArtworkInfo artwork;
   FILE *html_fp;
   MemoryIndexRecord *rec;
 
@@ -103,12 +102,7 @@ print_record (char *name, int rrn, va_list ap)
   rec = memory_index_find (db->pk_index, name);
   assert (rec);
 
-  /* Go to that register position in the database. */
-  fseek (db->base->fp, rec->rrn * BASE_REG_SIZE, SEEK_SET);
-  /* Read it. */
-  base_read_artwork_record (db->base, &artwork);
-  /* Then write it to the HTML file. */
-  html_write_record_info (html_fp, &artwork);
+  base_read_artwork_write_html (db->base, html_fp, rec->rrn);
 }
 
 static void
@@ -175,10 +169,9 @@ secindex_remove_wrapper (char *str, va_list ap)
 void
 adapter_find (Adapter * db)
 {
-  ArtworkInfo artwork;
   char key[TITLE_LENGTH + 1];   /* TITLE_LENGTH is the largest of all lengths */
   char img[255];
-  FILE *fp_html;
+  FILE *html_fp;
   MemoryIndex *mindex = NULL;
   MemoryIndexRecord *mrec = NULL;
   SecondaryIndex *secindex = NULL;
@@ -207,24 +200,20 @@ adapter_find (Adapter * db)
   mrec = memory_index_find (mindex, key);
   if (mrec)
     {
-      fp_html = fopen (HTMLFILE, "w");
-      assert (fp_html);
-      html_begin (fp_html);
+      html_fp = fopen (HTMLFILE, "w");
+      assert (html_fp);
+      html_begin (html_fp);
 
       if (secindex)
-        secondary_index_foreach (secindex, mrec, print_record, db, fp_html);
+        secondary_index_foreach (secindex, mrec, print_record, db, html_fp);
       else
-        {
-          fseek (db->base->fp, mrec->rrn * BASE_REG_SIZE, SEEK_SET);
-          base_read_artwork_record (db->base, &artwork);
-          html_write_record_info (fp_html, &artwork);
-        }
+        base_read_artwork_write_html (db->base, html_fp, mrec->rrn);
 
       printf ("   O resultado da busca por \"%s\" foi gravado em \"%s\".\n",
               key, HTMLFILE);
 
-      html_end (fp_html);
-      fclose (fp_html);
+      html_end (html_fp);
+      fclose (html_fp);
 
       /* User might want to delete any. */
       if (menuYesOrNo ("   Apagar algum resultado da busca? (s)im, (n)ao? "))
@@ -343,8 +332,7 @@ adapter_remove (Adapter * db)
   match = memory_index_find (db->pk_index, key);
   if (match)
     {
-      fseek (db->base->fp, match->rrn * BASE_REG_SIZE, SEEK_SET);
-      base_read_artwork_record (db->base, &artwork);
+      base_read_artwork_record_with_rrn (db->base, &artwork, match->rrn);
 
       title = str_dup (artwork.title);
       base_remove (db->base, match->rrn);
