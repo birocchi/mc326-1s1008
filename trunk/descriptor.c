@@ -21,11 +21,10 @@ static void simlist_inflate (SimilarityList * simlist, size_t newsize);
 static SimilarityList *simlist_new (void);
 
 static void change_hash_file (Descriptor * desc, unsigned int hashnum);
+static unsigned int descriptor_hash (unsigned char key);
 static void find_similarities (Descriptor * desc, SimilarityList * simlist,
                                char *imgname, unsigned char ds,
                                MemoryIndex * pk, Base * base, int hashnum);
-static unsigned int descriptor_hash (unsigned char key);
-static unsigned int descriptor_hash (unsigned char key);
 
 static void
 simlist_append (SimilarityList * simlist, ArtworkInfo artwork, double sim)
