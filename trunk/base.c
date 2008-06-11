@@ -5,6 +5,7 @@
 #include "avail.h"
 #include "base.h"
 #include "file.h"
+#include "html.h"
 #include "io.h"
 #include "mem.h"
 
@@ -180,22 +181,37 @@ base_get_image_path (const char *s)
 void
 base_read_artwork_record (Base * base, ArtworkInfo * info)
 {
-  assert ((base != NULL) && (info != NULL));
+  assert (base && info);
 
-  /* Read it all... */
   fgets (info->title, TITLE_LENGTH + 1, base->fp);
   fgets (info->type, TYPE_LENGTH + 1, base->fp);
   fgets (info->author, AUTHOR_LENGTH + 1, base->fp);
   fgets (info->year, YEAR_LENGTH + 1, base->fp);
   fgets (info->value, VALUE_LENGTH + 1, base->fp);
   fgets (info->img, IMG_LENGTH + 1, base->fp);
-  /* Strip the whitespaces from it all. */
+
   stripWhiteSpace (info->title);
   stripWhiteSpace (info->type);
   stripWhiteSpace (info->author);
   stripWhiteSpace (info->year);
   stripWhiteSpace (info->value);
   stripWhiteSpace (info->img);
+}
+
+void
+base_read_artwork_record_with_rrn (Base * base, ArtworkInfo * info, int rrn)
+{
+  fseek (base->fp, rrn * BASE_REG_SIZE, SEEK_SET);
+  base_read_artwork_record (base, info);
+}
+
+void
+base_read_artwork_write_html (Base * base, FILE *html_fp, int rrn)
+{
+  ArtworkInfo artwork;
+
+  base_read_artwork_record_with_rrn (base, &artwork, rrn);
+  html_write_record_info (html_fp, &artwork);
 }
 
 void

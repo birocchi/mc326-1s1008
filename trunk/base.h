@@ -113,6 +113,11 @@ char *base_get_image_path (const char *s);
  */
 void base_read_artwork_record (Base * base, ArtworkInfo * info);
 
+void base_read_artwork_record_with_rrn (Base * base, ArtworkInfo * info, int
+  rrn);
+
+void base_read_artwork_write_html (Base * base, FILE *html_fp, int rrn);
+
 /**
  * Writes the data from the struct pointed at by *info
  * to the file pointed at by *file.
