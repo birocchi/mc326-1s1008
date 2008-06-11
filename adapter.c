@@ -20,6 +20,12 @@
 #include "menu.h"
 #include "secindex.h"
 
+typedef enum
+{
+  WRAPPER_INSERT,
+  WRAPPER_REMOVE
+} SecIndexWrapperAction;
+
 typedef struct
 {
   char prefix[255];
@@ -27,12 +33,12 @@ typedef struct
 } FileLoadTuple;
 
 static int create_indexes_if_needed (FileLoadTuple *files, size_t count);
+static void insert_indexes (Adapter *db, ArtworkInfo *artwork, int rrn);
 static void load_files_from_base (Adapter * db);
 static void print_record (char *name, int rrn, va_list ap);
 static void read_secindex (Adapter * db, MemoryIndex ** mindex,
                            SecondaryIndex ** secindex, char *key);
-static void secindex_insert_wrapper (char *str, va_list ap);
-static void secindex_remove_wrapper (char *str, va_list ap);
+static void secindex_wrapper (char *str, va_list ap);
 
 static int
 create_indexes_if_needed (FileLoadTuple *files, size_t count)
@@ -49,6 +55,28 @@ create_indexes_if_needed (FileLoadTuple *files, size_t count)
   return retval;
 }
 
+static void
+insert_indexes (Adapter *db, ArtworkInfo *artwork, int rrn)
+{
+  char *imgpath = base_get_image_path (artwork->img),
+       *pkname  = str_dup (artwork->title);
+
+  memory_index_insert (db->pk_index, pkname, rrn);
+  descriptor_insert (db->desc, pkname, CalculaDescritor (imgpath));
+
+  str_foreach (artwork->author, secindex_wrapper,
+               db->author_index, pkname, WRAPPER_INSERT);
+  str_foreach (artwork->title, secindex_wrapper,
+               db->title_index, pkname, WRAPPER_INSERT);
+  str_foreach (artwork->type, secindex_wrapper, db->type_index,
+               pkname, WRAPPER_INSERT);
+  str_foreach (artwork->year, secindex_wrapper, db->year_index,
+               pkname, WRAPPER_INSERT);
+
+  free (imgpath);
+  free (pkname);
+}
+
 /**
  * @brief Read data from the base to all the indexes used.
  *
@@ -58,36 +86,18 @@ static void
 load_files_from_base (Adapter * db)
 {
   ArtworkInfo artwork;
-  char *imgpath, *title;
   int itemcount, i;
 
   assert (db);
 
-  itemcount = file_get_size (db->base->fp) / BASE_REG_SIZE;
-
   fseek (db->base->fp, 0, SEEK_SET);
+
+  itemcount = file_get_size (db->base->fp) / BASE_REG_SIZE;
 
   for (i = 0; i < itemcount; i++)
     {
       base_read_artwork_record (db->base, &artwork);
-
-      imgpath = base_get_image_path (artwork.img);
-      title = str_dup (artwork.title);
-
-      memory_index_insert (db->pk_index, title, i);
-      descriptor_insert (db->desc, title, CalculaDescritor (imgpath));
-
-      str_foreach (artwork.author, secindex_insert_wrapper,
-                   db->author_index, title);
-      str_foreach (artwork.title, secindex_insert_wrapper, db->title_index,
-                   title);
-      str_foreach (artwork.type, secindex_insert_wrapper, db->type_index,
-                   title);
-      str_foreach (artwork.year, secindex_insert_wrapper, db->year_index,
-                   title);
-
-      free (title);
-      free (imgpath);
+      insert_indexes (db, &artwork, i);
     }
 }
 
@@ -101,7 +111,6 @@ print_record (char *name, int rrn, va_list ap)
   db = va_arg (ap, Adapter *);
   html_fp = va_arg (ap, FILE *);
 
-  /* We search for it in the indexes. */
   rec = memory_index_find (db->pk_index, name);
   assert (rec);
 
@@ -140,33 +149,26 @@ read_secindex (Adapter * db, MemoryIndex ** mindex,
 }
 
 static void
-secindex_insert_wrapper (char *str, va_list ap)
+secindex_wrapper (char *str, va_list ap)
 {
   char *pk_value = NULL;
   SecondaryIndex *secindex = NULL;
+  SecIndexWrapperAction action;
 
   secindex = va_arg (ap, SecondaryIndex *);
   pk_value = va_arg (ap, char *);
+  action = va_arg (ap, SecIndexWrapperAction);
 
-  assert (secindex);
-  assert (pk_value);
+  assert (secindex && pk_value);
 
-  secondary_index_insert (secindex, str, pk_value);
-}
-
-static void
-secindex_remove_wrapper (char *str, va_list ap)
-{
-  char *pk_value = NULL;
-  SecondaryIndex *secindex = NULL;
-
-  secindex = va_arg (ap, SecondaryIndex *);
-  pk_value = va_arg (ap, char *);
-
-  assert (secindex);
-  assert (pk_value);
-
-  secondary_index_remove (secindex, str, pk_value);
+  switch (action)
+    {
+    case WRAPPER_INSERT:
+      secondary_index_insert (secindex, str, pk_value);
+      break;
+    case WRAPPER_REMOVE:
+      secondary_index_remove (secindex, str, pk_value);
+    }
 }
 
 void
@@ -221,7 +223,6 @@ adapter_find (Adapter * db)
       html_end (html_fp);
       fclose (html_fp);
 
-      /* User might want to delete any. */
       if (menuYesOrNo ("   Apagar algum resultado da busca? (s)im, (n)ao? "))
         adapter_remove (db);
     }
@@ -232,7 +233,6 @@ adapter_find (Adapter * db)
 void
 adapter_free (Adapter * db)
 {
-  /* Basically frees any memory allocated. */
   if (db)
     {
       base_free (db->base);
@@ -250,7 +250,6 @@ void
 adapter_insert (Adapter * db)
 {
   ArtworkInfo artwork;
-  char *imgpath, *title;
   int baserrn;
 
   do
@@ -259,24 +258,8 @@ adapter_insert (Adapter * db)
 
       if (memory_index_find (db->pk_index, artwork.title) == NULL)
         {
-          imgpath = base_get_image_path (artwork.img);
-          title = str_dup (artwork.title);
-
           baserrn = base_insert (db->base, &artwork);
-
-          memory_index_insert (db->pk_index, title, baserrn);
-          descriptor_insert (db->desc, title, CalculaDescritor (imgpath));
-
-          str_foreach (artwork.author, secindex_insert_wrapper,
-                       db->author_index, title);
-          str_foreach (artwork.title, secindex_insert_wrapper,
-                       db->title_index, title);
-          str_foreach (artwork.type, secindex_insert_wrapper, db->type_index,
-                       title);
-          str_foreach (artwork.year, secindex_insert_wrapper, db->year_index,
-                       title);
-
-          free (title);
+          insert_indexes (db, &artwork, baserrn);
         }
       else
         printf ("   Ja existe uma obra com titulo \"%s\".\n", artwork.title);
@@ -343,14 +326,14 @@ adapter_remove (Adapter * db)
       title = str_dup (artwork.title);
       base_remove (db->base, match->rrn);
       memory_index_remove (db->pk_index, match->name);
-      str_foreach (artwork.author, secindex_remove_wrapper,
-                   db->author_index, title);
-      str_foreach (artwork.title, secindex_remove_wrapper,
-                   db->title_index, title);
-      str_foreach (artwork.type, secindex_remove_wrapper, db->type_index,
-                   title);
-      str_foreach (artwork.year, secindex_remove_wrapper, db->year_index,
-                   title);
+      str_foreach (artwork.author, secindex_wrapper,
+                   db->author_index, title, WRAPPER_REMOVE);
+      str_foreach (artwork.title, secindex_wrapper,
+                   db->title_index, title, WRAPPER_REMOVE);
+      str_foreach (artwork.type, secindex_wrapper, db->type_index,
+                   title, WRAPPER_REMOVE);
+      str_foreach (artwork.year, secindex_wrapper, db->year_index,
+                   title, WRAPPER_REMOVE);
 
       printf ("   Obra \"%s\" removida com sucesso.\n", title);
 
