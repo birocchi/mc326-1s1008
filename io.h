@@ -94,6 +94,15 @@ char *str_dup (const char *s);
  */
 void str_foreach (char *str, void (*callback) (char *, va_list), ...);
 
+/**
+ * @brief Returns the concatenation of \a and \b.
+ *
+ * @param a The first string.
+ * @param b The second string.
+ *
+ * Allocates memory for a new char* that is \a b concatenated to \a a
+ * and return it.
+ */
 char *str_join (const char *a, const char *b);
 
 /**
