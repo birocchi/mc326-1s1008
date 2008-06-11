@@ -25,6 +25,13 @@ enum
   LOAD_BASE_YEAR = 1 << 4
 };
 
+/**
+ * @brief Inserts an entry into a secondary index.
+ *
+ * @param str The entry to be inserted.
+ * @param ap  Must be a \a SecondaryIndex*, a \a char*
+ *            and a \a SecondaryIndexWrapperAction.
+ */
 static void
 secindex_insert_wrapper (const char *str, va_list ap)
 {
@@ -40,6 +47,13 @@ secindex_insert_wrapper (const char *str, va_list ap)
   secondary_index_insert (secindex, str, pk_value);
 }
 
+/**
+ * @brief Removes an entry from a secondary index.
+ *
+ * @param str The entry to be inserted.
+ * @param ap  Must be a \a SecondaryIndex*, a \a char*
+ *            and a \a SecondaryIndexWrapperAction.
+ */
 static void
 secindex_remove_wrapper (const char *str, va_list ap)
 {
@@ -55,6 +69,12 @@ secindex_remove_wrapper (const char *str, va_list ap)
   secondary_index_remove (secindex, str, pk_value);
 }
 
+/**
+ * @brief Loads the database's indexes with data directly from the base file.
+ *
+ * @param db        The \a Adapter in use.
+ * @param loadflags The index files to load this way.
+ */
 static void
 load_files_from_base (Adapter * db, int loadflags)
 {
@@ -116,6 +136,16 @@ load_files_from_base (Adapter * db, int loadflags)
     }
 }
 
+/**
+ * @brief Given a primary key, print information about a database record.
+ *
+ * @param name  The primary key name.
+ * @param rrn   Unused.
+ * @param ap    Must be \a Adapter* and \a FILE* -- the database
+ *              and the HTML output.
+ *
+ * This function is a wrapper for a \a secondary_index_foreach call.
+ */
 static void
 print_record (const char *name, int rrn, va_list ap)
 {
@@ -139,6 +169,14 @@ print_record (const char *name, int rrn, va_list ap)
   html_write_record_info (html_fp, rec->rrn, &artwork);
 }
 
+/**
+ * @brief Reads the user's index choice for a partial search.
+ *
+ * @param db        The \a Adapter in use.
+ * @param mindex    The \a MemoryIndex that will be used.
+ * @param secindex  The \a SecondaryIndex that will be used.
+ * @param key       The value the user will search for.
+ */
 static void
 read_secindex (Adapter * db, MemoryIndex ** mindex,
                SecondaryIndex ** secindex, char *key)
