@@ -1,5 +1,5 @@
 /* Must be defined to have access to fileno() */
-#define _POSIX_C_SOURCE 1
+#define _XOPEN_SOURCE 600
 
 #include <stdio.h>
 #include <stdlib.h>

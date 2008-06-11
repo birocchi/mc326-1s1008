@@ -1,3 +1,6 @@
+/* Make atoll available */
+#define _XOPEN_SOURCE 600
+
 #include <assert.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -171,6 +174,7 @@ adapter_find (Adapter * db)
 {
   char key[TITLE_LENGTH + 1];   /* TITLE_LENGTH is the largest of all lengths */
   char img[255];
+  char maxresults[11];          /* In a 32-bit system, UINT_MAX has 10 digits */
   FILE *html_fp;
   MemoryIndex *mindex = NULL;
   MemoryIndexRecord *mrec = NULL;
@@ -188,9 +192,11 @@ adapter_find (Adapter * db)
       break;
     case 's':
       readString ("   Digite o nome da imagem de comparacao: ", img, 255);
+      readInt ("   Digite o numero maximo de resultados desejados: ",
+        maxresults, 10);
 
       if (file_is_valid (img))
-        descriptor_find (db->desc, img, db->pk_index, db->base, 50);
+        descriptor_find (db->desc, img, db->pk_index, db->base, atoll (maxresults));
       else
         printf ("   Imagem \"%s\" invalida ou nao encontrada.", img);
 
