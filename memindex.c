@@ -11,13 +11,6 @@
 #include "mem.h"
 #include "memindex.h"
 
-static int bsearch_compare (const void *a, const void *b);
-static void change_hash_file (MemoryIndex * index, unsigned int hashnum);
-static void flush_to_disk (MemoryIndex * index);
-static void inflate_list (MemoryIndex * index, size_t size);
-static void load_file (MemoryIndex * index, const char *filename);
-static int qsort_compare (const void *a, const void *b);
-
 /**
  * @brief Binary search comparison function.
  *
@@ -28,11 +21,7 @@ static int qsort_compare (const void *a, const void *b);
  * @retval 0  a == b.
  * @retval 1  a > b.
  */
-static int
-bsearch_compare (const void *a, const void *b)
-{
-  return strcasecmp ((char *) a, ((MemoryIndexRecord *) b)->name);
-}
+static int bsearch_compare (const void *a, const void *b);
 
 /**
  * @brief Changes the loaded hash file according to the current key.
@@ -40,6 +29,55 @@ bsearch_compare (const void *a, const void *b)
  * @param index   The memory index being used.
  * @param hashnum The hash returned by the hash function.
  */
+static void change_hash_file (MemoryIndex * index, unsigned int hashnum);
+
+/**
+ * @brief Serializes a memory index to disk.
+ *
+ * @param index The index to be serialized.
+ */
+static void flush_to_disk (MemoryIndex * index);
+
+/**
+ * @brief Allocate more memory for a memory index.
+ *
+ * @param index The memory index.
+ * @param size  The new size.
+ *
+ * If \a size is smaller than the current size,
+ * this function does nothing.
+ */
+static void inflate_list (MemoryIndex * index, size_t size);
+
+/**
+ * @brief Load data from disk.
+ *
+ * @param index    The memory index.
+ * @param filename Name of the serialized index file.
+ *
+ * This function restores a previously saved memory index
+ * into the current index.
+ */
+static void load_file (MemoryIndex * index, const char *filename);
+
+/**
+ * @brief Case-insensitive \a MemoryIndexRecord comparison.
+ *
+ * @param a Pointer to a \a MemoryIndexRecord.
+ * @param b Pointer to another \a MemoryIndexRecord.
+ *
+ * @retval -1 a < b.
+ * @retval 0  a == b.
+ * @retval 1  a > b.
+ */
+static int qsort_compare (const void *a, const void *b);
+
+static int
+bsearch_compare (const void *a, const void *b)
+{
+  return strcasecmp ((char *) a, ((MemoryIndexRecord *) b)->name);
+}
+
 static void
 change_hash_file (MemoryIndex * index, unsigned int hashnum)
 {
@@ -65,11 +103,6 @@ change_hash_file (MemoryIndex * index, unsigned int hashnum)
     }
 }
 
-/**
- * @brief Serializes a memory index to disk.
- *
- * @param index The index to be serialized.
- */
 static void
 flush_to_disk (MemoryIndex * index)
 {
@@ -82,8 +115,10 @@ flush_to_disk (MemoryIndex * index)
   /* Gets the filename with the right extension (filename.hXXXX) */
   filename =
     hash_get_filename (index->fp_name, index->loaded_file, INDEX_HASH_NUM);
+
   fp = fopen (filename, "w");
   assert (fp);
+
   free (filename);
 
   for (i = 0; i < index->regnum; i++)
@@ -95,15 +130,6 @@ flush_to_disk (MemoryIndex * index)
   fclose (fp);
 }
 
-/**
- * @brief Allocate more memory for a memory index.
- *
- * @param index The memory index.
- * @param size  The new size.
- *
- * If \a size is smaller than the current size,
- * this function does nothing.
- */
 static void
 inflate_list (MemoryIndex * index, size_t size)
 {
@@ -124,15 +150,6 @@ inflate_list (MemoryIndex * index, size_t size)
     }
 }
 
-/**
- * @brief Load data from disk.
- *
- * @param index    The memory index.
- * @param filename Name of the serialized index file.
- *
- * This function restores a previously saved memory index
- * into the current index.
- */
 static void
 load_file (MemoryIndex * index, const char *filename)
 {
@@ -173,16 +190,6 @@ load_file (MemoryIndex * index, const char *filename)
   fclose (fp);
 }
 
-/**
- * @brief Case-insensitive \a MemoryIndexRecord comparison.
- *
- * @param a Pointer to a \a MemoryIndexRecord.
- * @param b Pointer to another \a MemoryIndexRecord.
- *
- * @retval -1 a < b.
- * @retval 0  a == b.
- * @retval 1  a > b.
- */
 static int
 qsort_compare (const void *a, const void *b)
 {
