@@ -131,6 +131,7 @@ void base_read_artwork_record_with_rrn (Base * base, ArtworkInfo * info, int
  *
  * This s basically a wrapper around \a base_read_artwork_record_with_rrn and
  * \a html_write_record_info.
+ */
 void base_read_artwork_write_html (Base * base, FILE * html_fp, int rrn);
 
 /**
