@@ -24,7 +24,7 @@
 static int bsearch_compare (const void *a, const void *b);
 
 /**
- * @brief Changes the loaded hash file according to the current key.
+ * @brief Changes the loaded hash file according to the given hash number.
  *
  * @param index   The memory index being used.
  * @param hashnum The hash returned by the hash function.
