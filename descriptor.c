@@ -42,8 +42,8 @@ simlist_append (SimilarityList * simlist, ArtworkInfo artwork, double sim)
 static int
 simlist_compare (const void *a, const void *b)
 {
-  double sa = (((SimilarityRecord *) & a)->similarity);
-  double sb = (((SimilarityRecord *) & b)->similarity);
+  double sa = ( (*((SimilarityRecord *)a)).similarity );
+  double sb = ( (*((SimilarityRecord *)b)).similarity );
 
   if (sa < sb)
     return 1;
@@ -137,7 +137,7 @@ find_similarities (Descriptor * desc, SimilarityList * simlist, char *imgname,
 {
   ArtworkInfo artwork;
   char *imgpath;
-  char pkname[TITLE_LENGTH + 1];
+  char pkname[TITLE_LENGTH + 1] = {'\0'};
   MemoryIndexRecord *match;
   unsigned char di;
 
@@ -181,10 +181,7 @@ descriptor_find (Descriptor * desc, char *imgname, MemoryIndex * pk, Base
   unsigned char ds;
   unsigned int curload;
 
-  assert (desc);
-
-  if (!file_is_valid (imgname))
-    return;
+  assert (desc && file_is_valid (imgname));
 
   ds = CalculaDescritor (imgname);
   change_hash_file (desc, descriptor_hash (ds));
