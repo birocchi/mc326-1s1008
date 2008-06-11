@@ -139,7 +139,7 @@ str_join (const char *a, const char *b)
   sz_a = strlen (a);
   sz_b = strlen (b);
 
-  ret = MEM_ALLOC_N (char, sz_a + sz_b);
+  ret = MEM_ALLOC_N (char, sz_a + sz_b + 1);
 
   memcpy (ret, a, sz_a);
   memcpy (ret + sz_a, b, sz_b);
