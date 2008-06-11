@@ -9,8 +9,8 @@
 
 typedef struct
 {
+  ArtworkInfo artwork;
   double similarity;
-  char img[IMG_LENGTH + 1];
 } SimilarityRecord;
 
 typedef struct
@@ -29,7 +29,7 @@ typedef struct
 
 void
 descriptor_find (Descriptor * desc, char *imgname, MemoryIndex * pk,
-                 FILE * base_fp, size_t maxresults);
+                 Base * base, size_t maxresults);
 
 void descriptor_free (Descriptor * desc);
 
