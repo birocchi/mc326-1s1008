@@ -8,12 +8,6 @@
 #define GROUP_NUMBER "01" /**< The group number used in the image identifier */
 
 /**
- * \brief Flushes stdin to remove any leftover characters which
- *        may still be lying around.
- */
-void flushBuffer (void);
-
-/**
  * \brief Wrapper around readValue to read a single character (and
  *        make sure no more than one character was passed).
  *
