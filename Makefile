@@ -16,6 +16,8 @@ TP=tp4
 BASE=base01.dat
 BASEBACKUP=base01.dat.back
 
+.PHONY: all clean
+
 all: art
 
 art: $(OFILES)
