@@ -9,6 +9,11 @@
 #include "mem.h"
 #include "avail.h"
 
+/**
+ * @brief Flush changes to disk.
+ *
+ * @param avlist The avail list being used.
+ */
 static void
 avail_list_write (AvailList * avlist)
 {
