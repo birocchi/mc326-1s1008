@@ -186,15 +186,15 @@ adapter_find (Adapter * db)
   switch (menuMultipleAnswers ("   Opcao desejada: ", "eps"))
     {
     case 'e':
-      readString ("   Digite o titulo para busca: ", key, TITLE_LENGTH);
+      read_string ("   Digite o titulo para busca: ", key, TITLE_LENGTH);
       mindex = db->pk_index;
       break;
     case 'p':
       read_secindex (db, &mindex, &secindex, key);
       break;
     case 's':
-      readString ("   Digite o nome da imagem de comparacao: ", img, 255);
-      readInt ("   Digite o numero maximo de resultados desejados: ",
+      read_string ("   Digite o nome da imagem de comparacao: ", img, 255);
+      read_int ("   Digite o numero maximo de resultados desejados: ",
         maxresults, 10);
 
       if (file_is_valid (img))
@@ -316,7 +316,7 @@ adapter_remove (Adapter * db)
   char key[TITLE_LENGTH + 1], *title;
   MemoryIndexRecord *match;
 
-  readString ("   Digite o titulo da obra: ", key, TITLE_LENGTH);
+  read_string ("   Digite o titulo da obra: ", key, TITLE_LENGTH);
 
   match = memory_index_find (db->pk_index, key);
   if (match)

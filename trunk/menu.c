@@ -12,7 +12,7 @@ menuMultipleAnswers (const char *msg, const char *optstring)
     {
       printf (msg);
 
-      if ((readChar (&c)) || (!strchr (optstring, c)))
+      if ((read_char (&c)) || (!strchr (optstring, c)))
         {
           printf ("\n   Opcao invalida.\n");
           continue;

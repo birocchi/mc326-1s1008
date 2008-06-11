@@ -8,7 +8,7 @@
 #define GROUP_NUMBER "01" /**< The group number used in the image identifier */
 
 /**
- * \brief Wrapper around readValue to read a single character (and
+ * \brief Wrapper around read_value to read a single character (and
  *        make sure no more than one character was passed).
  *
  *        Removes trailing spaces before and after the text.
@@ -18,7 +18,7 @@
  * \retval -1 Error.
  * \retval 0 Success.
  */
-int readChar (char *c);
+int read_char (char *c);
 
 /**
  * \brief Reads input and checks if it's a valid integer. If not,
@@ -30,7 +30,7 @@ int readChar (char *c);
  * \param dest      Pointer to the place where we want to store the input.
  * \param length    The maximum number of characters that can be stored.
  */
-void readInt (const char *inputText, char *dest, size_t length);
+void read_int (const char *inputText, char *dest, size_t length);
 
 /**
  * \brief Read input from the user until it is not null.
@@ -41,7 +41,7 @@ void readInt (const char *inputText, char *dest, size_t length);
  * \param dest      Pointer to the place where we want to store the input.
  * \param length    The maximum number of characters that can be stored.
  */
-void readString (const char *inputText, char *dest, size_t length);
+void read_string (const char *inputText, char *dest, size_t length);
 
 /**
  * @brief Read a single word from the user.
@@ -64,7 +64,7 @@ void read_word (const char *msg, char *dest, size_t length);
  * \param s       Where to store the input.
  * \param length  The maximum number of characters that can be stored.
  */
-void readValue (char s[], size_t length);
+void read_value (char s[], size_t length);
 
 /**
  * @brief strdup implementation.

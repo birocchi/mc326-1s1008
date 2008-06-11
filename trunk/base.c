@@ -116,22 +116,22 @@ base_read_input (ArtworkInfo * info)
 
   assert (info != NULL);
 
-  readString
+  read_string
     ("\n   Por favor, digite o titulo da obra (Max: 200 caracteres): ",
      info->title, TITLE_LENGTH);
-  readString ("   Por favor, digite o tipo da obra (Max: 100 caracteres): ",
+  read_string ("   Por favor, digite o tipo da obra (Max: 100 caracteres): ",
               info->type, TYPE_LENGTH);
-  readString ("   Por favor, digite o autor da obra (Max: 125 caracteres): ",
+  read_string ("   Por favor, digite o autor da obra (Max: 125 caracteres): ",
               info->author, AUTHOR_LENGTH);
 
-  readInt ("   Por favor, digite o ano da obra (Max: 4 caracteres): ",
+  read_int ("   Por favor, digite o ano da obra (Max: 4 caracteres): ",
            info->year, YEAR_LENGTH);
-  readInt ("   Por favor, digite o valor da obra (Max: 12 caracteres): ",
+  read_int ("   Por favor, digite o valor da obra (Max: 12 caracteres): ",
            info->value, VALUE_LENGTH);
 
   while (1)
     {
-      readString
+      read_string
         ("   Por favor, digite o identificador da obra (Max: 7 caracteres): ",
          img, IMG_LENGTH - 2);
 

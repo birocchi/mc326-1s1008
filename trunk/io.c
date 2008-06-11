@@ -8,13 +8,13 @@
 #include "mem.h"
 
 int
-readChar (char *c)
+read_char (char *c)
 {
   char input[2 + 1];
 
   /* We read n+1 from the input to be able to check
    * if the user has written exactly n characters */
-  readValue (input, 2);
+  read_value (input, 2);
 
   if (strlen (input) != 1)
     return 1;
@@ -26,7 +26,7 @@ readChar (char *c)
 }
 
 void
-readInt (const char *inputText, char *dest, size_t length)
+read_int (const char *inputText, char *dest, size_t length)
 {
   int i, invalid;
 
@@ -35,7 +35,7 @@ readInt (const char *inputText, char *dest, size_t length)
   while (invalid)
     {
       invalid = 0;
-      readString (inputText, dest, length);
+      read_string (inputText, dest, length);
 
       for (i = 0; i < strlen (dest); i++)
         {
@@ -50,12 +50,12 @@ readInt (const char *inputText, char *dest, size_t length)
 }
 
 void
-readString (const char *inputText, char *dest, size_t length)
+read_string (const char *inputText, char *dest, size_t length)
 {
   while (1)
     {
       printf (inputText);
-      readValue (dest, length);
+      read_value (dest, length);
 
       if (strlen (dest) == 0)
         {
@@ -72,7 +72,7 @@ read_word (const char *msg, char *dest, size_t length)
 {
   char *space;
 
-  readString (msg, dest, length);
+  read_string (msg, dest, length);
 
   space = strchr (dest, ' ');
   if (space)
@@ -80,7 +80,7 @@ read_word (const char *msg, char *dest, size_t length)
 }
 
 void
-readValue (char s[], size_t length)
+read_value (char s[], size_t length)
 {
   fgets (s, length + 1, stdin);
 
