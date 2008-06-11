@@ -17,38 +17,21 @@ static void simlist_append (SimilarityList * simlist, ArtworkInfo artwork,
                             double sim);
 static int simlist_compare (const void *a, const void *b);
 static void simlist_free (SimilarityList * simlist);
+static void simlist_inflate (SimilarityList * simlist, size_t newsize);
 static SimilarityList *simlist_new (void);
+
 static void change_hash_file (Descriptor * desc, unsigned int hashnum);
 static void find_similarities (Descriptor * desc, SimilarityList * simlist,
                                char *imgname, unsigned char ds,
                                MemoryIndex * pk, Base * base, int hashnum);
 static unsigned int descriptor_hash (unsigned char key);
-static void inflate (SimilarityList * simlist, size_t newsize);
 static unsigned int descriptor_hash (unsigned char key);
-
-static void
-inflate (SimilarityList * simlist, size_t newsize)
-{
-  SimilarityRecord *tmp;
-
-  if (newsize == 0)
-    newsize = 50;
-
-  if (newsize > simlist->maxregs)
-    {
-      tmp = realloc (simlist->list, newsize * sizeof (SimilarityRecord));
-      assert (tmp);
-
-      simlist->list = tmp;
-      simlist->maxregs = newsize;
-    }
-}
 
 static void
 simlist_append (SimilarityList * simlist, ArtworkInfo artwork, double sim)
 {
   if (simlist->regnum == simlist->maxregs)
-    inflate (simlist, simlist->maxregs * 2);
+    simlist_inflate (simlist, simlist->maxregs * 2);
 
   simlist->list[simlist->regnum].artwork = artwork;
   simlist->list[simlist->regnum].similarity = sim;
@@ -77,6 +60,24 @@ simlist_free (SimilarityList * simlist)
     {
       free (simlist->list);
       free (simlist);
+    }
+}
+
+static void
+simlist_inflate (SimilarityList * simlist, size_t newsize)
+{
+  SimilarityRecord *tmp;
+
+  if (newsize == 0)
+    newsize = 50;
+
+  if (newsize > simlist->maxregs)
+    {
+      tmp = realloc (simlist->list, newsize * sizeof (SimilarityRecord));
+      assert (tmp);
+
+      simlist->list = tmp;
+      simlist->maxregs = newsize;
     }
 }
 
@@ -111,6 +112,22 @@ change_hash_file (Descriptor * desc, unsigned int hashnum)
 
       free (filename);
     }
+}
+
+static unsigned int
+descriptor_hash (unsigned char key)
+{
+  unsigned int hashnum = 0;
+  unsigned char comp = 1;
+
+  while (comp)
+    {
+      if (key & comp)
+        hashnum++;
+      comp <<= 1;
+    }
+
+  return hashnum;
 }
 
 static void
@@ -152,22 +169,6 @@ find_similarities (Descriptor * desc, SimilarityList * simlist, char *imgname,
             }
         }
     }
-}
-
-static unsigned int
-descriptor_hash (unsigned char key)
-{
-  unsigned int hashnum = 0;
-  unsigned char comp = 1;
-
-  while (comp)
-    {
-      if (key & comp)
-        hashnum++;
-      comp <<= 1;
-    }
-
-  return hashnum;
 }
 
 void
