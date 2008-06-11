@@ -49,9 +49,7 @@ typedef struct
  * @param base        The base being used.
  * @param maxresults  The maximum number of results to return.
  */
-void
-descriptor_find (Descriptor * desc, char *imgname, MemoryIndex * pk,
-                 Base * base, size_t maxresults);
+SimilarityList * descriptor_find (Descriptor *desc, SimilarityList * simlist, Base *base, MemoryIndex *pk, char *imgname);
 
 /**
  * @brief Frees memory allocated for a descriptor.
@@ -77,5 +75,19 @@ void descriptor_insert (Descriptor * desc, const char *pkname, unsigned char d);
  * @param fp_name The prefix (common name) for all hash files.
  */
 Descriptor *descriptor_new (const char *fp_name);
+
+/**
+ * @brief Frees memory allocated for a similarity list.
+ *
+ * @param simlist The similarity list being used.
+ */
+void simlist_free (SimilarityList * simlist);
+
+/**
+ * @brief Creates a new similarity list structure.
+ *
+ * @return A new \a SimilarityList structure.
+ */
+SimilarityList *simlist_new (void);
 
 #endif

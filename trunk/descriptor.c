@@ -16,7 +16,7 @@
 /**
  * @brief Appends an entry to the similarity list.
  *
- * @param simlist
+ * @param simlist The similarity list being used.
  * @param artwork The artwork to append.
  * @param sim     The similarity to a given image.
  */
@@ -37,28 +37,13 @@ static void simlist_append (SimilarityList * simlist, ArtworkInfo artwork,
  */
 static int simlist_compare (const void *a, const void *b);
 
-
-/**
- * @brief Frees memory allocated for a similarity list.
- *
- * @param simlist
- */
-static void simlist_free (SimilarityList * simlist);
-
 /**
  * @brief Allocates more memory for a similarity list.
  *
- * @param simlist
+ * @param simlist The similarity list being used.
  * @param newsize The new size of the list.
  */
 static void simlist_inflate (SimilarityList * simlist, size_t newsize);
-
-/**
- * @brief Creates a new similarity list structure.
- *
- * @return A new \a SimilarityList structure.
- */
-static SimilarityList *simlist_new (void);
 
 /**
  * @brief Changes the loaded hash file according to the given hash number.
@@ -76,21 +61,6 @@ static void change_hash_file (Descriptor * desc, unsigned int hashnum);
  * @return The number of bits 1 in the given byte.
  */
 static unsigned int descriptor_hash (unsigned char key);
-
-/**
- * @brief Finds the images that pass a similarity threshold in the base.
- *
- * @param desc        The descriptor in use.
- * @param simlist     The similarity list to use.
- * @param imgname     The filename of the base image.
- * @param ds          The descriptor of the base image.
- * @param pk          The primary key list.
- * @param base        The base being used.
- * @param hashnum     The hash file number to search.
- */
-static void find_similarities (Descriptor * desc, SimilarityList * simlist,
-                               char *imgname, unsigned char ds,
-                               MemoryIndex * pk, Base * base, int hashnum);
 
 static void
 simlist_append (SimilarityList * simlist, ArtworkInfo artwork, double sim)
@@ -119,16 +89,6 @@ simlist_compare (const void *a, const void *b)
 }
 
 static void
-simlist_free (SimilarityList * simlist)
-{
-  if (simlist)
-    {
-      free (simlist->list);
-      free (simlist);
-    }
-}
-
-static void
 simlist_inflate (SimilarityList * simlist, size_t newsize)
 {
   SimilarityRecord *tmp;
@@ -144,18 +104,6 @@ simlist_inflate (SimilarityList * simlist, size_t newsize)
       simlist->list = tmp;
       simlist->maxregs = newsize;
     }
-}
-
-static SimilarityList *
-simlist_new (void)
-{
-  SimilarityList *ret = MEM_ALLOC (SimilarityList);
-
-  ret->list = NULL;
-  ret->regnum = 0;
-  ret->maxregs = 0;
-
-  return ret;
 }
 
 static void
@@ -195,90 +143,59 @@ descriptor_hash (unsigned char key)
   return hashnum;
 }
 
-static void
-find_similarities (Descriptor * desc, SimilarityList * simlist, char *imgname,
-                   unsigned char ds, MemoryIndex * pk, Base * base, int hashnum)
+SimilarityList * descriptor_find (Descriptor *desc, SimilarityList * simlist, Base *base, MemoryIndex *pk, char *imgname)
 {
   ArtworkInfo artwork;
   char *imgpath;
   char pkname[TITLE_LENGTH + 1] = { '\0' };
-  MemoryIndexRecord *match;
-  unsigned char di;
-
-  if ((hashnum < 0) || (hashnum >= DESC_HASH_NUM))
-    return;
-
-  change_hash_file (desc, hashnum);
-
-  fseek (desc->fp, 0, SEEK_SET);
-
-  while (!feof (desc->fp))
-    {
-      /* Read an entry */
-      di = fgetc (desc->fp);
-      fgets (pkname, TITLE_LENGTH + 1, desc->fp);
-      stripWhiteSpace (pkname);
-
-      /* Check if it passes the threshold */
-      if (descriptor_hash (di ^ ds) <= 2)
-        {
-          match = memory_index_find (pk, pkname);
-
-          if (match)
-            {
-              fseek (base->fp, match->rrn * BASE_REG_SIZE, SEEK_SET);
-              base_read_artwork_record (base, &artwork);
-
-              imgpath = base_get_image_path (artwork.img);
-              simlist_append (simlist, artwork,
-                              ComputaSimilaridade (imgpath, imgname));
-              free (imgpath);
-            }
-        }
-    }
-}
-
-void
-descriptor_find (Descriptor * desc, char *imgname, MemoryIndex * pk, Base
-                 * base, size_t maxresults)
-{
-  FILE *htmlfile;
   int i;
-  SimilarityList *simlist = simlist_new ();
-  unsigned char ds;
+  MemoryIndexRecord *match;
+  unsigned char di, ds;
   unsigned int curload;
 
-  assert (desc && file_is_valid (imgname));
+  assert (file_is_valid (imgname));
 
   ds = CalculaDescritor (imgname);
   change_hash_file (desc, descriptor_hash (ds));
 
   curload = desc->loaded_file;
-  find_similarities (desc, simlist, imgname, ds, pk, base, curload - 1);
-  find_similarities (desc, simlist, imgname, ds, pk, base, curload);
-  find_similarities (desc, simlist, imgname, ds, pk, base, curload + 1);
 
-  if (simlist->regnum == 0)
-    printf ("   Nao ha imagens semelhantes a \"%s\".\n", imgname);
-  else
+  for (i = (curload - 1); i <= (curload + 1); i++)
     {
-      qsort (simlist->list, simlist->regnum, sizeof (SimilarityRecord),
-             simlist_compare);
+      change_hash_file (desc, i);
 
-      htmlfile = fopen (HTMLFILE, "w+");
+      fseek (desc->fp, 0, SEEK_SET);
 
-      html_begin (htmlfile);
-      fprintf (htmlfile, "<tr><td><img src=\"%s\"></td><td></td></tr>\n",
-               imgname);
+      while (!feof (desc->fp))
+        {
+          /* Read an entry */
+          di = fgetc (desc->fp);
+          fgets (pkname, TITLE_LENGTH + 1, desc->fp);
+          stripWhiteSpace (pkname);
 
-      for (i = 0; (i < maxresults) && (i < simlist->regnum); i++)
-        html_write_record_info (htmlfile, &(simlist->list[i].artwork));
+          /* Check if it passes the threshold */
+          if (descriptor_hash (di ^ ds) <= 2)
+            {
+              match = memory_index_find (pk, pkname);
 
-      html_end (htmlfile);
-      fclose (htmlfile);
+              if (match)
+                {
+                  fseek (base->fp, match->rrn * BASE_REG_SIZE, SEEK_SET);
+                  base_read_artwork_record (base, &artwork);
+
+                  imgpath = base_get_image_path (artwork.img);
+                  simlist_append (simlist, artwork,
+                                  ComputaSimilaridade (imgpath, imgname));
+                  free (imgpath);
+                }
+            }
+        }
     }
 
-  simlist_free (simlist);
+  qsort (simlist->list, simlist->regnum, sizeof (SimilarityRecord),
+         simlist_compare);
+
+  return simlist;
 }
 
 void
@@ -316,3 +233,26 @@ descriptor_new (const char *fp_name)
 
   return desc;
 }
+
+void
+simlist_free (SimilarityList * simlist)
+{
+  if (simlist)
+    {
+      free (simlist->list);
+      free (simlist);
+    }
+}
+
+SimilarityList *
+simlist_new (void)
+{
+  SimilarityList *ret = MEM_ALLOC (SimilarityList);
+
+  ret->list = NULL;
+  ret->regnum = 0;
+  ret->maxregs = 0;
+
+  return ret;
+}
+
