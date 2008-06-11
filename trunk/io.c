@@ -100,12 +100,15 @@ readValue (char s[], size_t length)
 char *
 str_dup (const char *s)
 {
-  char *dup = malloc (strlen (s) + 1);
-  assert (dup);
+  if (s != NULL)
+    {
+      register char *copy = malloc (strlen (s) + 1);
 
-  strcpy (dup, s);
+      if (copy != NULL)
+        return strcpy (copy, s);
+    }
 
-  return dup;
+  return NULL;
 }
 
 void
