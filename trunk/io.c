@@ -130,6 +130,23 @@ str_foreach (char *str, void (*callback) (char *, va_list), ...)
   va_end (ap);
 }
 
+char *
+str_join (const char *a, const char *b)
+{
+  char *ret;
+  size_t sz_a, sz_b;
+
+  sz_a = strlen (a);
+  sz_b = strlen (b);
+
+  ret = MEM_ALLOC_N (char, sz_a + sz_b);
+
+  memcpy (ret, a, sz_a);
+  memcpy (ret + sz_a, b, sz_b);
+  ret[sz_a + sz_b] = '\0';
+
+  return ret;
+}
 
 void
 stripNewLine (char s[])
