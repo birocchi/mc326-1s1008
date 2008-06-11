@@ -159,26 +159,22 @@ base_read_input (ArtworkInfo * info)
 char *
 base_get_image_path (const char *s)
 {
-  char *basename, *fullname;
+  char *basename;
+  char *fullpath;
 
-  /* 6 == "img/" + '.' + '\0' */
-  fullname = MEM_ALLOC_N (char, IMG_LENGTH + 6);
-  strcat (fullname, "img/");
-
-  /* fullpath == 1 needs space for "img/" */
   basename = MEM_ALLOC_N (char, IMG_LENGTH + 2);
 
-  /* Change the identifier string so it becomes the file path. */
+  /* Make '012426png' become '012426.png' */
   strncpy (basename, s, 6);
   basename[6] = '.';
   strncpy (basename + 7, s + 6, 3);
   basename[10] = '\0';
 
-  strcat (fullname, basename);
+  fullpath = str_join ("img/", basename);
 
   free (basename);
 
-  return fullname;
+  return fullpath;
 }
 
 void
