@@ -60,7 +60,7 @@ static int create_indexes_if_needed (FileLoadTuple * files, size_t count);
 static void insert_indexes (Adapter * db, ArtworkInfo * artwork, int rrn);
 
 /**
- * @brief Loads the database's indexes with data directly from the base file,
+ * @brief Loads the database's indexes with data directly from the base file.
  *
  * @param db The \a Adapter in use.
  */
@@ -230,11 +230,14 @@ adapter_find (Adapter * db)
   char key[TITLE_LENGTH + 1];   /* TITLE_LENGTH is the largest of all lengths */
   char img[255];                /* Maximum file name length in many file
                                    systems */
-  char maxresults[11];          /* In a 32-bit system, UINT_MAX has 10 digits */
+  char strmaxresults[11];       /* In a 32-bit system, UINT_MAX has 10 digits */
   FILE *html_fp;
+  int i;
   MemoryIndex *mindex = NULL;
   MemoryIndexRecord *mrec = NULL;
   SecondaryIndex *secindex = NULL;
+  SimilarityList *simlist = NULL;
+  unsigned int maxresults;
 
   /* User interface */
   print_search_type_menu ();
@@ -250,40 +253,67 @@ adapter_find (Adapter * db)
     case 's':
       read_string ("   Digite o nome da imagem de comparacao: ", img, 255);
       read_int ("   Digite o numero maximo de resultados desejados: ",
-                maxresults, 10);
+                strmaxresults, 10);
 
       if (file_is_valid (img))
-        descriptor_find (db->desc, img, db->pk_index, db->base,
-                         atoll (maxresults));
+        {
+          simlist = simlist_new ();
+          simlist = descriptor_find (db->desc, simlist, db->base, db->pk_index, img);
+        }
       else
         printf ("   Imagem \"%s\" invalida ou nao encontrada.", img);
 
-      return;
+      break;
     }
 
-  /* Search code */
-  mrec = memory_index_find (mindex, key);
-  if (mrec)
+  if (simlist == NULL)
     {
-      html_fp = fopen (HTMLFILE, "w");
-      html_begin (html_fp);
+      mrec = memory_index_find (mindex, key);
+      if (mrec)
+        {
+          html_fp = fopen (HTMLFILE, "w");
+          html_begin (html_fp);
 
-      if (secindex)
-        secondary_index_foreach (secindex, mrec, print_record, db, html_fp);
+          if (secindex)
+            secondary_index_foreach (secindex, mrec, print_record, db, html_fp);
+          else
+            base_read_artwork_write_html (db->base, html_fp, mrec->rrn);
+
+          printf ("   O resultado da busca por \"%s\" foi gravado em \"%s\".\n",
+                  key, HTMLFILE);
+
+          html_end (html_fp);
+          fclose (html_fp);
+
+          if (menuYesOrNo ("   Apagar algum resultado da busca? (s)im, (n)ao? "))
+            adapter_remove (db);
+        }
       else
-        base_read_artwork_write_html (db->base, html_fp, mrec->rrn);
-
-      printf ("   O resultado da busca por \"%s\" foi gravado em \"%s\".\n",
-              key, HTMLFILE);
-
-      html_end (html_fp);
-      fclose (html_fp);
-
-      if (menuYesOrNo ("   Apagar algum resultado da busca? (s)im, (n)ao? "))
-        adapter_remove (db);
+        printf ("   Nao foi encontrada nenhuma obra.");
     }
   else
-    printf ("   Nao foi encontrada nenhuma obra.");
+    {
+      if (simlist->regnum > 0)
+        {
+          html_fp = fopen (HTMLFILE, "w+");
+          html_begin (html_fp);
+
+          fprintf (html_fp, "<tr><td><img src=\"%s\"></td><td></td></tr>\n",
+                   img);
+
+          maxresults = atoll (strmaxresults);
+
+          for (i = 0; (i < maxresults) && (i < simlist->regnum); i++)
+            html_write_record_info (html_fp, &(simlist->list[i].artwork));
+
+          html_end (html_fp);
+          fclose (html_fp);
+        }
+      else
+        printf ("   Nao ha imagens semelhantes a \"%s\".\n", img);
+
+      simlist_free (simlist);
+    }
 }
 
 void
