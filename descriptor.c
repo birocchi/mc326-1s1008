@@ -42,8 +42,8 @@ simlist_append (SimilarityList * simlist, ArtworkInfo artwork, double sim)
 static int
 simlist_compare (const void *a, const void *b)
 {
-  double sa = ( (*((SimilarityRecord *)a)).similarity );
-  double sb = ( (*((SimilarityRecord *)b)).similarity );
+  double sa = ((*((SimilarityRecord *) a)).similarity);
+  double sb = ((*((SimilarityRecord *) b)).similarity);
 
   if (sa < sb)
     return 1;
@@ -132,12 +132,11 @@ descriptor_hash (unsigned char key)
 
 static void
 find_similarities (Descriptor * desc, SimilarityList * simlist, char *imgname,
-                   unsigned char ds, MemoryIndex * pk, Base * base,
-                   int hashnum)
+                   unsigned char ds, MemoryIndex * pk, Base * base, int hashnum)
 {
   ArtworkInfo artwork;
   char *imgpath;
-  char pkname[TITLE_LENGTH + 1] = {'\0'};
+  char pkname[TITLE_LENGTH + 1] = { '\0' };
   MemoryIndexRecord *match;
   unsigned char di;
 
@@ -164,7 +163,8 @@ find_similarities (Descriptor * desc, SimilarityList * simlist, char *imgname,
               base_read_artwork_record (base, &artwork);
 
               imgpath = base_get_image_path (artwork.img);
-              simlist_append (simlist, artwork, ComputaSimilaridade (imgpath, imgname));
+              simlist_append (simlist, artwork,
+                              ComputaSimilaridade (imgpath, imgname));
               free (imgpath);
             }
         }
@@ -173,7 +173,7 @@ find_similarities (Descriptor * desc, SimilarityList * simlist, char *imgname,
 
 void
 descriptor_find (Descriptor * desc, char *imgname, MemoryIndex * pk, Base
-                 *base, size_t maxresults)
+                 * base, size_t maxresults)
 {
   FILE *htmlfile;
   int i;

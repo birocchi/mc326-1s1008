@@ -21,6 +21,7 @@ unsigned int hash_function (char *key);
  *
  * Remember to free() the name returned by this function.
  */
-char *hash_get_filename (const char *prefix, unsigned int hashnum, unsigned int maxhash);
+char *hash_get_filename (const char *prefix, unsigned int hashnum,
+                         unsigned int maxhash);
 
 #endif
