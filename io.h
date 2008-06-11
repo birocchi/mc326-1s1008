@@ -100,6 +100,8 @@ char *str_dup (const char *s);
  */
 void str_foreach (char *str, void (*callback) (char *, va_list), ...);
 
+char *str_join (const char *a, const char *b);
+
 /**
  * \brief Replaces the trailing '\\n' character (if it exists) in a string
  *        with '\\0'.
