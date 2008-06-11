@@ -32,8 +32,8 @@ typedef struct
   unsigned int hashcount;
 } FileLoadTuple;
 
-static int create_indexes_if_needed (FileLoadTuple *files, size_t count);
-static void insert_indexes (Adapter *db, ArtworkInfo *artwork, int rrn);
+static int create_indexes_if_needed (FileLoadTuple * files, size_t count);
+static void insert_indexes (Adapter * db, ArtworkInfo * artwork, int rrn);
 static void load_files_from_base (Adapter * db);
 static void print_record (char *name, int rrn, va_list ap);
 static void read_secindex (Adapter * db, MemoryIndex ** mindex,
@@ -41,7 +41,7 @@ static void read_secindex (Adapter * db, MemoryIndex ** mindex,
 static void secindex_wrapper (char *str, va_list ap);
 
 static int
-create_indexes_if_needed (FileLoadTuple *files, size_t count)
+create_indexes_if_needed (FileLoadTuple * files, size_t count)
 {
   int retval = 0;
   unsigned int i;
@@ -56,10 +56,10 @@ create_indexes_if_needed (FileLoadTuple *files, size_t count)
 }
 
 static void
-insert_indexes (Adapter *db, ArtworkInfo *artwork, int rrn)
+insert_indexes (Adapter * db, ArtworkInfo * artwork, int rrn)
 {
   char *imgpath = base_get_image_path (artwork->img),
-       *pkname  = str_dup (artwork->title);
+    *pkname = str_dup (artwork->title);
 
   memory_index_insert (db->pk_index, pkname, rrn);
   descriptor_insert (db->desc, pkname, CalculaDescritor (imgpath));
@@ -195,10 +195,11 @@ adapter_find (Adapter * db)
     case 's':
       read_string ("   Digite o nome da imagem de comparacao: ", img, 255);
       read_int ("   Digite o numero maximo de resultados desejados: ",
-        maxresults, 10);
+                maxresults, 10);
 
       if (file_is_valid (img))
-        descriptor_find (db->desc, img, db->pk_index, db->base, atoll (maxresults));
+        descriptor_find (db->desc, img, db->pk_index, db->base,
+                         atoll (maxresults));
       else
         printf ("   Imagem \"%s\" invalida ou nao encontrada.", img);
 
@@ -272,12 +273,12 @@ adapter_load_files (Adapter * db)
 {
   int found_invalid;
   FileLoadTuple files[] = {
-    { PKFILE, INDEX_HASH_NUM },
-    { SI_AUTHOR_INDEX, INDEX_HASH_NUM },
-    { SI_TITLE_INDEX, INDEX_HASH_NUM },
-    { SI_TYPE_INDEX, INDEX_HASH_NUM },
-    { SI_YEAR_INDEX, INDEX_HASH_NUM },
-    { DESCFILE, DESC_HASH_NUM }
+    {PKFILE, INDEX_HASH_NUM},
+    {SI_AUTHOR_INDEX, INDEX_HASH_NUM},
+    {SI_TITLE_INDEX, INDEX_HASH_NUM},
+    {SI_TYPE_INDEX, INDEX_HASH_NUM},
+    {SI_YEAR_INDEX, INDEX_HASH_NUM},
+    {DESCFILE, DESC_HASH_NUM}
   };
 
   assert (db);
@@ -288,19 +289,23 @@ adapter_load_files (Adapter * db)
   db->pk_index = memory_index_new (PKFILE, hash_function);
   db->desc = descriptor_new (DESCFILE);
   db->author_index = secondary_index_new (SI_AUTHOR_INDEX, SI_AUTHOR_LIST,
-                                          SI_AUTHOR_AVAIL, hash_function, found_invalid);
-  db->title_index = secondary_index_new (SI_TITLE_INDEX, SI_TITLE_LIST,
-                                         SI_TITLE_AVAIL, hash_function, found_invalid);
-  db->type_index = secondary_index_new (SI_TYPE_INDEX, SI_TYPE_LIST,
-                                        SI_TYPE_AVAIL, hash_function, found_invalid);
-  db->year_index = secondary_index_new (SI_YEAR_INDEX, SI_YEAR_LIST,
-                                        SI_YEAR_AVAIL, hash_function, found_invalid);
+                                          SI_AUTHOR_AVAIL, hash_function,
+                                          found_invalid);
+  db->title_index =
+    secondary_index_new (SI_TITLE_INDEX, SI_TITLE_LIST, SI_TITLE_AVAIL,
+                         hash_function, found_invalid);
+  db->type_index =
+    secondary_index_new (SI_TYPE_INDEX, SI_TYPE_LIST, SI_TYPE_AVAIL,
+                         hash_function, found_invalid);
+  db->year_index =
+    secondary_index_new (SI_YEAR_INDEX, SI_YEAR_LIST, SI_YEAR_AVAIL,
+                         hash_function, found_invalid);
 
   if (found_invalid)
-  {
-    printf ("   Loading data for the first time...\n");
-    load_files_from_base (db);
-  }
+    {
+      printf ("   Loading data for the first time...\n");
+      load_files_from_base (db);
+    }
 }
 
 Adapter *

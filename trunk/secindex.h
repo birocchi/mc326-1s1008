@@ -69,7 +69,8 @@ void secondary_index_insert (SecondaryIndex * si_index, char *si_value,
  */
 SecondaryIndex *secondary_index_new (const char *indexname,
                                      const char *listname, const char *avname,
-                                     unsigned int (*hash_func)(char*), int overwrite_index);
+                                     unsigned int (*hash_func) (char *),
+                                     int overwrite_index);
 
 /**
  * @brief Removes an entry from a secondary index.*

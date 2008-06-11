@@ -15,8 +15,7 @@ static int bsearch_compare (const void *a, const void *b);
 static void change_hash_file (MemoryIndex * index, unsigned int hashnum);
 static void flush_to_disk (MemoryIndex * index);
 static void inflate_list (MemoryIndex * index, size_t size);
-static void load_file (MemoryIndex * index, const char
-                                         *filename);
+static void load_file (MemoryIndex * index, const char *filename);
 static int qsort_compare (const void *a, const void *b);
 
 /**
@@ -32,8 +31,7 @@ static int qsort_compare (const void *a, const void *b);
 static int
 bsearch_compare (const void *a, const void *b)
 {
-  return strcasecmp ((char *) a,
-                     ((MemoryIndexRecord *) b)->name);
+  return strcasecmp ((char *) a, ((MemoryIndexRecord *) b)->name);
 }
 
 /**
@@ -82,7 +80,8 @@ flush_to_disk (MemoryIndex * index)
   assert (index);
 
   /* Gets the filename with the right extension (filename.hXXXX) */
-  filename = hash_get_filename (index->fp_name, index->loaded_file, INDEX_HASH_NUM);
+  filename =
+    hash_get_filename (index->fp_name, index->loaded_file, INDEX_HASH_NUM);
   fp = fopen (filename, "w");
   assert (fp);
   free (filename);
@@ -237,7 +236,7 @@ memory_index_insert (MemoryIndex * index, char *name, int rrn)
 }
 
 MemoryIndex *
-memory_index_new (const char *fp_name, unsigned int (*hash_func)(char *))
+memory_index_new (const char *fp_name, unsigned int (*hash_func) (char *))
 {
   MemoryIndex *index = MEM_ALLOC (MemoryIndex);
 
@@ -254,7 +253,7 @@ memory_index_new (const char *fp_name, unsigned int (*hash_func)(char *))
 }
 
 void
-memory_index_remove (MemoryIndex * index, char * name)
+memory_index_remove (MemoryIndex * index, char *name)
 {
   int i = 0, j;
 
@@ -262,7 +261,8 @@ memory_index_remove (MemoryIndex * index, char * name)
 
   change_hash_file (index, index->hash_function (name));
 
-  while ((i < index->regnum) && (strcasecmp(index->reclist[i].name, name) != 0))
+  while ((i < index->regnum)
+         && (strcasecmp (index->reclist[i].name, name) != 0))
     i++;
 
   if (i == index->regnum)       /* Match not found, leave function */
