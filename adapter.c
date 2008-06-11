@@ -20,24 +20,82 @@
 #include "menu.h"
 #include "secindex.h"
 
+/**
+ * Actions that \a secindex_wrapper is allowed to perform.
+ */
 typedef enum
 {
   WRAPPER_INSERT,
   WRAPPER_REMOVE
 } SecIndexWrapperAction;
 
+/**
+ * A tuple-like data structure used by \a create_indexes_if_needed.
+ * Contains a file prefix and the number of files it is split into.
+ */
 typedef struct
 {
   char prefix[255];
   unsigned int hashcount;
 } FileLoadTuple;
 
+/**
+ * @brief Checks if all indexes are valid files; if not, create them.
+ *
+ * @param files An array of \a FileLoadTuple structures.
+ * @param count The length of the array.
+ *
+ * @retval 0 All indexes were present and valid.
+ * @retval 1 Some indexes had do be created.
+ */
 static int create_indexes_if_needed (FileLoadTuple * files, size_t count);
+
+/**
+ * @brief Inserts a new artwork entry to the database's indexes.
+ *
+ * @param db      The \a Adapter in use.
+ * @param artwork The new artwork entry.
+ * @param rrn     The relative register number of the new entry in the base.
+ */
 static void insert_indexes (Adapter * db, ArtworkInfo * artwork, int rrn);
+
+/**
+ * @brief Loads the database's indexes with data directly from the base file,
+ *
+ * @param db The \a Adapter in use.
+ */
 static void load_files_from_base (Adapter * db);
+
+/**
+ * @brief Given a primary key, print information about a database record.
+ *
+ * @param name  The primary key name.
+ * @param rrn   Unused.
+ * @param ap    Must be \a Adapter* and \a FILE* -- the database
+ *              and the HTML output.
+ *
+ * This function is a wrapper for a \a secondary_index_foreach call.
+ */
 static void print_record (char *name, int rrn, va_list ap);
+
+/**
+ * @brief Reads the user's index choice for a partial search.
+ *
+ * @param db        The \a Adapter in use.
+ * @param mindex    The \a MemoryIndex that will be used.
+ * @param secindex  The \a SecondaryIndex that will be used.
+ * @param key       The value the user will search for.
+ */
 static void read_secindex (Adapter * db, MemoryIndex ** mindex,
                            SecondaryIndex ** secindex, char *key);
+
+/**
+ * @brief Inserts or removes an entry from a secondary index.
+ *
+ * @param str The entry to be inserted.
+ * @param ap  Must be a \a SecondaryIndex*, a \a char*
+ *            and a \a SecondaryIndexWrapperAction.
+ */
 static void secindex_wrapper (char *str, va_list ap);
 
 static int
@@ -59,7 +117,7 @@ static void
 insert_indexes (Adapter * db, ArtworkInfo * artwork, int rrn)
 {
   char *imgpath = base_get_image_path (artwork->img),
-    *pkname = str_dup (artwork->title);
+       *pkname = str_dup (artwork->title);
 
   memory_index_insert (db->pk_index, pkname, rrn);
   descriptor_insert (db->desc, pkname, CalculaDescritor (imgpath));
@@ -77,11 +135,6 @@ insert_indexes (Adapter * db, ArtworkInfo * artwork, int rrn)
   free (pkname);
 }
 
-/**
- * @brief Read data from the base to all the indexes used.
- *
- * @param db The database.
- */
 static void
 load_files_from_base (Adapter * db)
 {
@@ -175,13 +228,15 @@ void
 adapter_find (Adapter * db)
 {
   char key[TITLE_LENGTH + 1];   /* TITLE_LENGTH is the largest of all lengths */
-  char img[255];
+  char img[255];                /* Maximum file name length in many file
+                                   systems */
   char maxresults[11];          /* In a 32-bit system, UINT_MAX has 10 digits */
   FILE *html_fp;
   MemoryIndex *mindex = NULL;
   MemoryIndexRecord *mrec = NULL;
   SecondaryIndex *secindex = NULL;
 
+  /* User interface */
   print_search_type_menu ();
   switch (menuMultipleAnswers ("   Opcao desejada: ", "eps"))
     {
@@ -206,11 +261,11 @@ adapter_find (Adapter * db)
       return;
     }
 
+  /* Search code */
   mrec = memory_index_find (mindex, key);
   if (mrec)
     {
       html_fp = fopen (HTMLFILE, "w");
-      assert (html_fp);
       html_begin (html_fp);
 
       if (secindex)
@@ -288,9 +343,9 @@ adapter_load_files (Adapter * db)
   db->base = base_new (DBFILE, DBFILE_AVAIL);
   db->pk_index = memory_index_new (PKFILE, hash_function);
   db->desc = descriptor_new (DESCFILE);
-  db->author_index = secondary_index_new (SI_AUTHOR_INDEX, SI_AUTHOR_LIST,
-                                          SI_AUTHOR_AVAIL, hash_function,
-                                          found_invalid);
+  db->author_index =
+    secondary_index_new (SI_AUTHOR_INDEX, SI_AUTHOR_LIST, SI_AUTHOR_AVAIL,
+                         hash_function, found_invalid);
   db->title_index =
     secondary_index_new (SI_TITLE_INDEX, SI_TITLE_LIST, SI_TITLE_AVAIL,
                          hash_function, found_invalid);
@@ -329,6 +384,7 @@ adapter_remove (Adapter * db)
       base_read_artwork_record_with_rrn (db->base, &artwork, match->rrn);
 
       title = str_dup (artwork.title);
+
       base_remove (db->base, match->rrn);
       memory_index_remove (db->pk_index, match->name);
       str_foreach (artwork.author, secindex_wrapper,
