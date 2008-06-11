@@ -7,15 +7,6 @@
 #include "io.h"
 #include "mem.h"
 
-void
-flushBuffer (void)
-{
-  int c;
-
-  while ((c = getchar ()) != '\n' && c != EOF)
-    continue;
-}
-
 int
 readChar (char *c)
 {
@@ -152,9 +143,13 @@ void
 stripNewLine (char s[])
 {
   char *pos = strchr (s, '\n');
+  int c;
 
   if (!pos)
-    flushBuffer ();
+    {
+      while ((c = getchar ()) != '\n' && c != EOF)
+        continue;
+    }
   else
     *pos = '\0';
 }
