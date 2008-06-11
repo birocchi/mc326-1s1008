@@ -83,8 +83,8 @@ load_files_from_base (Adapter * db)
       str_foreach (artwork.year, secindex_insert_wrapper, db->year_index,
                    title);
 
-      free (imgpath);
       free (title);
+      free (imgpath);
     }
 }
 
@@ -197,7 +197,7 @@ adapter_find (Adapter * db)
       readString ("   Digite o nome da imagem de comparacao: ", img, 255);
 
       if (file_is_valid (img))
-        descriptor_find (db->desc, img, db->pk_index, db->base->fp, 50);
+        descriptor_find (db->desc, img, db->pk_index, db->base, 50);
       else
         printf ("   Imagem \"%s\" invalida ou nao encontrada.", img);
 
