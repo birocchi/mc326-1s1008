@@ -44,12 +44,11 @@ typedef struct
  * @brief Looks in the database for images similar to the given one.
  *
  * @param desc        The descriptor in use.
- * @param imgname     The filename of the base image.
- * @param pk          The primary key list.
  * @param base        The base being used.
- * @param maxresults  The maximum number of results to return.
+ * @param pk          The primary key list.
+ * @param imgname     The filename of the base image.
  */
-SimilarityList * descriptor_find (Descriptor *desc, SimilarityList * simlist, Base *base, MemoryIndex *pk, char *imgname);
+SimilarityList * descriptor_find (Descriptor *desc, Base *base, MemoryIndex *pk, char *imgname);
 
 /**
  * @brief Frees memory allocated for a descriptor.
