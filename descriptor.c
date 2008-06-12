@@ -161,6 +161,10 @@ SimilarityList * descriptor_find (Descriptor *desc, SimilarityList * simlist, Ba
   /* Run the algorithm for Vn-1, V and Vn+1 */
   for (i = (curload - 1); i <= (curload + 1); i++)
     {
+      /* Skip invalid values */
+      if ((i < 0) || (i > DESC_HASH_NUM))
+        continue;
+
       change_hash_file (desc, i);
 
       fseek (desc->fp, 0, SEEK_SET);
