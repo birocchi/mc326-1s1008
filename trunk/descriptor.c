@@ -143,13 +143,14 @@ descriptor_hash (unsigned char key)
   return hashnum;
 }
 
-SimilarityList * descriptor_find (Descriptor *desc, SimilarityList * simlist, Base *base, MemoryIndex *pk, char *imgname)
+SimilarityList * descriptor_find (Descriptor *desc, Base *base, MemoryIndex *pk, char *imgname)
 {
   ArtworkInfo artwork;
   char *imgpath;
   char pkname[TITLE_LENGTH + 1] = { '\0' };
   int i;
   MemoryIndexRecord *match;
+  SimilarityList *simlist = simlist_new ();
   unsigned char di, ds;
   unsigned int curload;
 
