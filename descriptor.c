@@ -156,10 +156,9 @@ SimilarityList * descriptor_find (Descriptor *desc, SimilarityList * simlist, Ba
   assert (file_is_valid (imgname));
 
   ds = CalculaDescritor (imgname);
-  change_hash_file (desc, descriptor_hash (ds));
+  curload = descriptor_hash (ds);
 
-  curload = desc->loaded_file;
-
+  /* Run the algorithm for Vn-1, V and Vn+1 */
   for (i = (curload - 1); i <= (curload + 1); i++)
     {
       change_hash_file (desc, i);
@@ -180,8 +179,7 @@ SimilarityList * descriptor_find (Descriptor *desc, SimilarityList * simlist, Ba
 
               if (match)
                 {
-                  fseek (base->fp, match->rrn * BASE_REG_SIZE, SEEK_SET);
-                  base_read_artwork_record (base, &artwork);
+                  base_read_artwork_record_with_rrn (base, &artwork, match->rrn);
 
                   imgpath = base_get_image_path (artwork.img);
                   simlist_append (simlist, artwork,
