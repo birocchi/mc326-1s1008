@@ -227,12 +227,12 @@ secindex_wrapper (char *str, va_list ap)
 void
 adapter_find (Adapter * db)
 {
-  char key[TITLE_LENGTH + 1];   /* TITLE_LENGTH is the largest of all lengths */
-  char img[255];                /* Maximum file name length in many file
-                                   systems */
+  char key[255];                /* Maximum file name length in many file
+                                   systems (can also hold any entry field) */
+  char search_type;
   char strmaxresults[11];       /* In a 32-bit system, UINT_MAX has 10 digits */
   FILE *html_fp;
-  int i;
+  int has_matches, i;
   MemoryIndex *mindex = NULL;
   MemoryIndexRecord *mrec = NULL;
   SecondaryIndex *secindex = NULL;
@@ -241,79 +241,75 @@ adapter_find (Adapter * db)
 
   /* User interface */
   print_search_type_menu ();
-  switch (menuMultipleAnswers ("   Opcao desejada: ", "eps"))
+  search_type = menuMultipleAnswers ("   Opcao desejada: ", "eps");
+  switch (search_type)
     {
     case 'e':
       read_string ("   Digite o titulo para busca: ", key, TITLE_LENGTH);
-      mindex = db->pk_index;
+      mrec = memory_index_find (db->pk_index, key);
       break;
     case 'p':
       read_secindex (db, &mindex, &secindex, key);
+      mrec = memory_index_find (mindex, key);
       break;
     case 's':
-      read_string ("   Digite o nome da imagem de comparacao: ", img, 255);
+      read_string ("   Digite o nome da imagem de comparacao: ", key, 255);
+
+      if (!file_is_valid (key))
+        {
+          printf ("   Imagem \"%s\" invalida ou nao encontrada.", key);
+          return;
+        }
+
       read_int ("   Digite o numero maximo de resultados desejados: ",
                 strmaxresults, 10);
 
-      if (file_is_valid (img))
-        {
-          simlist = simlist_new ();
-          simlist = descriptor_find (db->desc, simlist, db->base, db->pk_index, img);
-        }
-      else
-        printf ("   Imagem \"%s\" invalida ou nao encontrada.", img);
+      simlist = descriptor_find (db->desc, db->base, db->pk_index, key);
 
       break;
     }
 
-  if (simlist == NULL)
+  /* Search code */
+  has_matches = ((mrec != NULL) || ((simlist != NULL) && (simlist->regnum > 0)));
+
+  if (has_matches)
     {
-      mrec = memory_index_find (mindex, key);
-      if (mrec)
+      html_fp = fopen (HTMLFILE, "w");
+      html_begin (html_fp);
+
+      switch (search_type)
         {
-          html_fp = fopen (HTMLFILE, "w");
-          html_begin (html_fp);
-
-          if (secindex)
-            secondary_index_foreach (secindex, mrec, print_record, db, html_fp);
-          else
-            base_read_artwork_write_html (db->base, html_fp, mrec->rrn);
-
-          printf ("   O resultado da busca por \"%s\" foi gravado em \"%s\".\n",
-                  key, HTMLFILE);
-
-          html_end (html_fp);
-          fclose (html_fp);
-
-          if (menuYesOrNo ("   Apagar algum resultado da busca? (s)im, (n)ao? "))
-            adapter_remove (db);
-        }
-      else
-        printf ("   Nao foi encontrada nenhuma obra.");
-    }
-  else
-    {
-      if (simlist->regnum > 0)
-        {
-          html_fp = fopen (HTMLFILE, "w+");
-          html_begin (html_fp);
-
-          fprintf (html_fp, "<tr><td><img src=\"%s\"></td><td></td></tr>\n",
-                   img);
+        case 'e': /* Exact search */
+          base_read_artwork_write_html (db->base, html_fp, mrec->rrn);
+          break;
+        case 'p': /* Partial search */
+          secondary_index_foreach (secindex, mrec, print_record, db, html_fp);
+          break;
+        case 's': /* Similarity search */
+          fprintf (html_fp, "<tr><td><img src=\"%s\"></td><td></td></tr>\n\n",
+                   key);
 
           maxresults = atoll (strmaxresults);
 
           for (i = 0; (i < maxresults) && (i < simlist->regnum); i++)
             html_write_record_info (html_fp, &(simlist->list[i].artwork));
 
-          html_end (html_fp);
-          fclose (html_fp);
-        }
-      else
-        printf ("   Nao ha imagens semelhantes a \"%s\".\n", img);
+          simlist_free (simlist);
 
-      simlist_free (simlist);
+          break;
+        }
+
+      html_end (html_fp);
+      fclose (html_fp);
+
+      printf ("   O resultado da busca por \"%s\" foi gravado em \"%s\".\n",
+              key, HTMLFILE);
+
+      if (menuYesOrNo ("   Apagar algum resultado? (s)im, (n)ao? "))
+        adapter_remove (db);
     }
+  else
+    printf ("   Nao foi encontrada nenhuma obra.\n");
 }
 
 void
