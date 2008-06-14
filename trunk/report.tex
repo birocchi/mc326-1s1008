@@ -31,13 +31,9 @@ Dentre as principais alterações no código e nas funcionalidades do programa e
 
 \textbf{Código}:
 \begin{itemize}
-\item Criada uma estrutura \texttt{MemoryIndex} para representar os índices em memória;
-\item Criada uma estrutura \texttt{Adapter}, correspondente ao \textit{design pattern} de mesmo nome, para gerenciar e fazer a interface entre a base de dados, o índice primário e os índices secundários;
-\item Criada a estrutura \texttt{SecondaryIndex} para representar os índices secundários;
-\item Criada a estrutura \texttt{AvailList} para representar a \textit{avail list} utilizada nas remoções e inserções;
-\item A maior parte do código de \textit{main} foi movida para \textit{adapter.c};
-\item Agora é feito um uso massivo da função \texttt{assert} para checagem de dados e para facilitar o debugging do programa.
-\item pk.c e pk.h foram removidos;
+\item A estrutura \texttt{MemoryIndex} foi adaptada para ter seu conteúdo em disco dividido em diversos arquivos ao invés de apenas um. Para indicar em qual arquivo determinada entrada está, é utilizada uma função de \textit{hashing} que utiliza o nome da entrada como chave;
+\item Criadas uma estrutura \texttt{Descriptor} e as estruturas auxiliares \texttt{SimiliarityList} e \texttt{SimilarityRecord}, para o cadastro das informações do descritor de cada imagem do banco de dados;
+\item Boa parte do código da função \texttt{adapter\_find} foi reescrito para suportar de forma limpa e eficiente as três estruturas usadas em busca: \texttt{MemoryIndex}, \texttt{SecondaryIndex} e \texttt{Descriptor}.
 \end{itemize}
 
 \section{Uso da interface}\
