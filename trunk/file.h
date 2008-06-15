@@ -36,4 +36,15 @@ long file_get_size_from_name (const char *filename);
  */
 int file_is_valid (const char *filename);
 
+/**
+ * @brief Checks if the file is valid and has a valid
+ *        image extension (gif, jpg or png).
+ *
+ * @param filename The file name to check.
+ *
+ * @retval 0 The file or the file name are not valid.
+ * @retval 1 The file and the file name are valid.
+ */
+int file_is_valid_image (const char *filename);
+
 #endif
