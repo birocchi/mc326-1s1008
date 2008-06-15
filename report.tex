@@ -48,21 +48,25 @@ No modo de \textbf{inserção}, o usuário deve digitar as informações para \t
 
 \subsection{Consulta}\
 
-No modo de \textbf{consulta}, o usuário deve primeiro escolher se deseja uma busca \textit{parcial} ou \textit{exata}. Em ambos os casos, não há diferença entre maiúsculas e minúsculas nos itens pesquisados.\\
+No modo de \textbf{consulta}, o usuário é apresentado às formas de consulta que podem ser realizadas: \textit{parcial}, \textit{exata} ou por \textit{similaridade}.\\
 
-Uma busca \textit{parcial} é feita somente nos índices secundários do banco de dados. É possível buscar por \textbf{ano}, \textbf{tipo}, \textbf{título} ou \textbf{autor} da obra. Neste modo de pesquisa, é possível buscar por apenas \textbf{uma} palavra, que retornará as entradas que contiverem a palavra buscada.\\
+Uma busca \textit{parcial} é feita somente nos índices secundários do banco de dados. É possível buscar por \textbf{ano}, \textbf{tipo}, \textbf{título} ou \textbf{autor} da obra. Neste modo de pesquisa, é possível buscar por apenas \textbf{uma} palavra, que retornará as entradas que contiverem a palavra buscada. O programa não faz distinção entre maiúsculas e minúsculas.\\
 
-Uma busca \textit{exata} é feita somente no índice primário (título da obra), e busca o título exato entrado pelo usuário.\\
+Uma busca \textit{exata} é feita somente no índice primário (título da obra), e busca o título exato entrado pelo usuário. Neste caso, também não há distinção entre maiúsculas e minúsculas.\\
 
-Os resultados encontrados são escritos com os campos NRR, título, tipo, autor, ano de criação, valor e identificador no arquivo \textbf{lista.html}. Caso não haja nenhum resultado, exibe-se uma mensagem de erro.
+A busca por \textit{similaridade} possui outra interface. Inicialmente, o usuário deve entrar com o caminho completo de uma imagem que será usada como base de comparação. Caso a imagem não seja encontrada, ou se não possuir uma das extensões aceitas pelo programa (png, jpg ou gif), uma mensagem de erro é exibida e o usuário é levado novamente ao menu inicial. Se a imagem for um arquivo válido, o programa pergunta ao usuário o número máximo de imagens semelhantes devem ser exibidas em listagem. O programa realiza, então, uma busca em seu banco de dados de imagens por imagens semelhantes à base de comparação e, em seguida, lista as ocorrências juntamente com a imagem base.\\
+
+Os resultados encontrados são escritos com os campos título, tipo, autor, ano de criação, valor e identificador no arquivo \texttt{lista.html}. Caso não haja nenhum resultado, exibe-se uma mensagem de erro.
 
 \subsection{Remoção}
 
-No modo de \textbf{remoção}, o usuário deve entrar com o NRR (número relativo de registro) da obra que deseja excluir do banco de dados. O NRR é obtido através de uma \textbf{consulta} ou \textbf{geração} de lista de obras. Enquanto o NRR entrado não for válido, o usuário é perguntado por um novo NRR válido para exclusão.
+No modo de \textbf{remoção}, o usuário deve entrar com o título completo da obra que deseja excluir do banco de dados. O programa não realiza distinções entre maísculas e minúculas. O título pode ser obtido através de uma \textbf{consulta} de obras. Quando o título digitado pelo usuário é inválido, é exibida uma mensagem de erro e o programa retorna ao menu inicial.
 
 \section{Descrição do Trabalho}\
 
-Desde a versão anterior foi definida uma divisão dos códigos fonte para melhor manutenção e escalabilidade. Com o crescimento das funcionalidades e necessidade de melhor base para algumas destas, acabou-se modificando a estrutura dos arquivos para melhor adequação. Atualmente, os seguintes arquivos compõem o programa:
+Em relação à versão anterior do trabalho, não foram feitas grandes alterações na estrutura ou na quantidade de arquivos presentes, ao contrário do que ocorreu na transição entre os trabalhos práticos 2 e 3.\\
+
+Foram criados apenas os arquivos \texttt{descriptor.c}, \texttt{descriptor.h}, \texttt{hash.c} e \texttt{hash.h}, enquanto os outros arquivos presentes tiveram apenas algumas funcionalidades editadas. Nenhum arquivo de código da versão anterior foi removido. Atualmente, os seguintes arquivos compõem o programa:
 
 \begin{itemize}
 \item \textbf{adapter.c, adapter.h}\\
@@ -74,11 +78,17 @@ Desde a versão anterior foi definida uma divisão dos códigos fonte para melho
 \item \textbf{base.c, base.h}\\
 	Contêm as funções referentes à manipulação da base de dados e definições relacionadas, como o tamanho dos campos da base de dados e a estrutura que representa uma entrada na base de dados. Há funções para adição e remoção na base de dados, além de funções auxiliares que validam o identificador e lêem entradas na base de dados.
 
+\item \textbf{descriptor.c, descriptor.h}\\
+	Contêm as funções referentes à manipulação do índice de descritores de imagens, incluindo adição, remoção e busca no índice.
+
  \item \textbf{file.c, file.h}\\
-	Contêm funções relacionadas à manipulação de arquivos quaisquer: atualmente, checa se determinado arquivo existe, retorna o tamanho de determinado arquivo e checa se o arquivo é válido para o trabalho (possui tamanho maior que 0).
+	Contêm funções relacionadas à manipulação de arquivos quaisquer: checa se um arquivo existe, se possui uma extensão válida, se não está vazio.
 
 \item \textbf{filelist.h}\\
-	Contêm os nomes dos arquivos utilizados pelo banco de dados (base, chaves primárias, secundárias e avail lists), de modo a evitar nomes \textit{hardcoded} no código.
+	Contêm os nomes dos arquivos utilizados pelo banco de dados (base, chaves primárias, secundárias e avail lists), de modo a evitar nomes \textit{hardcoded} no código. Possui também a quantidade de índices secundários existentes e o número de arquivos em que o arquivo de índice em memória foi dividido para os índices (com exceção do índice de descritores, que possui contagem própria).
+
+\item \textbf{hash.c, hash.h}\\
+	Contêm uma função de \textit{hashing} genérica (algoritmo de Fowler/Noll/Vo) e uma função de adição do sufixo correto a um arquivo para a obtenção do arquivo de hashing correto.
 
  \item \textbf{html.c, html.h}\\
 	Contêm as funções relacionadas à manipulação e geração de arquivos HTML para consultas e listas usadas pelo programa, para automatizar o processo de escrita de dados. Atualmente, cria o começo e o fim de um arquivo HTML e escreve as informações de uma entrada no banco de dados em formato HTML.
@@ -100,6 +110,8 @@ Desde a versão anterior foi definida uma divisão dos códigos fonte para melho
 \end{itemize}
 
 \section{Arquivos gerados e existentes}\
+
+\textbf{MUST BE EDITED!!!}
 
 \begin{itemize}
  \item \textbf{doc/api/*}: Documentação da API do sistema em HTML e LaTeX.
