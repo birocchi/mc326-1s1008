@@ -8,15 +8,16 @@
 unsigned int
 hash_function (char *key)
 {
-  unsigned int retval = 0;
+  unsigned char *s = (unsigned char *)key;
+  unsigned long hash = 0x811c9dc5; /* FNV1 32-bit offset basis */
 
-  while (*key)
+  while (*s)
     {
-      retval *= 0x01000193;
-      retval ^= tolower (*key++);
+      hash *= 0x01000193; /* 32-bit FNV prime */
+      hash ^= tolower (*s++);
     }
 
-  return retval % INDEX_HASH_NUM;
+  return hash % INDEX_HASH_NUM;
 }
 
 char *
