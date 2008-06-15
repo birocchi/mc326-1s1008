@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -77,4 +78,14 @@ int
 file_is_valid (const char *filename)
 {
   return (file_exists (filename) && (file_get_size_from_name (filename) > 0));
+}
+
+int
+file_is_valid_image (const char *filename)
+{
+  const char *ext = filename + strlen (filename) - 3;
+
+  return (file_is_valid (filename) &&
+          (!strcmp (ext, "jpg") || !strcmp (ext, "gif") || !strcmp (ext, "png"))
+         );
 }

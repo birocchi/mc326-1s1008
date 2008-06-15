@@ -255,9 +255,9 @@ adapter_find (Adapter * db)
     case 's':
       read_string ("   Digite o nome da imagem de comparacao: ", key, 255);
 
-      if (!file_is_valid (key))
+      if (!file_is_valid_image (key))
         {
-          printf ("   Imagem \"%s\" invalida ou nao encontrada.", key);
+          printf ("\n   Imagem \"%s\" invalida ou nao encontrada.\n", key);
           return;
         }
 
@@ -302,14 +302,14 @@ adapter_find (Adapter * db)
       html_end (html_fp);
       fclose (html_fp);
 
-      printf ("   O resultado da busca por \"%s\" foi gravado em \"%s\".\n",
+      printf ("\n   O resultado da busca por \"%s\" foi gravado em \"%s\".\n",
               key, HTMLFILE);
 
-      if (menuYesOrNo ("   Apagar algum resultado? (s)im, (n)ao? "))
+      if (menuYesOrNo ("\n   Apagar algum resultado? (s)im, (n)ao? "))
         adapter_remove (db);
     }
   else
-    printf ("   Nao foi encontrada nenhuma obra.\n");
+    printf ("\n   Nao foi encontrada nenhuma obra.\n");
 }
 
 void
