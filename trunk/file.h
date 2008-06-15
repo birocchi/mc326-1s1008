@@ -3,6 +3,17 @@
 
 #include <stdio.h>
 
+/**
+ * @brief Checks for the existence of all files whose name have
+ *        the same prefix and end in a value between 0 and \a maxhash
+ *        and create any of them if necessary.
+ *
+ * @param prefix  The prefix shared by all files to be looked for.
+ * @param maxhash The upper interval of the suffix numbers of the files.
+ *
+ * @retval 0 All files were present, none were created.
+ * @retval 1 Some file has been created by the function.
+ */
 int file_create_if_needed (const char *prefix, size_t maxhash);
 
 /**
@@ -31,8 +42,11 @@ long file_get_size (FILE * f);
 long file_get_size_from_name (const char *filename);
 
 /**
- * \brief Checks if the file exists and is non-empty.
- * \return 0 or 1 to show if it's valid.
+ * @brief Checks if the file exists and is non-empty.
+ *
+ * @param filename The file name to check.
+ *
+ * @return 0 or 1 to show if it's valid.
  */
 int file_is_valid (const char *filename);
 
