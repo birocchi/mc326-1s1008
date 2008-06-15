@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -86,6 +87,6 @@ file_is_valid_image (const char *filename)
   const char *ext = filename + strlen (filename) - 3;
 
   return (file_is_valid (filename) &&
-          (!strcmp (ext, "jpg") || !strcmp (ext, "gif") || !strcmp (ext, "png"))
-         );
+          (!strcasecmp (ext, "jpg") || !strcasecmp (ext, "gif")
+           || !strcasecmp (ext, "png")));
 }
