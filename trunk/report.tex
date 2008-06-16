@@ -31,6 +31,9 @@ Dentre as principais alterações no código e nas funcionalidades do programa e
 \textbf{Código}:
 \begin{itemize}
 \item A estrutura \texttt{MemoryIndex} foi adaptada para ter seu conteúdo em disco dividido em diversos arquivos ao invés de apenas um. Para indicar em qual arquivo determinada entrada está, é utilizada uma função de \textit{hashing} que utiliza o nome da entrada como chave;
+\item A função \texttt{memory\_index\_load\_from\_file} foi tornada \textit{static} e renomeada para \texttt{load\_file};
+\item Implementadas funções auxiliares em \texttt{file.c} para a criação e checagem de validade de arquivos, como \texttt{file\_create\_if\_needed} e \texttt{file\_is\_valid\_image};
+\item As funções \texttt{secindex\_insert\_wrapper} e \texttt{secindex\_remove\_wrapper} foram unificadas em \texttt{secindex\_wrapper}, com o \textit{enum} \texttt{SecIndexWrapperAction} definindo a ação;
 \item Criadas uma estrutura \texttt{Descriptor} e as estruturas auxiliares \texttt{SimiliarityList} e \texttt{SimilarityRecord}, para o cadastro das informações do descritor de cada imagem do banco de dados;
 \item Boa parte do código da função \texttt{adapter\_find} foi reescrito para suportar de forma limpa e eficiente as três estruturas usadas em busca: \texttt{MemoryIndex}, \texttt{SecondaryIndex} e \texttt{Descriptor}.
 \end{itemize}
@@ -104,10 +107,10 @@ Foram criados apenas os arquivos \texttt{descriptor.c}, \texttt{descriptor.h}, \
 \item[pkfile.pk:] Arquivo de ``cache'' das chaves primárias (título das obras).
 \end{description}
 
-\section{Decisões de design}
+\section{Decisões de design}\label{designdecisions}
 Em face dos novos requisitos apresentados no enunciado deste trabalho prático, à maneira do trabalho prático anterior as primeiras atitudes tomadas foram tentar reutilizar código, encaixar as novas estruturas e os novos requisitos no código atual e, só então, criar novas estruturas.
 
-Inicialmente, foram criados os arquivos \texttt{hash.c} e \texttt{hash.h}. Pensou-se que seriam arquivos grandes, porém devido à implementação da estrutura \texttt{MemoryIndex}, não foram precisas muitas mudanças para atender o requisito de ``quebrar'' o conteúdo da estrutura em vários arquivos ao escrever seu conteúdo em disco. Assim, os arquivos \texttt{hash.c} e \texttt{hash.h} possuem apenas duas funções: uma implementação do algoritmo FNV-1 de \textit{hashing} (ver subseção abaixo) e uma função de manipulação de \textit{strings} responsável por acrescentar o sufixo certo a determinado arquivo (o sufixo ``.hNNNN''). Em \texttt{memindex.c}, foi implementada a função \textit{static} \texttt{change\_hash\_file}, responsável por, dada uma chave, carregar o arquivo onde ela está contida caso ela esteja cadastrada. Foram feitas modificações pontuais nas funções de busca, adição e remoção de entradas para que todas chamassem \texttt{change\_hash\_function} quando precisassem mudar o arquivo carregado.
+Inicialmente, foram criados os arquivos \texttt{hash.c} e \texttt{hash.h}. Pensou-se que seriam arquivos grandes, porém devido à implementação da estrutura \texttt{MemoryIndex}, não foram precisas muitas mudanças para atender o requisito de ``quebrar'' o conteúdo da estrutura em vários arquivos ao escrever seu conteúdo em disco. Assim, os arquivos \texttt{hash.c} e \texttt{hash.h} possuem apenas duas funções: uma implementação do algoritmo FNV-1 de \textit{hashing} (ver \ref{fnv1}) e uma função de manipulação de \textit{strings} responsável por acrescentar o sufixo certo a determinado arquivo (o sufixo ``.hNNNN''). Em \texttt{memindex.c}, foi implementada a função \textit{static} \texttt{change\_hash\_file}, responsável por, dada uma chave, carregar o arquivo onde ela está contida caso ela esteja cadastrada. Foram feitas modificações pontuais nas funções de busca, adição e remoção de entradas para que todas chamassem \texttt{change\_hash\_function} quando precisassem mudar o arquivo carregado. A quantidade de arquivos de hash em que o índice deve ser dividido é a constante \texttt{INDEX\_HASH\_NUM}, definida em \texttt{filelist.h}. Editanto-a e executando-se \texttt{make clean}, é possível alterar o número de arquivos em que cada índice secundário ou primário (com exceção do descritor) será dividido.
 
 Percebeu-se que o índice de descritores possuía grande semelhança com a estrutura atual de índices secundários, \texttt{SecondaryIndex}. Assim, a idéia inicial foi tentar criar apenas mais um índice secundário como os já existentes (ano, autor, tipo e título) que conteria o descritor e o nome da obra correspondente (a chave primária).
 
@@ -115,18 +118,24 @@ Entretanto, embora o índice de descritores apresente similaridades com relaçã
 
 Assim, foram criadas as estruturas \texttt{Descriptor}, \texttt{SimilarityList} e \texttt{SimilarityRecord}, que têm sua estrutura semelhante à de \texttt{MemoryIndex} e \texttt{MemoryRecord}, porém com comportamento diferente principalmente na inserção e busca de dados. As novas estruturas foram implementadas nos arquivos \texttt{descriptor.c} e \texttt{descriptor.h}, que também possuem uma função \textit{static} \texttt{change\_hash\_file} com implementação adaptada às necessidades das novas estruturas.
 
-\subsection{Função de hashing FNV-1}
-Para o \textit{hashing} dos índices secundários e do índice primário, foi utilizado o algoritmo FNV-1, de Fowler/Noll/Vo.
+\subsection{Função de hashing FNV-1}\label{fnv1}
+Para o \textit{hashing} dos índices secundários e do índice primário, foi utilizado o algoritmo FNV-1, criado por Glenn Fowler, Landon Curt Noll e Phong Vo. Trata-se de um algoritmo de \textit{hashing} bastante simples, porém muito eficiente.
+
+Começa-se atribuindo a uma variável \textit{hash} o valor de \textit{offset\_basis}. Então, para cada byte da entrada, multiplica-se o valor de \textit{hash} por um \textit{primo FNV}, e depois realiza-se uma operação XOR com o mesmo \textit{hash}. Na implementação do algoritmo neste trabalho, o resultado final de \textit{hash} é retornado após um \textit{mod} com a constante \texttt{INDEX\_HASH\_NUM}, que contém a quantidade de arquivos em que cada índice foi dividida.
+
+\textit{offset\_basis} e o \textit{primo FNV} são constantes dependentes do número de bits do hash final. Nesta implementação, \textit{hash} é um \texttt{unsigned int} com 32 bits de tamanho (não foram realizados testes com o programa rodando num sistema de 64 bits, mas a implementação deve continuar funcionando). Para um hash de 32 bits, o algoritmo indica o valor 2166136261 como \textit{offset\_basis} e o primo 16777619 como \textit{primo FNV}. O valor de \textit{offset\_basis} é o resultado do hash da string ``chongo $<$Landon Curt Noll$>$ /\textbackslash../\textbackslash'' com o algoritmo FNV-0, uma versão anterior do algoritmo que assumia \textit{offset\_basis} = 0. A escolha dos valores do \textit{primo FNV} não é descrita em detalhes por Noll, que diz, em sua página:
+
+\begin{quote}
+The theory behind which primes make good FNV\_primes is beyond the scope of this webpage.
+\end{quote}
 
 \section{Resultado final e comentários}
-Conseguimos fazer um programa sem bugs conhecidos e sem vazamentos de memória encontrados. As consultas e remoções funcionam corretamente de acordo com os requisitos mínimos do trabalho prático.
+Rodando o Valgrind no binário \textit{tp4} sem o uso do \textit{Electric Fence}, não foram constatados erros ou vazamentos de memória. A consulta por similaridade e a divisão dos índices em vários arquivos funcionam como esperado.
 
-Para controle de versões do código, desde o primeiro trabalho é utilizado o \textbf{Subversion}. O repositório do grupo encontra-se em \textit{http://code.google.com/p/mc326-1s1008}. A partir da versão passada, passou-se a utilizar o \textit{Doxygen} para geração de documentação do código-fonte. Por fim, este relatório e seu fonte em LaTeX encontram-se na pasta dos fontes do programa.
+Para controle de versões do código, desde o primeiro trabalho é utilizado o \textbf{Subversion}. O repositório do grupo encontra-se em \textit{http://code.google.com/p/mc326-1s1008}. A partir do segundo trabalho prático, passou-se a utilizar o \textit{Doxygen} para geração de documentação do código-fonte. Por fim, este relatório e seu fonte em LaTeX encontram-se na pasta dos fontes do programa.
 
-As maiores dificuldades foram encontradas durante o planejamento da implementação das novas funcionalidades do sistema. Foi somente quando parte da estrutura já havia sido implementada que percebeu-se que era possível criar \texttt{MemoryIndex}, e parte do código teve de ser reescrito. Além disso, o código de \textit{adapter.c} ficou maior do que o esperado devido a detalhes do código, como o carregamento correto dos arquivos e a independência das funções. Entretanto, o uso da função \texttt{assert} facilitou a detecção de erros de segmentação e o \textit{gdb} permitiu que o código fosse debugado rapidamente. Pela primeira vez durante os testes foi utilizado o \textit{bug tracker} do projeto no Google Code para o gerenciamento de bugs e correções.
+O tempo de implementação deste trabalho foi consideravelmente menor que o gasto para o trabalho prático anterior, em parte devido ao fato das principais estruturas do programa (os índices de memória) e o \textit{Adapter} já estarem consolidados e não terem sofrido grandes alterações. Ainda assim, como evidenciado na seção \ref{designdecisions}, gastou-se muito esforço tentando unificar o índice de descritores e \texttt{MemoryIndex}, sem grandes sucessos. Futuramente, espera-se reusar mais código nessas duas estruturas.
 
-Um detalhe que deve ser notado é o uso das funções \textit{fread} e \textit{fwrite} para leitura e escrita dos NRRs dos índices primários e secundários. Como eles são inteiros, caso fossem escritos com \textit{fprintf} e lidos com \textit{fgets} os 4 bytes seriam ocupados por uma seqüência de bytes em que a conversão de inteiros para strings foi feita de forma literal. Assim, o inteiro -1 seria escrito como ``-001` e não 0xFFFFFFFF. Isso diminui consideravelmente a quantidade possível de inteiros que poderiam ser escritos, além de causar uma corrupção nos arquivos caso o inteiro tivesse mais que 4 dígitos. Para campos string, continuou-se usando \textit{fprintf} e \textit{fgets}.
-
-Finalmente, para os próximos trabalhos pretende-se trabalhar nas idéias presentes no arquivo TODO: renomear algumas funções de \textit{base.c} e mexer na estrutura de \textit{ArtworkInfo} se necessário, além de criar um ''wrapper`` para a função \texttt{fopen} para diminuir algumas linhas de código fazendo-se a checagem da abertura dos arquivos automaticamente e uma automatização da leitura da estrutura nome e NRR.
+Como não houve grandes alterações estruturais no programa, não foram encontrados tantos bugs como anteriormente. Em relação ao sistema de controle de versões, foram criados \textit{branches} para os trabalhos práticos 2 e 3, e quando havia \textit{bug fixes} importantes para alguma das versões, eles eram inseridos nos branches, possibilitando a reentrega desses trabalhos com as alterações sugeridas em correções anteriores.
 
 \end{document}
