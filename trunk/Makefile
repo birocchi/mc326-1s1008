@@ -14,7 +14,6 @@ OFILES=adapter.o avail.o base.o descriptor.o file.o io.o hash.o html.o main.o me
 
 TP=tp4
 BASE=base01.dat
-BASEBACKUP=base01.dat.back
 
 .PHONY: all clean
 
@@ -66,5 +65,4 @@ secindex.o: secindex.c secindex.h
 	$(CC) $(CFLAGS) $<
 
 clean:
-	cp -v $(BASE) $(BASEBACKUP) ; \
-	rm -rf doc/ *.o $(TP) $(BASE) *.av descriptor.desc* *.sk.h* *.sl pkfile.pk.h* ;
+	rm -rf doc/ *.o $(TP) *.av descriptor.desc* *.sk.h* *.sl pkfile.pk.h*
