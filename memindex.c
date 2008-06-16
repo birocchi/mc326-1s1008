@@ -137,6 +137,7 @@ inflate_list (MemoryIndex * index, size_t size)
 
   assert (index);
 
+  /* If the list is empty, allocate 20 blocks */
   if (size == 0)
     size = 20;
 
