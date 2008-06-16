@@ -292,7 +292,7 @@ adapter_find (Adapter * db)
           maxresults = atoll (strmaxresults);
 
           for (i = 0; (i < maxresults) && (i < simlist->regnum); i++)
-            html_write_record_info (html_fp, &(simlist->list[i].artwork));
+            base_read_artwork_write_html (db->base, html_fp, simlist->list[i].rrn);
 
           simlist_free (simlist);
 

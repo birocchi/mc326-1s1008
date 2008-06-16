@@ -13,8 +13,8 @@
  */
 typedef struct
 {
-  ArtworkInfo artwork;
   double similarity;
+  int rrn;
 } SimilarityRecord;
 
 /**
