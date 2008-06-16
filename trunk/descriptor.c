@@ -17,10 +17,10 @@
  * @brief Appends an entry to the similarity list.
  *
  * @param simlist The similarity list being used.
- * @param artwork The artwork to append.
+ * @param rrn     The RRN of the record in the base.
  * @param sim     The similarity to a given image.
  */
-static void simlist_append (SimilarityList * simlist, ArtworkInfo artwork,
+static void simlist_append (SimilarityList * simlist, int rrn,
                             double sim);
 
 /**
@@ -63,12 +63,12 @@ static void change_hash_file (Descriptor * desc, unsigned int hashnum);
 static unsigned int descriptor_hash (unsigned char key);
 
 static void
-simlist_append (SimilarityList * simlist, ArtworkInfo artwork, double sim)
+simlist_append (SimilarityList * simlist, int rrn, double sim)
 {
   if (simlist->regnum == simlist->maxregs)
     simlist_inflate (simlist, simlist->maxregs * 2);
 
-  simlist->list[simlist->regnum].artwork = artwork;
+  simlist->list[simlist->regnum].rrn = rrn;
   simlist->list[simlist->regnum].similarity = sim;
 
   simlist->regnum++;
@@ -145,7 +145,7 @@ descriptor_hash (unsigned char key)
 
 SimilarityList * descriptor_find (Descriptor *desc, Base *base, MemoryIndex *pk, char *imgname)
 {
-  ArtworkInfo artwork;
+  char baseimg[IMG_LENGTH + 1] = { '\0' };
   char *imgpath;
   char pkname[TITLE_LENGTH + 1] = { '\0' };
   int i;
@@ -184,10 +184,12 @@ SimilarityList * descriptor_find (Descriptor *desc, Base *base, MemoryIndex *pk,
 
               if (match)
                 {
-                  base_read_artwork_record_with_rrn (base, &artwork, match->rrn);
+                  /* Seek to the image name in the entry */
+                  fseek (base->fp, (match->rrn * BASE_REG_SIZE) + (BASE_REG_SIZE - IMG_LENGTH), SEEK_SET);
+                  fgets (baseimg, IMG_LENGTH + 1, base->fp);
 
-                  imgpath = base_get_image_path (artwork.img);
-                  simlist_append (simlist, artwork,
+                  imgpath = base_get_image_path (baseimg);
+                  simlist_append (simlist, match->rrn,
                                   ComputaSimilaridade (imgpath, imgname));
                   free (imgpath);
                 }
