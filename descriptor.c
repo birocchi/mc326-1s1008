@@ -127,6 +127,52 @@ change_hash_file (Descriptor * desc, unsigned int hashnum)
     }
 }
 
+<<<<<<< .mine
+static void
+find_similarities (Descriptor * desc, SimilarityList * simlist, char *imgname,
+                   unsigned char ds, MemoryIndex * pk, FILE * base_fp,
+                   int hashnum)
+{
+  unsigned char di;
+  char *imgpath = NULL;
+  char pkname[TITLE_LENGTH + 1] = {'\0'};
+  char imgfile[IMG_LENGTH + 1] = {'\0'};
+  MemoryIndexRecord *match;
+
+  if ((hashnum < 0) || (hashnum >= DESC_HASH_NUM))
+    return;
+
+  change_hash_file (desc, hashnum);
+
+  fseek (desc->fp, 0, SEEK_SET);
+
+  while (!feof (desc->fp))
+    {
+      di = fgetc (desc->fp);
+      fgets (pkname, TITLE_LENGTH + 1, desc->fp);
+      stripWhiteSpace (pkname);
+
+      if (descriptor_hash (di ^ ds) <= 2)
+        {
+          match = memory_index_find (pk, pkname);
+
+          if (match)
+            {
+              fseek (base_fp, (match->rrn * BASE_REG_SIZE) +
+                     (BASE_REG_SIZE - IMG_LENGTH), SEEK_SET);
+
+              fgets (imgfile, IMG_LENGTH + 1, base_fp);
+
+              imgpath = base_get_image_path (imgfile);
+              simlist_append (simlist, imgfile, ComputaSimilaridade (imgpath, imgname));
+              free (imgpath);
+            }
+        }
+    }
+}
+
+=======
+>>>>>>> .r506
 static unsigned int
 descriptor_hash (unsigned char key)
 {
@@ -145,9 +191,15 @@ descriptor_hash (unsigned char key)
 
 SimilarityList * descriptor_find (Descriptor *desc, Base *base, MemoryIndex *pk, char *imgname)
 {
+<<<<<<< .mine
+  char *imgpath = NULL;
+  unsigned char ds;
+  SimilarityList *simlist = NULL;
+=======
   ArtworkInfo artwork;
   char *imgpath;
   char pkname[TITLE_LENGTH + 1] = { '\0' };
+>>>>>>> .r506
   int i;
   MemoryIndexRecord *match;
   SimilarityList *simlist = simlist_new ();
@@ -156,6 +208,7 @@ SimilarityList * descriptor_find (Descriptor *desc, Base *base, MemoryIndex *pk,
 
   assert (file_is_valid (imgname));
 
+  simlist = simlist_new ();
   ds = CalculaDescritor (imgname);
   curload = descriptor_hash (ds);
 
