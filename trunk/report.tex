@@ -66,7 +66,7 @@ Em relação à versão anterior do trabalho, não foram feitas grandes alteraç
 Foram criados apenas os arquivos \texttt{descriptor.c}, \texttt{descriptor.h}, \texttt{hash.c} e \texttt{hash.h}, enquanto os outros arquivos presentes tiveram apenas algumas funcionalidades editadas. Nenhum arquivo de código da versão anterior foi removido. Atualmente, os seguintes arquivos compõem o programa:
 
 \begin{description}
-\item[adapter.c, adapter.h:] \textit{Design pattern} utilizada como uma espécie de ``cola'' entre as diversas partes do sistema: coordena índices e base para buscas, remoções e inserções.
+\item[adapter.c, adapter.h:] \textit{Design pattern}\cite{adapterwiki} utilizada como uma espécie de ``cola'' entre as diversas partes do sistema: coordena índices e base para buscas, remoções e inserções.
 
 \item[avail.c, avail.h:] Contêm as funções referentes à manipulação das avail lists usadas pelos índices e pela base de dados.
 
@@ -119,7 +119,7 @@ Entretanto, embora o índice de descritores apresente similaridades com relaçã
 Assim, foram criadas as estruturas \texttt{Descriptor}, \texttt{SimilarityList} e \texttt{SimilarityRecord}, que têm sua estrutura semelhante à de \texttt{MemoryIndex} e \texttt{MemoryRecord}, porém com comportamento diferente principalmente na inserção e busca de dados. As novas estruturas foram implementadas nos arquivos \texttt{descriptor.c} e \texttt{descriptor.h}, que também possuem uma função \textit{static} \texttt{change\_hash\_file} com implementação adaptada às necessidades das novas estruturas.
 
 \subsection{Função de hashing FNV-1}\label{fnv1}
-Para o \textit{hashing} dos índices secundários e do índice primário, foi utilizado o algoritmo FNV-1, criado por Glenn Fowler, Landon Curt Noll e Phong Vo. Trata-se de um algoritmo de \textit{hashing} bastante simples, porém muito eficiente.
+Para o \textit{hashing} dos índices secundários e do índice primário, foi utilizado o algoritmo FNV-1, criado por Glenn Fowler, Landon Curt Noll e Phong Vo\cite{fnv1ref,fnv1wiki}. Trata-se de um algoritmo de \textit{hashing} bastante simples, porém muito eficiente.
 
 Começa-se atribuindo a uma variável \textit{hash} o valor de \textit{offset\_basis}. Então, para cada byte da entrada, multiplica-se o valor de \textit{hash} por um \textit{primo FNV}, e depois realiza-se uma operação XOR com o mesmo \textit{hash}. Na implementação do algoritmo neste trabalho, o resultado final de \textit{hash} é retornado após um \textit{mod} com a constante \texttt{INDEX\_HASH\_NUM}, que contém a quantidade de arquivos em que cada índice foi dividida.
 
@@ -132,10 +132,17 @@ The theory behind which primes make good FNV\_primes is beyond the scope of this
 \section{Resultado final e comentários}
 Rodando o Valgrind no binário \textit{tp4} sem o uso do \textit{Electric Fence}, não foram constatados erros ou vazamentos de memória. A consulta por similaridade e a divisão dos índices em vários arquivos funcionam como esperado.
 
-Para controle de versões do código, desde o primeiro trabalho é utilizado o \textbf{Subversion}. O repositório do grupo encontra-se em \textit{http://code.google.com/p/mc326-1s1008}. A partir do segundo trabalho prático, passou-se a utilizar o \textit{Doxygen} para geração de documentação do código-fonte. Por fim, este relatório e seu fonte em LaTeX encontram-se na pasta dos fontes do programa.
+Para controle de versões do código, desde o primeiro trabalho é utilizado o \textbf{Subversion}. O repositório do grupo encontra-se no Google Code\cite{googlecode}. A partir do segundo trabalho prático, passou-se a utilizar o \textit{Doxygen} para geração de documentação do código-fonte. Por fim, este relatório e seu fonte em LaTeX encontram-se na pasta dos fontes do programa.
 
 O tempo de implementação deste trabalho foi consideravelmente menor que o gasto para o trabalho prático anterior, em parte devido ao fato das principais estruturas do programa (os índices de memória) e o \textit{Adapter} já estarem consolidados e não terem sofrido grandes alterações. Ainda assim, como evidenciado na seção \ref{designdecisions}, gastou-se muito esforço tentando unificar o índice de descritores e \texttt{MemoryIndex}, sem grandes sucessos. Futuramente, espera-se reusar mais código nessas duas estruturas.
 
 Como não houve grandes alterações estruturais no programa, não foram encontrados tantos bugs como anteriormente. Em relação ao sistema de controle de versões, foram criados \textit{branches} para os trabalhos práticos 2 e 3, e quando havia \textit{bug fixes} importantes para alguma das versões, eles eram inseridos nos branches, possibilitando a reentrega desses trabalhos com as alterações sugeridas em correções anteriores.
+
+\begin{thebibliography}{99}
+\bibitem{adapterwiki} http://en.wikipedia.org/wiki/Adapter\_pattern
+\bibitem{fnv1ref} http://isthe.com/chongo/tech/comp/fnv
+\bibitem{fnv1wiki} http://en.wikipedia.org/wiki/Fowler\_Noll\_Vo\_hash
+\bibitem{googlecode} http://code.google.com/p/mc326-1s1008
+\end{thebibliography}
 
 \end{document}
