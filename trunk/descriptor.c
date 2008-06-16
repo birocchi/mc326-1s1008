@@ -93,8 +93,9 @@ simlist_inflate (SimilarityList * simlist, size_t newsize)
 {
   SimilarityRecord *tmp;
 
+  /* If the list is empty, allocate 20 blocks */
   if (newsize == 0)
-    newsize = 50;
+    newsize = 20;
 
   if (newsize > simlist->maxregs)
     {
