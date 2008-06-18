@@ -244,7 +244,7 @@ memory_index_insert (MemoryIndex * index, char *name, int rrn)
 }
 
 MemoryIndex *
-memory_index_new (const char *fp_name, unsigned int (*hash_func) (char *))
+memory_index_new (const char *fp_name)
 {
   MemoryIndex *index = MEM_ALLOC (MemoryIndex);
 
@@ -255,7 +255,7 @@ memory_index_new (const char *fp_name, unsigned int (*hash_func) (char *))
   index->fp_name = str_dup (fp_name);
 
   index->loaded_file = -1;
-  index->hash_function = hash_func;
+  index->hash_function = fnv1_hash;
 
   return index;
 }

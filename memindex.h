@@ -76,8 +76,7 @@ void memory_index_insert (MemoryIndex * index, char *name, int rrn);
  * This is a wrapper around \a memory_index_new_with_hash, using
  * \a hash_function as the hash function.
  */
-MemoryIndex *memory_index_new (const char *fp_name,
-                               unsigned int (*hash_func) (char *));
+MemoryIndex *memory_index_new (const char *fp_name);
 
 /**
  * @brief Removes the specified entry from the index.
