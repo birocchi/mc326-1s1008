@@ -135,7 +135,7 @@ base_read_input (ArtworkInfo * info)
           strncpy (info->img, GROUP_NUMBER, 2);
           strncpy (info->img + 2, img, (IMG_LENGTH - 2) + 1);
 
-          if (!file_is_valid (info->img))
+          if (!is_valid_identifier (info->img))
             {
               printf ("   Imagem \"%s\" nao encontrada.\n", info->img);
               continue;
