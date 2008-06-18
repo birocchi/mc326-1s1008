@@ -29,7 +29,7 @@ char *
 hash_get_filename (const char *prefix, unsigned int hashnum,
                    unsigned int maxhash)
 {
-  char filename[MAX_FILE_LENGHT];
+  char filename[MAX_FILE_LENGTH];
   int count;
 
   assert (hashnum < maxhash);
