@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include "avail.h"
 #include "base.h"
 #include "file.h"
@@ -29,8 +30,8 @@ is_valid_identifier (const char *name)
   /* Checking the extension, length, etc.. */
   i = strtol (name, &endptr, 10);
   if ((endptr == name) || (endptr == '\0') || strlen (endptr) != 3
-      || ((strncmp (endptr, "jpg", 3)) && strncmp (endptr, "gif", 3)
-          && (strncmp (endptr, "png", 3))))
+      || ((strcasecmp (endptr, "jpg")) && strcasecmp (endptr, "gif")
+          && (strcasecmp (endptr, "png"))))
     return 1;
   else
     return 0;
