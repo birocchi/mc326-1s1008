@@ -221,6 +221,7 @@ secindex_wrapper (char *str, va_list ap)
       break;
     case WRAPPER_REMOVE:
       secondary_index_remove (secindex, str, pk_value);
+      break;
     }
 }
 
