@@ -8,7 +8,7 @@
  *
  * @return The result of the hash function modulo \a INDEX_HASH_NUM. 
  */
-unsigned int hash_function (char *key);
+unsigned int fnv1_hash (char *key);
 
 /**
  * @brief Returns a name with the ".hXXXX" suffix appended to it.
