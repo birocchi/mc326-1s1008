@@ -138,11 +138,14 @@ O tempo de implementação deste trabalho foi consideravelmente menor que o gast
 
 Como não houve grandes alterações estruturais no programa, não foram encontrados tantos bugs como anteriormente. Em relação ao sistema de controle de versões, foram criados \textit{branches} para os trabalhos práticos 2 e 3, e quando havia \textit{bug fixes} importantes para alguma das versões, eles eram inseridos nos branches, possibilitando a reentrega desses trabalhos com as alterações sugeridas em correções anteriores.
 
+Por último, os cálculos de similaridade e descritor foram feitos com o auxílio de uma biblioteca auxiliar, \textit{libimg}\cite{libimg}. Durante o desenvolvimento do programa, foi utilizada a versão 2 da biblioteca. Alguns problemas apresentados pela biblioteca, como um vazamento de memória ou o uso de comentários em estilo C++ num programa compilado como ANSI C, foram corrigidos antes do lançamento da versão 3 da biblioteca, que corrigia justamente esses problemas. As soluções são idênticas, mas com formatação diferente - daí o resultado de um \texttt{diff} apontar algumas linhas não idênticas.
+
 \begin{thebibliography}{99}
 \bibitem{adapterwiki} http://en.wikipedia.org/wiki/Adapter\_pattern
 \bibitem{fnv1ref} http://isthe.com/chongo/tech/comp/fnv
 \bibitem{fnv1wiki} http://en.wikipedia.org/wiki/Fowler\_Noll\_Vo\_hash
 \bibitem{googlecode} http://code.google.com/p/mc326-1s1008
+\bibitem{libimg} http://www.students.ic.unicamp.br/~ra015988/libimg3.zip
 \end{thebibliography}
 
 \end{document}
