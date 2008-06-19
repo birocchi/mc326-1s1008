@@ -12,13 +12,8 @@ CFLAGS=-c -Wall -g -ansi -pedantic
 LDFLAGS=-ljpeg -lungif -lpng
 OFILES=adapter.o avail.o base.o descriptor.o file.o io.o hash.o html.o main.o mem.o memindex.o menu.o secindex.o libimg.o
 
-<<<<<<< .working
 TP=tp4
 BASE=base01.dat
-=======
-IMG:
-	gcc -Wall -g -c libimg.c -ansi -Wall -pedantic
->>>>>>> .merge-right.r536
 
 .PHONY: all clean
 
