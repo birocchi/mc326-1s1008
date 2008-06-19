@@ -1,3 +1,4 @@
+
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
@@ -7,7 +8,7 @@
 #include "libimg.h"
 #include <math.h>
 
-unsigned char CalculaDescritor(char* NomeImagem)
+char CalculaDescritor(char* NomeImagem)
 {
   unsigned char descritor=0;
   Hist h;
@@ -89,7 +90,7 @@ unsigned char CalculaDescritor(char* NomeImagem)
   if (cmb>128)
     descritor|=0x01;
 
-  libera_memoria (&im);
+  libera_memoria(&im);
 
   return descritor;
 }
@@ -144,6 +145,7 @@ NHist NormalizaHistograma(Hist h)
   NHist resposta;
   int i;
   sr=sg=sb=0;
+
   for (i=0;i<256;i++)
     {
       sr+=h.r[i];
@@ -187,7 +189,8 @@ char* strlwr( char* str ){ /*Transforma os caracteres alfabeticos maiusculos em 
   return str;
 }
 
-int InterlacedOffset[] = { 0, 4, 2, 1 }, InterlacedJumps[] = { 8, 8, 4, 2 }; /* GIF - Para ler imagem interlaced */
+int InterlacedOffset[] = { 0, 4, 2, 1 }, InterlacedJumps[] = { 8, 8, 4, 2 }; 
+/* GIF - Para ler imagem interlaced*/
 
 void libera_memoria(Imagem** im)
 {
@@ -427,26 +430,26 @@ Imagem* le_gif(char *arquivo) {
      return 0;
    }
    
-   if ((oBuffer = (GifRowType *) malloc(oGif->SHeight * sizeof(GifRowType *))) == NULL) /* Aloca a memoria necessaria para as linhas e colunas */
+   if ((oBuffer = (GifRowType *) malloc(oGif->SHeight * sizeof(GifRowType *))) == NULL) /* Aloca a memoria necessaria para as linhas e colunas*/
       printf("Nao foi possivel alocar a memoria necessaria.");
 
-   Tamanho = oGif->SWidth * sizeof(GifPixelType); /* Tamanho em bytes de uma linha */
-   if ((oBuffer[0] = (GifRowType) malloc(Tamanho)) == NULL) /* Aloca a primeira linha separadamente para facilitar a copia da cor de fundo */
+   Tamanho = oGif->SWidth * sizeof(GifPixelType); /* Tamanho em bytes de uma linha*/
+   if ((oBuffer[0] = (GifRowType) malloc(Tamanho)) == NULL) /* Aloca a primeira linha separadamente para facilitar a copia da cor de fundo*/
       printf("Nao foi possivel alocar a memoria necessaria.");
 
-   for (i = 0; i < oGif->SWidth; i++) oBuffer[0][i] = oGif->SBackGroundColor; /* Seta a cor da primeira linha para a cor do fundo */
-   for (i = 1; i < oGif->SHeight; i++) {  /* Aloca as demais linhas ja com a cor do fundo */
+   for (i = 0; i < oGif->SWidth; i++) oBuffer[0][i] = oGif->SBackGroundColor; /* Seta a cor da primeira linha para a cor do fundo*/
+   for (i = 1; i < oGif->SHeight; i++) {  /* Aloca as demais linhas ja com a cor do fundo*/
 	  if ((oBuffer[i] = (GifRowType) malloc(Tamanho)) == NULL) printf("Nao foi possivel alocar a memoria necessaria.");
 	  memcpy(oBuffer[i], oBuffer[0], Tamanho);
    }
 
-   do { /* Inicia o tratamento do arquivo */
-      if (DGifGetRecordType(oGif, &RecordType) == GIF_ERROR) { /* Obtem o record type do bloco atual */
+   do { /*/ Inicia o tratamento do arquivo*/
+     if (DGifGetRecordType(oGif, &RecordType) == GIF_ERROR) { /* Obtem o record type do bloco atual*/
          PrintGifError();
          return 0;
       }
       switch (RecordType) {
-         case IMAGE_DESC_RECORD_TYPE: /* Bloco de informacoes da imagem */
+      case IMAGE_DESC_RECORD_TYPE: /* Bloco de informacoes da imagem*/
             if (DGifGetImageDesc(oGif) == GIF_ERROR) {
    		       PrintGifError();
    		       return 0;
@@ -454,7 +457,7 @@ Imagem* le_gif(char *arquivo) {
             Lin = oGif->Image.Top;
             Col = oGif->Image.Left;
 			
-            if (oGif->Image.Interlace) { /* Imagem em modo Interlaced precisa ser passada 4 vezes */
+            if (oGif->Image.Interlace) { /* Imagem em modo Interlaced precisa ser passada 4 vezes*/
                for (i = 0; i < 4; i++)
                   for (j = Lin + InterlacedOffset[i]; j < Lin + oGif->SWidth; j += InterlacedJumps[i]) {
                      if (DGifGetLine(oGif, &oBuffer[j][Col], oGif->SWidth) == GIF_ERROR) {
@@ -462,7 +465,7 @@ Imagem* le_gif(char *arquivo) {
                         return 0;
                      }
    			   }
-            } else { /* Imagem em modo Normal */
+			   } else { /* Imagem em modo Normal*/
                for (i = 0; i < oGif->SHeight; i++) {
                   if (DGifGetLine(oGif, &oBuffer[Lin++][Col], oGif->SWidth) == GIF_ERROR) {
                      PrintGifError();
@@ -471,7 +474,7 @@ Imagem* le_gif(char *arquivo) {
                }
             }
             break;
-   	   case EXTENSION_RECORD_TYPE: /* Desconsidera qualquer bloco Extension na imagem */
+	    case EXTENSION_RECORD_TYPE: /* Desconsidera qualquer bloco Extension na imagem*/
             if (DGifGetExtension(oGif, &ExtCode, &Extension) == GIF_ERROR) {
                PrintGifError();
                return 0;
@@ -494,7 +497,7 @@ Imagem* le_gif(char *arquivo) {
 
    resul = criar_img( oGif->SWidth,  oGif->SHeight, 3 );
 
-   for (i = 0; i < resul->h; i++) { /* Guarda os Pixels na struct Imagem */
+   for (i = 0; i < resul->h; i++) { /* Guarda os Pixels na struct Imagem*/
       for (j = 0; j < resul->w; j++) {
          MapaCores = &Mapa->Colors[oBuffer[i][j]];
 	 	escreve_pixel(resul,j,i,MapaCores->Red,MapaCores->Green,MapaCores->Blue);
