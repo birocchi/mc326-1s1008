@@ -15,7 +15,7 @@ unsigned int fnv1_hash (char *key);
  *
  * @param prefix  The base filename.
  * @param hashnum The number to append to the filename.
- * @param maxhash The maximum acceptable value for \ahashum.
+ * @param maxhash The maximum acceptable value for \a hashum.
  *
  * @return The filename with the suffix appended to it.
  *
