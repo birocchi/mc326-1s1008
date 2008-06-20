@@ -95,7 +95,7 @@ char *str_dup (const char *s);
 void str_foreach (char *str, void (*callback) (char *, va_list), ...);
 
 /**
- * @brief Returns the concatenation of \a and \b.
+ * @brief Returns the concatenation of \a a and \a b.
  *
  * @param a The first string.
  * @param b The second string.
