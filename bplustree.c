@@ -15,14 +15,14 @@ B+Tree * getNewB+Tree(){
 
 /* Return a pointer to a new allocated Node. */
 /* Also allocates the arrays inside the Node. */
-Node * getNewNode(int n) {
+Node * getNewNode() {
   Node * new_node;
   
   new_node = (Node*)malloc(sizeof(Node));
   
   if (new_node) {
-    new_node->keys = (int*)malloc(sizeof(int) * n);
-    new_node->pointers = (int*)malloc(sizeof(int) * (n + 1));
+    new_node->keys = (int*)malloc(sizeof(int) * B_ORDER);
+    new_node->pointers = (int*)malloc(sizeof(int) * (B_ORDER + 1));
   }
 
   return new_node;

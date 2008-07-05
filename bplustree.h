@@ -1,3 +1,6 @@
+#define B_ORDER 5  /*Order of the B+ Tree*/
+#define MIN_SIZE (B_ORDER)/2  /*Minimun size of the node*/
+
 
 /* The struct that represents the B+ Tree*/
 typedef struct{
