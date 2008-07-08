@@ -22,8 +22,8 @@ typedef struct
   unsigned int left;
   unsigned int right;
 
-  unsigned int *keys;
-  unsigned int *values;
+  int *keys;
+  int *values;
 } BPNode;
 
 static unsigned int
@@ -138,23 +138,62 @@ bpnode_get_type (BPNode *node)
   return node->type;
 }
 
-void
-bpnode_insert (BPTree *tree, int key, int value)
+BPNode *
+find_leaf_node (BPNode *node, int key)
 {
+  BPNode *ret = node, *tmpnode;
   unsigned int pos;
 
-  if (bptree_is_leaf (tree))
-    {
-      if (!is_duplicate (tree, key))
-        {
-          pos = get_position_for (tree, key);
-          shift_right (tree, pos);
+  bpassert (node);
 
-          tree->keys[pos] = key;
-          tree->values[pos] = value;
-          tree->keycount++;
-        }
+  if (bpnode_is_leaf (node))
+    return node;
+  else
+    {
+      pos = get_position_for (node, key);
+      tmpnode = bpnode_unmarshal (node->values[pos]);
+      ret = find_leaf_node (tmpnode, key);
+      bpnode_free (tmpnode);
     }
+
+  return ret;
+}
+
+int
+bpnode_insert (BPNode *node, int key, int value)
+{
+  int child_overflow = 0, has_overflowed = 0;
+  unsigned int pos;
+
+  if (bpnode_is_leaf (node))
+    {
+      pos = get_position_for (node, key);
+
+      if ((pos > 0) && (node->keys[pos-1] == key))
+        return 0;
+
+      shift_right (node, pos);
+
+      node->keys[pos] = key;
+      node->values[pos] = value;
+      node->usedsize++;
+
+      if (bpnode_is_full (node))
+        has_overflowed = 1;
+    }
+  else
+    {
+      leafnode = find_leaf_node (node, key);
+      pos = get_position_for (node, key);
+    }
+
+  return has_overflowed;
+}
+
+int
+bpnode_is_full (BPNode *node)
+{
+  return bpnode_get_maxsize (node) == bpnode_get_maxsize (node);
 }
 
 int
@@ -185,14 +224,63 @@ bpnode_marshal (BPNode *node)
 
   /* Variable-length information */
   for (i = 0; i < usedsize; i++)
-    fwrite (&(node->keys[i]), sizeof (unsigned int), 1, fp);
+    fwrite (&(node->keys[i]), sizeof (int), 1, fp);
 
   for (i = 0; i < usedsize; i++)
-    fwrite (&(node->values[i]), sizeof (unsigned int), 1, fp);
+    fwrite (&(node->values[i]), sizeof (int), 1, fp);
 
   /* In case it's not a leaf node, write the last pointer */
   if (!bpnode_is_leaf (node))
-    fwrite (&(node->values[usedsize]), sizeof (unsigned int), 1, fp);
+    fwrite (&(node->values[usedsize]), sizeof (int), 1, fp);
+
+  fclose (fp);
+}
+
+static char *
+make_node_name (unsigned int id)
+{
+  char filename[MAX_FILENAME_LENGTH];
+  int count;
+
+  count = sprintf (filename, "%u.bpx", id);
+  bpassert (count <= MAX_FILENAME_LENGTH);
+
+  return str_dup (filename);
+}
+
+BPNode *
+bpnode_unmarshal (unsigned int id)
+{
+  char *fp_name;
+  FILE *fp;
+  unsigned int maxsize, usedsize;
+
+  fp_name = make_node_name (id);
+
+  bpassert (file_is_valid (aaa));
+
+  fp = fopen (bpnode_get_filename (node), "w");
+  bpassert (fp);
+
+  usedsize = bpnode_get_usedsize (node);
+
+  /* Write header (fixed-size information) */
+  fputc (bpnode_get_type (node), fp);
+  fwrite (&(bpnode_get_maxsize (node)), sizeof (unsigned int), 1, fp);
+  fwrite (&usedsize, sizeof (unsigned int), 1, fp);
+  fwrite (&(bpnode_get_left_node (node)), sizeof (unsigned int), 1, fp);
+  fwrite (&(bpnode_get_right_node (node)), sizeof (unsigned int), 1, fp);
+
+  /* Variable-length information */
+  for (i = 0; i < usedsize; i++)
+    fwrite (&(node->keys[i]), sizeof (int), 1, fp);
+
+  for (i = 0; i < usedsize; i++)
+    fwrite (&(node->values[i]), sizeof (int), 1, fp);
+
+  /* In case it's not a leaf node, write the last pointer */
+  if (!bpnode_is_leaf (node))
+    fwrite (&(node->values[usedsize]), sizeof (int), 1, fp);
 
   fclose (fp);
 }
