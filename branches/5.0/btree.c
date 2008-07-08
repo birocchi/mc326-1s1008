@@ -39,6 +39,14 @@ Node * getNewNode(int n) {
   return new_node;
 }
 
+void
+bptree_insert (Node *node, int data)
+{
+  if (node_is_leaf (node))
+    {
+    }
+}
+
 /* Return 0 if wrote ok, 1 otherwize */
 int writeNode(Node* node, int filename) {
 
