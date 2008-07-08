@@ -17,7 +17,7 @@ enum
 typedef struct
 {
   unsigned int id;
-  unsigned int order;
+  unsigned int maxsize;
   unsigned int usedsize;
   unsigned int left;
   unsigned int right;
@@ -51,9 +51,9 @@ shift_right (BPTree *tree, unsigned int pos)
 void
 bptree_insert (BPTree *tree, int key, int value)
 {
+  int has_overflowed;
   BPNode *newnode, *newroot;
   BPNode *root = tree->root;
-  int has_overflowed;
 
   has_overflowed = bpnode_insert (root, key, value);
   if (has_overflowed) /* root overflow */
@@ -71,6 +71,9 @@ bptree_insert (BPTree *tree, int key, int value)
       /* Serialize and update tree root */
       bpnode_marshal (newroot);
       bptree_update_root (tree, newroot);
+
+      bpnode_free (root);
+      bpnode_free (newnode);
     }
 }
 
@@ -80,6 +83,51 @@ bptree_update_root (BPTree *tree, BPNode *newroot)
   bpassert (tree && newroot);
 
   tree->root = newroot;
+}
+
+void
+bpnode_free (BPNode *node)
+{
+  bpassert (node);
+
+  free (node->keys);
+  free (node->values);
+  free (node);
+}
+
+unsigned int
+bpnode_get_id (BPNode *node)
+{
+  bpassert (node);
+  return node->id;
+}
+
+unsigned int
+bpnode_get_left_node (BPNode *node)
+{
+  bpassert (node);
+  return node->left;
+}
+
+unsigned int
+bpnode_get_maxsize (BPNode *node)
+{
+  bpassert (node);
+  return node->maxsize;
+}
+
+unsigned int
+bpnode_get_right_node (BPNode *node)
+{
+  bpassert (node);
+  return node->right;
+}
+
+unsigned int
+bpnode_get_usedsize (BPNode *node)
+{
+  bpassert (node);
+  return node->usedsize;
 }
 
 BPNodeType
@@ -145,4 +193,6 @@ bpnode_marshal (BPNode *node)
   /* In case it's not a leaf node, write the last pointer */
   if (!bpnode_is_leaf (node))
     fwrite (&(node->values[usedsize]), sizeof (unsigned int), 1, fp);
+
+  fclose (fp);
 }
