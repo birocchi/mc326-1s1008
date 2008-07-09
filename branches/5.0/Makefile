@@ -10,7 +10,7 @@
 CC=gcc
 CFLAGS=-c -Wall -g -ansi -pedantic
 LDFLAGS=-lefence
-OFILES=bptree.o btree.o file.o io.o main.o mem.o menu.o
+OFILES=bptree.o file.o io.o main.o mem.o menu.o
 
 TP=tp5
 
@@ -20,9 +20,6 @@ art: $(OFILES)
 	$(CC) $(LDFLAGS) $(OFILES) -o $(TP)
 
 bptree.o: bptree.c bptree.h
-	$(CC) $(CFLAGS) $<
-
-btree.o: btree.c btree.h
 	$(CC) $(CFLAGS) $<
 
 file.o: file.c file.h

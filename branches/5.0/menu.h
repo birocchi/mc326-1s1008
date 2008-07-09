@@ -24,7 +24,6 @@ char menuMultipleAnswers (const char *msg, const char *optstring);
  * This is a wrapper around menuMultipleAnswers, passing "sn" as
  * the option string.
  */
-//int menuYesOrNo (const char *msg);
 
 /**
  * \brief Prin the options for a search in the database.
@@ -35,8 +34,6 @@ void printConsultMenu (void);
  * \brief Print the options for the main menu.
  */
 void printMainMenu (void);
-
-//void print_search_type_menu (void);
 
 /**
  * \brief Print a nifty welcome message.

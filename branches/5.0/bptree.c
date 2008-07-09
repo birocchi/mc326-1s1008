@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include "bptree.h"
 #include "file.h"
+#include "io.h"
 #include "mem.h"
 
 #ifdef DEBUG
@@ -11,11 +13,11 @@
 #endif
 
 static unsigned int
-get_position_for (BPTree *tree, int key)
+get_position_for (BPNode *node, int key)
 {
   unsigned int i;
 
-  for (i = 0; (i < tree->keycount) && (tree->keys[i] < key); i++);
+  for (i = 0; (i < node->usedsize) && (node->keys[i] < key); i++);
 
   return i;
 }
@@ -35,6 +37,8 @@ make_node_name (unsigned int id)
 static void
 shift_right (BPNode *node, unsigned int pos)
 {
+  unsigned int i;
+
   if (!bpnode_is_leaf (node))
     node->values[node->usedsize + 1] = node->values[node->usedsize];
 
@@ -139,19 +143,23 @@ bptree_new (void)
   else
     {
       root = bpnode_new (BP_TYPE_LEAF);
-      bptree_update_root (tree, root);
+      bptree_update_root (ret, root);
     }
+
+  return ret;
 }
 
 void
 bptree_update_root (BPTree *tree, BPNode *newroot)
 {
   FILE *rootid = fopen (BP_ROOTID_FILE, "w");
+  unsigned int id;
 
   bpassert (tree && newroot && rootid);
 
   tree->root = newroot;
-  fwrite (&(bpnode_get_id (newroot)), sizeof (unsigned int), 1, rootid);
+  id = bpnode_get_id (tree->root);
+  fwrite (&id, sizeof (unsigned int), 1, rootid);
 
   fclose (rootid);
 }
@@ -229,9 +237,6 @@ bpnode_insert (BPNode *node, int key, int value)
 
       node->keys[pos] = key;
       node->values[pos] = value;
-
-      if (bpnode_is_full (node))
-        has_overflowed = 1;
     }
   else
     {
@@ -248,9 +253,9 @@ bpnode_insert (BPNode *node, int key, int value)
           else /* Only then split the node */
             {
               newnode = bpnode_new (bpnode_get_type (childnode));
-              bpnode_split (childnode, newnode);
+              bpnode_split (childnode, newnode, &midpos);
 
-              shift_right (node, pos, &midpos);
+              shift_right (node, pos);
               node->keys[pos] = childnode->keys[midpos];
               node->values[pos + 1] = bpnode_get_id (newnode);
 
@@ -279,22 +284,28 @@ bpnode_is_leaf (BPNode *node)
 void
 bpnode_marshal (BPNode *node)
 {
+  BPNodeType t;
   FILE *fp;
-  unsigned int i, maxsize, usedsize;
+  unsigned int i, usedsize;
 
   bpassert (node);
 
-  fp = fopen (bpnode_get_filename (node), "w");
+  fp = fopen (make_node_name (node->id), "w");
   bpassert (fp);
 
   usedsize = bpnode_get_usedsize (node);
 
   /* Write header (fixed-size information) */
   fputc (bpnode_get_type (node), fp);
-  fwrite (&(bpnode_get_maxsize (node)), sizeof (unsigned int), 1, fp);
+  i = bpnode_get_maxsize (node);
+  fwrite (&i, sizeof (unsigned int), 1, fp);
   fwrite (&usedsize, sizeof (unsigned int), 1, fp);
-  fwrite (&(bpnode_get_left_node (node)), sizeof (unsigned int), 1, fp);
-  fwrite (&(bpnode_get_right_node (node)), sizeof (unsigned int), 1, fp);
+  i = bpnode_get_left_node (node);
+  fwrite (&i, sizeof (unsigned int), 1, fp);
+  i = bpnode_get_right_node (node);
+  fwrite (&i, sizeof (unsigned int), 1, fp);
+  t = bpnode_get_type (node);
+  fwrite (&t, sizeof (BPNodeType), 1, fp);
 
   /* Variable-length information */
   for (i = 0; i < usedsize; i++)
@@ -321,8 +332,8 @@ bpnode_new (BPNodeType type)
   ret->left = 0;
   ret->right = 0;
 
-  ret->keys = MEM_ALLOC_N (unsigned int, BPTREE_ORDER + 1);
-  ret->values = MEM_ALLOC_N (unsigned int, BPTREE_ORDER + 2);
+  ret->keys = MEM_ALLOC_N (int, BPTREE_ORDER + 1);
+  ret->values = MEM_ALLOC_N (int, BPTREE_ORDER + 2);
 
   return ret;
 }
@@ -346,8 +357,8 @@ bpnode_rotate_left (BPNode *node, unsigned int *id)
       return 0;
     }
 
-  leftnode->keys[leafnode->usedsize] = node->keys[0];
-  leftnode->values[leafnode->usedsize] = node->values[0];
+  leftnode->keys[leftnode->usedsize] = node->keys[0];
+  leftnode->values[leftnode->usedsize] = node->values[0];
   leftnode->usedsize++;
 
   for (i = 0; i < node->usedsize; i++)
@@ -370,7 +381,6 @@ int
 bpnode_rotate_right (BPNode *node, unsigned int *id)
 {
   BPNode *rightnode;
-  unsigned int i;
 
   bpassert (node);
 
@@ -402,7 +412,7 @@ bpnode_rotate_right (BPNode *node, unsigned int *id)
 void
 bpnode_split (BPNode *curnode, BPNode *newnode, unsigned int *midpos)
 {
-  unsigned int i, mid;
+  unsigned int i, j, mid;
 
   bpassert (curnode && newnode);
 
@@ -436,7 +446,7 @@ bpnode_unmarshal (unsigned int id)
   BPNode *node;
   char *fp_name;
   FILE *fp;
-  unsigned int i, maxsize, usedsize;
+  unsigned int i;
 
   node = bpnode_new (BP_TYPE_NODE);
 
@@ -451,6 +461,7 @@ bpnode_unmarshal (unsigned int id)
   fread (&(node->usedsize), sizeof (unsigned int), 1, fp);
   fread (&(node->left), sizeof (unsigned int), 1, fp);
   fread (&(node->right), sizeof (unsigned int), 1, fp);
+  fread (&(node->type), sizeof (BPNodeType), 1, fp);
 
   /* Variable-length information */
   for (i = 0; i < node->usedsize; i++)
