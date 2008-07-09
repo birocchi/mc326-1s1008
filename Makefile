@@ -38,4 +38,4 @@ menu.o: menu.c menu.h
 	$(CC) $(CFLAGS) $<
 
 clean:
-	rm -rf doc/ *.o $(TP);
+	rm -rf *.o $(TP) 0 *.bpx;
