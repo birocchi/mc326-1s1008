@@ -9,7 +9,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include "file.h"
-#include "hash.h"
 
 int
 file_exists (const char *filename)

@@ -3,7 +3,6 @@
 
 #include <stdarg.h>
 #include <stdio.h>
-#include "base.h"
 
 /**
  * \brief Wrapper around read_value to read a single character (and
