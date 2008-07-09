@@ -21,9 +21,6 @@ main (int argc, char *argv[])
   int halt = 0;
 
   tree = bptree_new ();
-  /*Primeiro tenta carregar o arquivo pra memoria*/
-  if( !file_exists("BPNODE_NAME") ){
-    node = /*funcao que carrega o arquivo e retorna um apontador pro nodo raíz*/
   
   printWelcome();
 
