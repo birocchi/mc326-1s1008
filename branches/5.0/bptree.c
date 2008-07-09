@@ -16,12 +16,8 @@ static unsigned int
 get_position_for (BPNode *node, int key)
 {
   unsigned int i = 0;
-  printf("%u\n", node->usedsize);
 
-  for (i = 0; (i < node->usedsize) && (node->keys[i] <= key); i++)
-  {
-  printf("%u %u\n", node->keys[i], key);
-  }
+  for (i = 0; (i < node->usedsize) && (node->keys[i] <= key); i++);
 
   return i;
 }
@@ -238,7 +234,10 @@ bpnode_insert (BPNode *node, int key, int value)
       pos = get_position_for (node, key);
 
       if ((pos > 0) && (node->keys[pos-1] == key))
-        return 0;
+        {
+          printf ("Erro: a chave %d ja foi inserida.\n", key);
+          return 0;
+        }
 
       shift_right (node, pos);
 
@@ -248,7 +247,6 @@ bpnode_insert (BPNode *node, int key, int value)
   else
     {
       pos = get_position_for (node, key);
-      printf ("pos: %u\n", pos);
       childnode = bpnode_unmarshal (node->values[pos]);
 
       child_overflow = bpnode_insert (childnode, key, value);
@@ -261,7 +259,6 @@ bpnode_insert (BPNode *node, int key, int value)
           else /* Only then split the node */
             {
               newnode = bpnode_new (bpnode_get_type (childnode), 1);
-              printf("id: %u\n", newnode->id);
               bpnode_split (childnode, newnode, &midpos);
 
               shift_right (node, pos);
@@ -421,6 +418,36 @@ bpnode_rotate_right (BPNode *node, unsigned int *id)
   bpnode_marshal (node);
 
   return 1;
+}
+
+int
+bpnode_search (BPNode *node, int key, int *not_found)
+{
+  BPNode *childnode;
+  unsigned int i, pos;
+
+  bpassert (node);
+
+  if (bpnode_is_leaf (node))
+    {
+      for (i = 0; i < node->usedsize; i++)
+        {
+          if (node->keys[i] == key)
+            {
+              *not_found = 0;
+              return node->values[i];
+            }
+        }
+
+      *not_found = 1;
+      return 0;
+    }
+  else
+    {
+      pos = get_position_for (node, key);
+      childnode = bpnode_unmarshal (node->values[pos]);
+      return bpnode_search (childnode, key, not_found);
+    }
 }
 
 void

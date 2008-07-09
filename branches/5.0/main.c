@@ -15,6 +15,7 @@ main (int argc, char *argv[])
 {
   BPTree *tree;
   char strkey[INTLEN+1], strvalue[INTLEN+1];
+  int no_key;
   int key, value;
   int halt = 0;
 
@@ -39,7 +40,15 @@ main (int argc, char *argv[])
         break;
 
       case 'b':
-        printf ("Nao implementado.\n");
+        read_int ("Digite a chave a ser buscada: ", strkey, INTLEN);
+        key = atoll (strkey);
+
+        value = bpnode_search (tree->root, key, &no_key);
+
+        if (no_key)
+          printf ("Chave %d nao encontrada.\n", key);
+        else
+          printf ("Valor da chave %d: %d\n", key, value);
         break;
 
       case 's':
