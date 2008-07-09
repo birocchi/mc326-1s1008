@@ -117,7 +117,7 @@ bptree_insert (BPTree *tree, int key, int value)
     }
 }
 
-static BPTree *
+BPTree *
 bptree_new (void)
 {
   FILE *rootid_fp;
@@ -209,27 +209,6 @@ bpnode_get_type (BPNode *node)
   bpassert (node);
 
   return node->type;
-}
-
-BPNode *
-find_leaf_node (BPNode *node, int key)
-{
-  BPNode *ret = node, *tmpnode;
-  unsigned int pos;
-
-  bpassert (node);
-
-  if (bpnode_is_leaf (node))
-    return node;
-  else
-    {
-      pos = get_position_for (node, key);
-      tmpnode = bpnode_unmarshal (node->values[pos]);
-      ret = find_leaf_node (tmpnode, key);
-      bpnode_free (tmpnode);
-    }
-
-  return ret;
 }
 
 int
