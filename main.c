@@ -1,28 +1,29 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "bplustree.h"
+#include "bptree.h"
+#include "file.h"
+#include "io.h"
+#include "mem.h"
+#include "menu.h"
+
+                     /*colocar o nome do nodo raiz aki*/
+#define "BPNODE_NAME "0.bpnode"
 
 int main() {
-  B+Tree tree;
+  BPNode *node;
   char option;
   int registro,busca;
 
-  tree = getNewB+Tree(); 
-
-  /*void loadBase(); alguma função que carregue os dados que ja estao na base*/
-
+  /*Primeiro tenta carregar o arquivo pra memoria*/
+  if( !file_exists("BPNODE_NAME") ){
+    node = /*funcao que carrega o arquivo e retorna um apontador pro nodo raíz*/
+  
+  printWelcome();
 
   do {
-    printf("  #############\n");
-    printf("  # (I)nserir #\n");
-    printf("  # (R)emover #\n");
-    printf("  # (B)uscar  #\n");
-    printf("  # (S)air    #\n");
-    printf("  #############\n");
-    printf("  Escolha uma opção: ");
-    scanf("%c", &option);
+    printMainMenu ();
 
-    switch( tolower(option) ) {
+    switch (menuMultipleAnswers ("   Opcao desejada: ", "irbs"))) {
       case 'i':
         printf("Digite o registro a ser inserido: ");
         scanf("%d", &registro);
@@ -43,11 +44,14 @@ int main() {
 
       case 's':
         break;
+   
+      default:
+        break;
     }
   } while(option);
   
   /* Frees the memory used by the B+tree */
-  free(tree);
+  free(node);
 
   return 0;
 }
