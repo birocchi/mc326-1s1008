@@ -37,14 +37,15 @@ get_position_for (BPTree *tree, int key)
 }
 
 static void
-shift_right (BPTree *tree, unsigned int pos)
+shift_right (BPNode *node, unsigned int pos)
 {
-  unsigned int i = pos + 1;
+  if (!bpnode_is_leaf (node))
+    node->values[node->usedsize + 1] = node->values[node->usedsize];
 
-  for (i = pos + 1; i < tree->keycount; i++)
+  for (i = node->usedsize; i > pos; i--)
     {
-      tree->keys[i] = tree->keys[i-1];
-      tree->values[i] = tree->values[i-1];
+      node->keys[i] = node->keys[i-1];
+      node->values[i] = node->values[i-1];
     }
 }
 
@@ -162,7 +163,7 @@ find_leaf_node (BPNode *node, int key)
 int
 bpnode_insert (BPNode *node, int key, int value)
 {
-  BPNode *leafnode;
+  BPNode *newnode, *tmpnode;
   int child_overflow = 0, has_overflowed = 0;
   unsigned int pos;
 
@@ -196,6 +197,10 @@ bpnode_insert (BPNode *node, int key, int value)
             node->keys[pos] = id;
           else /* Only then split the node */
             {
+              newnode = bpnode_new (bpnode_get_type (tmpnode));
+              bpnode_split (tmpnode, newnode);
+
+              shift_right (node, pos);
             }
         }
     }
@@ -206,7 +211,7 @@ bpnode_insert (BPNode *node, int key, int value)
 int
 bpnode_is_full (BPNode *node)
 {
-  return bpnode_get_maxsize (node) == bpnode_get_maxsize (node);
+  return bpnode_get_usedsize (node) >= (bpnode_get_maxsize (node) - 1);
 }
 
 int
