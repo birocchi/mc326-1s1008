@@ -162,6 +162,7 @@ find_leaf_node (BPNode *node, int key)
 int
 bpnode_insert (BPNode *node, int key, int value)
 {
+  BPNode *leafnode;
   int child_overflow = 0, has_overflowed = 0;
   unsigned int pos;
 
@@ -183,8 +184,20 @@ bpnode_insert (BPNode *node, int key, int value)
     }
   else
     {
-      leafnode = find_leaf_node (node, key);
       pos = get_position_for (node, key);
+      tmpnode = bpnode_unmarshal (node->values[pos]);
+
+      child_overflow = bpnode_insert (tmpnode, key, value);
+      if (child_overflow)
+        {
+          if (rotate_left (tmpnode, &id)) /* First try to rotate left */
+            node->keys[pos-1] = id;
+          else if (rotate_right (tmpnode, &id)) /* Then rotate right */
+            node->keys[pos] = id;
+          else /* Only then split the node */
+            {
+            }
+        }
     }
 
   return has_overflowed;
@@ -206,7 +219,7 @@ void
 bpnode_marshal (BPNode *node)
 {
   FILE *fp;
-  unsigned int maxsize, usedsize;
+  unsigned int i, maxsize, usedsize;
 
   bpassert (node);
 
@@ -251,36 +264,38 @@ make_node_name (unsigned int id)
 BPNode *
 bpnode_unmarshal (unsigned int id)
 {
+  BPNode *node;
   char *fp_name;
   FILE *fp;
-  unsigned int maxsize, usedsize;
+  unsigned int i, maxsize, usedsize;
+
+  node = bpnode_new (BP_TYPE_NODE);
 
   fp_name = make_node_name (id);
+  bpassert (file_is_valid (fp_name));
 
-  bpassert (file_is_valid (aaa));
-
-  fp = fopen (bpnode_get_filename (node), "w");
+  fp = fopen (fp_name, "r");
   bpassert (fp);
 
-  usedsize = bpnode_get_usedsize (node);
-
-  /* Write header (fixed-size information) */
-  fputc (bpnode_get_type (node), fp);
-  fwrite (&(bpnode_get_maxsize (node)), sizeof (unsigned int), 1, fp);
-  fwrite (&usedsize, sizeof (unsigned int), 1, fp);
-  fwrite (&(bpnode_get_left_node (node)), sizeof (unsigned int), 1, fp);
-  fwrite (&(bpnode_get_right_node (node)), sizeof (unsigned int), 1, fp);
+  node->id = fgetc (fp);
+  fread (&(node->maxsize), sizeof (unsigned int), 1, fp);
+  fread (&(node->usedsize), sizeof (unsigned int), 1, fp);
+  fread (&(node->left), sizeof (unsigned int), 1, fp);
+  fread (&(node->right), sizeof (unsigned int), 1, fp);
 
   /* Variable-length information */
-  for (i = 0; i < usedsize; i++)
-    fwrite (&(node->keys[i]), sizeof (int), 1, fp);
+  for (i = 0; i < node->usedsize; i++)
+    fread (&(node->keys[i]), sizeof (int), 1, fp);
 
-  for (i = 0; i < usedsize; i++)
-    fwrite (&(node->values[i]), sizeof (int), 1, fp);
+  for (i = 0; i < node->usedsize; i++)
+    fread (&(node->values[i]), sizeof (int), 1, fp);
 
   /* In case it's not a leaf node, write the last pointer */
   if (!bpnode_is_leaf (node))
-    fwrite (&(node->values[usedsize]), sizeof (int), 1, fp);
+    fread (&(node->values[node->usedsize]), sizeof (int), 1, fp);
 
+  free (fp_name);
   fclose (fp);
+
+  return node;
 }
