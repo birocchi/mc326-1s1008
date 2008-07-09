@@ -1,3 +1,5 @@
+#define _XOPEN_SOURCE 600
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "bptree.h"
@@ -6,14 +8,19 @@
 #include "mem.h"
 #include "menu.h"
 
-                     /*colocar o nome do nodo raiz aki*/
-#define "BPNODE_NAME "0.bpnode"
+#define UINTLEN 10 /* In a 32-bit system, UINT_MAX has 10 digits */
 
-int main() {
+int
+main (int argc, char *argv[])
+{
+  BPTree *tree;
   BPNode *node;
-  char option;
-  int registro,busca;
+  char strkey[UINTLEN+1], strvalue[UINTLEN+1];
+  int key, value;
+  int registro, busca;
+  int halt = 0;
 
+  tree = bptree_new ();
   /*Primeiro tenta carregar o arquivo pra memoria*/
   if( !file_exists("BPNODE_NAME") ){
     node = /*funcao que carrega o arquivo e retorna um apontador pro nodo raíz*/
@@ -23,35 +30,35 @@ int main() {
   do {
     printMainMenu ();
 
-    switch (menuMultipleAnswers ("   Opcao desejada: ", "irbs"))) {
+    switch (menuMultipleAnswers ("   Opcao desejada: ", "irbs")) {
       case 'i':
-        printf("Digite o registro a ser inserido: ");
-        scanf("%d", &registro);
-        /*void insert(); alguma função que insere*/
+        read_int ("Digite a chave a ser inserida: ", strkey, UINTLEN);
+        key = atoll (strkey);
+        read_int ("Digite o valor a ser inserido: ", strkey, UINTLEN);
+        value = atoll (strvalue);
+        bptree_insert (tree, key, value);
         break;
 
       case 'r':
-        printf("Digite o registro a ser removido: ");
-        scanf("%d", &registro);
-        /*void remove(); alguma função que remove*/
+        printf ("Nao implementado.\n");
         break;
 
       case 'b': 
-        printf("Digite a o numero a ser buscado: ");
+        printf ("Digite a o numero a ser buscado: ");
         scanf("%d", &busca);
         /*void search(); alguma função de busca*/
         break;
 
       case 's':
+        halt = 1;
         break;
    
       default:
         break;
     }
-  } while(option);
+  } while (!halt);
   
-  /* Frees the memory used by the B+tree */
-  free(node);
+  bptree_free (tree);
 
   return 0;
 }
