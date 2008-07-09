@@ -43,10 +43,8 @@ main (int argc, char *argv[])
         printf ("Nao implementado.\n");
         break;
 
-      case 'b': 
-        printf ("Digite a o numero a ser buscado: ");
-        scanf("%d", &busca);
-        /*void search(); alguma função de busca*/
+      case 'b':
+        printf ("Nao implementado.\n");
         break;
 
       case 's':
