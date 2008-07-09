@@ -67,6 +67,7 @@ void
 bptree_insert (BPTree *tree, int key, int value)
 {
   int has_overflowed;
+  unsigned int midpos = 0;
   BPNode *newnode, *newroot;
   BPNode *root = tree->root;
 
@@ -76,14 +77,14 @@ bptree_insert (BPTree *tree, int key, int value)
       newnode = bpnode_new (bpnode_get_type (root));
       newroot = bpnode_new (BP_TYPE_NODE);
 
-      bpnode_split (root, newnode);
+      bpnode_split (root, newnode, &midpos);
 
-      newroot->keys[0] = bpnode_get_largest_key (root);
+      newroot->keys[0] = root->keys[midpos];
       newroot->values[0] = bpnode_get_id (root);
       newroot->values[1] = bpnode_get_id (newnode);
-      newroot->numkeys = 2;
+      newroot->usedsize = 2;
 
-      /* Serialize and update tree root */
+      /* Serialize and update */
       bpnode_marshal (newroot);
       bptree_update_root (tree, newroot);
 
@@ -104,6 +105,8 @@ void
 bpnode_free (BPNode *node)
 {
   bpassert (node);
+
+  bpnode_marshal (node);
 
   free (node->keys);
   free (node->values);
@@ -179,7 +182,7 @@ bpnode_insert (BPNode *node, int key, int value)
 {
   BPNode *newnode, *childnode;
   int child_overflow = 0;
-  unsigned int pos;
+  unsigned int pos, midpos = 0;
 
   if (bpnode_is_leaf (node))
     {
@@ -213,8 +216,8 @@ bpnode_insert (BPNode *node, int key, int value)
               newnode = bpnode_new (bpnode_get_type (childnode));
               bpnode_split (childnode, newnode);
 
-              shift_right (node, pos);
-              node->keys[pos] = newnode->keys[0];
+              shift_right (node, pos, &midpos);
+              node->keys[pos] = childnode->keys[midpos];
               node->values[pos + 1] = bpnode_get_id (newnode);
 
               bpnode_free (childnode);
@@ -270,6 +273,37 @@ bpnode_marshal (BPNode *node)
     fwrite (&(node->values[usedsize]), sizeof (int), 1, fp);
 
   fclose (fp);
+}
+
+void
+bpnode_split (BPNode *curnode, BPNode *newnode, unsigned int *midpos)
+{
+  unsigned int i, mid;
+
+  bpassert (curnode && newnode);
+
+  *midpos = bpnode_get_maxsize (curnode) / 2;
+  mid = (bpnode_is_leaf (curnode) ? *midpos : *midpos + 1);
+
+  for (i = 0, j = mid; j < curnode->maxsize; i++, j++)
+    {
+      newnode->keys[i] = curnode->keys[j];
+      newnode->values[i] = curnode->values[j];
+    }
+
+  if (bpnode_is_leaf (curnode))
+    curnode->usedsize = mid;
+  else
+    curnode->usedsize = mid - 1;
+
+  newnode->usedsize = (bpnode_get_maxsize (curnode) - mid) + 1;
+
+  newnode->left = bpnode_get_id (curnode);
+  newnode->right = bpnode_get_right_node (curnode);
+  curnode->right = bpnode_get_id (newnode);
+
+  bpnode_marshal (curnode);
+  bpnode_marshal (newnode);
 }
 
 BPNode *
