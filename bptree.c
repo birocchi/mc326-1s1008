@@ -182,7 +182,7 @@ bpnode_insert (BPNode *node, int key, int value)
 {
   BPNode *newnode, *childnode;
   int child_overflow = 0;
-  unsigned int pos, midpos = 0;
+  unsigned int id = 0, pos, midpos = 0;
 
   if (bpnode_is_leaf (node))
     {
@@ -207,9 +207,9 @@ bpnode_insert (BPNode *node, int key, int value)
       child_overflow = bpnode_insert (childnode, key, value);
       if (child_overflow)
         {
-          if (rotate_left (childnode, &id)) /* First try to rotate left */
+          if (bpnode_rotate_left (childnode, &id)) /* First try to rotate left */
             node->keys[pos-1] = id;
-          else if (rotate_right (childnode, &id)) /* Then rotate right */
+          else if (bpnode_rotate_right (childnode, &id)) /* Then rotate right */
             node->keys[pos] = id;
           else /* Only then split the node */
             {
@@ -273,6 +273,33 @@ bpnode_marshal (BPNode *node)
     fwrite (&(node->values[usedsize]), sizeof (int), 1, fp);
 
   fclose (fp);
+}
+
+int
+bpnode_rotate_left (BPNode *node, unsigned int *id)
+{
+  BPNode *leftnode;
+  unsigned int i;
+
+  bpassert (node);
+
+  if ((node->left == 0) || (bpnode_is_full (left)) || (!bpnode_is_leaf (node)))
+    return 0;
+
+  leftnode = bpnode_unmarshal (node->left);
+  leftnode->keys[leafnode->usedsize] = node->keys[0];
+  leftnode->values[leafnode->usedsize] = node->values[0];
+  leftnode->usedsize++;
+
+  for (i = 0; i < node->usedsize; i++)
+    {
+      node->keys[i] = node->keys[i+1];
+      node->values[i] = node->values[i+1];
+    }
+
+  *id = node->keys[0];
+
+  return 1;
 }
 
 void
