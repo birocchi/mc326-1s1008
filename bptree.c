@@ -305,9 +305,44 @@ bpnode_rotate_left (BPNode *node, unsigned int *id)
       node->values[i] = node->values[i+1];
     }
 
+  node->usedsize--;
+
   *id = node->keys[0];
 
   bpnode_free (leftnode);
+  bpnode_marshal (node);
+
+  return 1;
+}
+
+int
+bpnode_rotate_right (BPNode *node, unsigned int *id)
+{
+  BPNode *rightnode;
+  unsigned int i;
+
+  bpassert (node);
+
+  if ((node->right == 0) || (!bpnode_is_leaf (node)))
+    return 0;
+
+  rightnode = bpnode_unmarshal (node->right);
+
+  if (bpnode_is_full (rightnode))
+    {
+      bpnode_free (rightnode);
+      return 0;
+    }
+
+  shift_right (rightnode, 0);
+  rightnode->keys[0] = node->keys[node->usedsize];
+  rightnode->values[0] = node->values[node->usedsize];
+
+  node->usedsize--;
+
+  *id = rightnode->keys[0];
+
+  bpnode_free (rightnode);
   bpnode_marshal (node);
 
   return 1;
