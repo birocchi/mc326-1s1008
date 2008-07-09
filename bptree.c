@@ -1,4 +1,6 @@
 #include <stdlib.h>
+#include <stdio.h>
+#include "file.h"
 #include "mem.h"
 
 #ifdef DEBUG
@@ -7,24 +9,6 @@
 #else
 #define bpassert(x)
 #endif
-
-enum
-{
-  BP_TYPE_NODE,
-  BP_TYPE_LEAF
-} BPNodeType;
-
-typedef struct
-{
-  unsigned int id;
-  unsigned int maxsize;
-  unsigned int usedsize;
-  unsigned int left;
-  unsigned int right;
-
-  int *keys;
-  int *values;
-} BPNode;
 
 static unsigned int
 get_position_for (BPTree *tree, int key)
@@ -64,6 +48,46 @@ shift_right (BPNode *node, unsigned int pos)
 }
 
 void
+bptree_free (BPTree *tree)
+{
+  bpassert (tree);
+
+  bpnode_free (tree->root);
+  free (tree);
+}
+
+unsigned int
+bptree_get_next_id (void)
+{
+  FILE *nextid;
+  int created_now = 0;
+  unsigned int id = 1;
+
+  bpassert (tree);
+
+  if (file_is_valid (BP_NEXTID_FILE))
+    {
+      nextid = fopen (BP_NEXTID_FILE, "r");
+      bpassert (nextid);
+
+      fread (&id, sizeof (unsigned int), 1, nextid);
+      fclose (nextid);
+
+      created_now = 1;
+    }
+
+  nextid = fopen (BP_NEXTID_FILE, "w");
+  bpassert (nextid);
+
+  if (!created_now)
+    id++;
+
+  fwrite (&id, sizeof (unsigned int), 1, nextid);
+
+  return (created_now ? id : id - 1);
+}
+
+void
 bptree_insert (BPTree *tree, int key, int value)
 {
   int has_overflowed;
@@ -93,12 +117,43 @@ bptree_insert (BPTree *tree, int key, int value)
     }
 }
 
+static BPTree *
+bptree_new (void)
+{
+  FILE *rootid_fp;
+  unsigned int rootid;
+  BPNode *root;
+  BPTree *ret = MEM_ALLOC (BPTree);
+
+  if (file_is_valid (BP_ROOTID_FILE))
+    {
+      rootid_fp = fopen (BP_ROOTID_FILE, "r");
+      bpassert (rootid_fp);
+
+      fread (&rootid, sizeof (unsigned int), 1, rootid_fp);
+
+      ret->root = bpnode_unmarshal (rootid);
+
+      fclose (rootid_fp);
+    }
+  else
+    {
+      root = bpnode_new (BP_TYPE_LEAF);
+      bptree_update_root (tree, root);
+    }
+}
+
 void
 bptree_update_root (BPTree *tree, BPNode *newroot)
 {
-  bpassert (tree && newroot);
+  FILE *rootid = fopen (BP_ROOTID_FILE, "w");
+
+  bpassert (tree && newroot && rootid);
 
   tree->root = newroot;
+  fwrite (&(bpnode_get_id (newroot)), sizeof (unsigned int), 1, rootid);
+
+  fclose (rootid);
 }
 
 void
