@@ -8,16 +8,14 @@
 #include "mem.h"
 #include "menu.h"
 
-#define UINTLEN 9 /* In a 32-bit system, INT_MAX has 10 digits */
+#define INTLEN 9 /* In a 32-bit system, INT_MAX has 10 digits */
 
 int
 main (int argc, char *argv[])
 {
   BPTree *tree;
-  BPNode *node;
-  char strkey[UINTLEN+1], strvalue[UINTLEN+1];
+  char strkey[INTLEN+1], strvalue[INTLEN+1];
   int key, value;
-  int registro, busca;
   int halt = 0;
 
   tree = bptree_new ();
