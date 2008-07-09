@@ -276,6 +276,23 @@ bpnode_marshal (BPNode *node)
   fclose (fp);
 }
 
+BPNode *
+bpnode_new (BPNodeType type)
+{
+  BPNode *ret = MEM_ALLOC (BPNode);
+
+  ret->id = bptree_get_next_id ();
+  ret->maxsize = BPTREE_ORDER;
+  ret->usedsize = 0;
+  ret->left = 0;
+  ret->right = 0;
+
+  ret->keys = MEM_ALLOC_N (unsigned int, BPTREE_ORDER + 1);
+  ret->values = MEM_ALLOC_N (unsigned int, BPTREE_ORDER + 2);
+
+  return ret;
+}
+
 int
 bpnode_rotate_left (BPNode *node, unsigned int *id)
 {
