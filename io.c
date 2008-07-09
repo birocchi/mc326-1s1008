@@ -39,7 +39,7 @@ read_int (const char *inputText, char *dest, size_t length)
 
       for (i = 0; i < strlen (dest); i++)
         {
-          if (!isdigit (dest[i]))
+          if (((!isdigit (dest[i])) && (i != 0)) || (i == 0 && (!isdigit(dest[i]) && (dest[i] != '-'))))
             {
               printf ("   Entrada invalida.\n");
               invalid = 1;

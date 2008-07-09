@@ -8,7 +8,7 @@
 #include "mem.h"
 #include "menu.h"
 
-#define UINTLEN 10 /* In a 32-bit system, UINT_MAX has 10 digits */
+#define UINTLEN 9 /* In a 32-bit system, INT_MAX has 10 digits */
 
 int
 main (int argc, char *argv[])
@@ -29,9 +29,9 @@ main (int argc, char *argv[])
 
     switch (menuMultipleAnswers ("   Opcao desejada: ", "irbs")) {
       case 'i':
-        read_int ("Digite a chave a ser inserida: ", strkey, UINTLEN);
+        read_int ("Digite a chave a ser inserida: ", strkey, INTLEN);
         key = atoll (strkey);
-        read_int ("Digite o valor a ser inserido: ", strkey, UINTLEN);
+        read_int ("Digite o valor a ser inserido: ", strvalue, INTLEN);
         value = atoll (strvalue);
         bptree_insert (tree, key, value);
         break;

@@ -8,7 +8,7 @@
 #
 
 CC=gcc
-CFLAGS=-c -Wall -g -ansi -pedantic
+CFLAGS=-c -Wall -g -ansi -pedantic -DDEBUG
 LDFLAGS=-lefence
 OFILES=bptree.o file.o io.o main.o mem.o menu.o
 
