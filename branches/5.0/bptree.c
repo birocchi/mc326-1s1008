@@ -15,9 +15,13 @@
 static unsigned int
 get_position_for (BPNode *node, int key)
 {
-  unsigned int i;
+  unsigned int i = 0;
+  printf("%u\n", node->usedsize);
 
-  for (i = 0; (i < node->usedsize) && (node->keys[i] < key); i++);
+  for (i = 0; (i < node->usedsize) && (node->keys[i] <= key); i++)
+  {
+  printf("%u %u\n", node->keys[i], key);
+  }
 
   return i;
 }
@@ -39,10 +43,10 @@ shift_right (BPNode *node, unsigned int pos)
 {
   unsigned int i;
 
-  if (!bpnode_is_leaf (node))
+  if (bpnode_is_leaf (node))
     node->values[node->usedsize + 1] = node->values[node->usedsize];
 
-  for (i = node->usedsize; i > pos; i--)
+  for (i = (node->usedsize == 0 ? 1 : node->usedsize); i > pos; i--)
     {
       node->keys[i] = node->keys[i-1];
       node->values[i] = node->values[i-1];
@@ -64,10 +68,8 @@ unsigned int
 bptree_get_next_id (void)
 {
   FILE *nextid;
-  int created_now = 0;
+  int created_now = 1;
   unsigned int id = 1;
-
-  bpassert (tree);
 
   if (file_is_valid (BP_NEXTID_FILE))
     {
@@ -77,7 +79,7 @@ bptree_get_next_id (void)
       fread (&id, sizeof (unsigned int), 1, nextid);
       fclose (nextid);
 
-      created_now = 1;
+      created_now = 0;
     }
 
   nextid = fopen (BP_NEXTID_FILE, "w");
@@ -87,8 +89,11 @@ bptree_get_next_id (void)
     id++;
 
   fwrite (&id, sizeof (unsigned int), 1, nextid);
+  fclose (nextid);
 
-  return (created_now ? id : id - 1);
+  return id;
+
+  /*return (created_now ? id : id - 1);*/
 }
 
 void
@@ -102,15 +107,15 @@ bptree_insert (BPTree *tree, int key, int value)
   has_overflowed = bpnode_insert (root, key, value);
   if (has_overflowed) /* root overflow */
     {
-      newnode = bpnode_new (bpnode_get_type (root));
-      newroot = bpnode_new (BP_TYPE_NODE);
+      newnode = bpnode_new (bpnode_get_type (root), 1);
+      newroot = bpnode_new (BP_TYPE_NODE, 1);
 
       bpnode_split (root, newnode, &midpos);
 
       newroot->keys[0] = root->keys[midpos];
       newroot->values[0] = bpnode_get_id (root);
       newroot->values[1] = bpnode_get_id (newnode);
-      newroot->usedsize = 2;
+      newroot->usedsize = 1;
 
       /* Serialize and update */
       bpnode_marshal (newroot);
@@ -142,7 +147,7 @@ bptree_new (void)
     }
   else
     {
-      root = bpnode_new (BP_TYPE_LEAF);
+      root = bpnode_new (BP_TYPE_LEAF, 1);
       bptree_update_root (ret, root);
     }
 
@@ -226,6 +231,8 @@ bpnode_insert (BPNode *node, int key, int value)
   int child_overflow = 0;
   unsigned int id = 0, pos, midpos = 0;
 
+  bpassert (node);
+
   if (bpnode_is_leaf (node))
     {
       pos = get_position_for (node, key);
@@ -241,6 +248,7 @@ bpnode_insert (BPNode *node, int key, int value)
   else
     {
       pos = get_position_for (node, key);
+      printf ("pos: %u\n", pos);
       childnode = bpnode_unmarshal (node->values[pos]);
 
       child_overflow = bpnode_insert (childnode, key, value);
@@ -252,7 +260,8 @@ bpnode_insert (BPNode *node, int key, int value)
             node->keys[pos] = id;
           else /* Only then split the node */
             {
-              newnode = bpnode_new (bpnode_get_type (childnode));
+              newnode = bpnode_new (bpnode_get_type (childnode), 1);
+              printf("id: %u\n", newnode->id);
               bpnode_split (childnode, newnode, &midpos);
 
               shift_right (node, pos);
@@ -272,7 +281,7 @@ bpnode_insert (BPNode *node, int key, int value)
 int
 bpnode_is_full (BPNode *node)
 {
-  return bpnode_get_usedsize (node) >= (bpnode_get_maxsize (node) - 1);
+  return bpnode_get_usedsize (node) == (bpnode_get_maxsize (node) + 1);
 }
 
 int
@@ -296,7 +305,7 @@ bpnode_marshal (BPNode *node)
   usedsize = bpnode_get_usedsize (node);
 
   /* Write header (fixed-size information) */
-  fputc (bpnode_get_type (node), fp);
+  fputc (bpnode_get_id (node), fp);
   i = bpnode_get_maxsize (node);
   fwrite (&i, sizeof (unsigned int), 1, fp);
   fwrite (&usedsize, sizeof (unsigned int), 1, fp);
@@ -322,15 +331,20 @@ bpnode_marshal (BPNode *node)
 }
 
 BPNode *
-bpnode_new (BPNodeType type)
+bpnode_new (BPNodeType type, int get_new_id)
 {
   BPNode *ret = MEM_ALLOC (BPNode);
 
-  ret->id = bptree_get_next_id ();
+  if (get_new_id)
+    ret->id = bptree_get_next_id ();
+  else
+    ret->id = 0;
+
   ret->maxsize = BPTREE_ORDER;
   ret->usedsize = 0;
   ret->left = 0;
   ret->right = 0;
+  ret->type = type;
 
   ret->keys = MEM_ALLOC_N (int, BPTREE_ORDER + 1);
   ret->values = MEM_ALLOC_N (int, BPTREE_ORDER + 2);
@@ -361,13 +375,13 @@ bpnode_rotate_left (BPNode *node, unsigned int *id)
   leftnode->values[leftnode->usedsize] = node->values[0];
   leftnode->usedsize++;
 
+  node->usedsize--;
+
   for (i = 0; i < node->usedsize; i++)
     {
       node->keys[i] = node->keys[i+1];
       node->values[i] = node->values[i+1];
     }
-
-  node->usedsize--;
 
   *id = node->keys[0];
 
@@ -395,11 +409,11 @@ bpnode_rotate_right (BPNode *node, unsigned int *id)
       return 0;
     }
 
+  node->usedsize--;
+
   shift_right (rightnode, 0);
   rightnode->keys[0] = node->keys[node->usedsize];
   rightnode->values[0] = node->values[node->usedsize];
-
-  node->usedsize--;
 
   *id = rightnode->keys[0];
 
@@ -419,7 +433,7 @@ bpnode_split (BPNode *curnode, BPNode *newnode, unsigned int *midpos)
   *midpos = bpnode_get_maxsize (curnode) / 2;
   mid = (bpnode_is_leaf (curnode) ? *midpos : *midpos + 1);
 
-  for (i = 0, j = mid; j < curnode->maxsize; i++, j++)
+  for (i = 0, j = mid; j <= curnode->maxsize; i++, j++)
     {
       newnode->keys[i] = curnode->keys[j];
       newnode->values[i] = curnode->values[j];
@@ -448,7 +462,7 @@ bpnode_unmarshal (unsigned int id)
   FILE *fp;
   unsigned int i;
 
-  node = bpnode_new (BP_TYPE_NODE);
+  node = bpnode_new (BP_TYPE_NODE, 0);
 
   fp_name = make_node_name (id);
   bpassert (file_is_valid (fp_name));
