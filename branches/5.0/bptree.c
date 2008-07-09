@@ -220,10 +220,11 @@ bpnode_insert (BPNode *node, int key, int value)
               node->keys[pos] = childnode->keys[midpos];
               node->values[pos + 1] = bpnode_get_id (newnode);
 
-              bpnode_free (childnode);
               bpnode_free (newnode);
             }
         }
+
+      bpnode_free (childnode);
     }
 
   return bpnode_is_full (node);
@@ -283,10 +284,17 @@ bpnode_rotate_left (BPNode *node, unsigned int *id)
 
   bpassert (node);
 
-  if ((node->left == 0) || (bpnode_is_full (left)) || (!bpnode_is_leaf (node)))
+  if ((node->left == 0) || (!bpnode_is_leaf (node)))
     return 0;
 
   leftnode = bpnode_unmarshal (node->left);
+
+  if (bpnode_is_full (leftnode))
+    {
+      bpnode_free (leftnode);
+      return 0;
+    }
+
   leftnode->keys[leafnode->usedsize] = node->keys[0];
   leftnode->values[leafnode->usedsize] = node->values[0];
   leftnode->usedsize++;
@@ -298,6 +306,9 @@ bpnode_rotate_left (BPNode *node, unsigned int *id)
     }
 
   *id = node->keys[0];
+
+  bpnode_free (leftnode);
+  bpnode_marshal (node);
 
   return 1;
 }
