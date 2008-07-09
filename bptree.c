@@ -36,6 +36,18 @@ get_position_for (BPTree *tree, int key)
   return i;
 }
 
+static char *
+make_node_name (unsigned int id)
+{
+  char filename[MAX_FILENAME_LENGTH];
+  int count;
+
+  count = sprintf (filename, "%u.bpx", id);
+  bpassert (count <= MAX_FILENAME_LENGTH);
+
+  return str_dup (filename);
+}
+
 static void
 shift_right (BPNode *node, unsigned int pos)
 {
@@ -47,6 +59,8 @@ shift_right (BPNode *node, unsigned int pos)
       node->keys[i] = node->keys[i-1];
       node->values[i] = node->values[i-1];
     }
+
+  node->usedsize++;
 }
 
 void
@@ -163,8 +177,8 @@ find_leaf_node (BPNode *node, int key)
 int
 bpnode_insert (BPNode *node, int key, int value)
 {
-  BPNode *newnode, *tmpnode;
-  int child_overflow = 0, has_overflowed = 0;
+  BPNode *newnode, *childnode;
+  int child_overflow = 0;
   unsigned int pos;
 
   if (bpnode_is_leaf (node))
@@ -178,7 +192,6 @@ bpnode_insert (BPNode *node, int key, int value)
 
       node->keys[pos] = key;
       node->values[pos] = value;
-      node->usedsize++;
 
       if (bpnode_is_full (node))
         has_overflowed = 1;
@@ -186,26 +199,31 @@ bpnode_insert (BPNode *node, int key, int value)
   else
     {
       pos = get_position_for (node, key);
-      tmpnode = bpnode_unmarshal (node->values[pos]);
+      childnode = bpnode_unmarshal (node->values[pos]);
 
-      child_overflow = bpnode_insert (tmpnode, key, value);
+      child_overflow = bpnode_insert (childnode, key, value);
       if (child_overflow)
         {
-          if (rotate_left (tmpnode, &id)) /* First try to rotate left */
+          if (rotate_left (childnode, &id)) /* First try to rotate left */
             node->keys[pos-1] = id;
-          else if (rotate_right (tmpnode, &id)) /* Then rotate right */
+          else if (rotate_right (childnode, &id)) /* Then rotate right */
             node->keys[pos] = id;
           else /* Only then split the node */
             {
-              newnode = bpnode_new (bpnode_get_type (tmpnode));
-              bpnode_split (tmpnode, newnode);
+              newnode = bpnode_new (bpnode_get_type (childnode));
+              bpnode_split (childnode, newnode);
 
               shift_right (node, pos);
+              node->keys[pos] = newnode->keys[0];
+              node->values[pos + 1] = bpnode_get_id (newnode);
+
+              bpnode_free (childnode);
+              bpnode_free (newnode);
             }
         }
     }
 
-  return has_overflowed;
+  return bpnode_is_full (node);
 }
 
 int
@@ -252,18 +270,6 @@ bpnode_marshal (BPNode *node)
     fwrite (&(node->values[usedsize]), sizeof (int), 1, fp);
 
   fclose (fp);
-}
-
-static char *
-make_node_name (unsigned int id)
-{
-  char filename[MAX_FILENAME_LENGTH];
-  int count;
-
-  count = sprintf (filename, "%u.bpx", id);
-  bpassert (count <= MAX_FILENAME_LENGTH);
-
-  return str_dup (filename);
 }
 
 BPNode *
